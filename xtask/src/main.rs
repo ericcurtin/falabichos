@@ -59,6 +59,9 @@ const ANDROID_ABIS: [(&str, &str); 3] = [
     ("x86_64", "x86_64-linux-android"),
 ];
 
+/// Must match `minSdk` in mobile/android/app/build.gradle (oboe/cpal link `-laaudio`, API 26+).
+const ANDROID_MIN_SDK: &str = "28";
+
 pub fn plan(task: &str, extra: &[String], host_os: &str) -> Result<Vec<Cmd>, String> {
     let release = !extra.iter().any(|a| a == "--debug");
     Ok(match task {
@@ -210,6 +213,8 @@ pub fn plan(task: &str, extra: &[String], host_os: &str) -> Result<Vec<Cmd>, Str
                 ndk.push(abi);
             }
             ndk.extend([
+                "--platform",
+                ANDROID_MIN_SDK,
                 "-o",
                 "mobile/android/app/src/main/jniLibs",
                 "build",
@@ -267,6 +272,8 @@ pub fn plan(task: &str, extra: &[String], host_os: &str) -> Result<Vec<Cmd>, Str
                         sdk,
                         "-configuration",
                         "Release",
+                        // the Rust library is arm64 only; Xcode would also link x86_64
+                        "ARCHS=arm64",
                         "CODE_SIGNING_ALLOWED=NO",
                         "build",
                     ],
@@ -377,6 +384,7 @@ mod tests {
             assert!(ndk.contains(abi), "{ndk}");
         }
         assert!(ndk.contains("android-game-activity"));
+        assert!(ndk.contains("--platform 28"), "{ndk}");
         assert_eq!(p[1].args, vec!["assembleRelease"]);
         assert_eq!(p[1].dir.as_deref(), Some(Path::new("mobile/android")));
         let aab = plan("android", &["--aab".into()], "linux").unwrap();
@@ -392,6 +400,7 @@ mod tests {
         assert!(d[0].show().contains("--target aarch64-apple-ios"));
         assert!(!d[0].show().contains("-sim"));
         // the hand-written Xcode project has no shared scheme: build by target
+        assert!(p[1].show().contains("ARCHS=arm64"));
         assert!(p[1].show().contains("-target Falabichos") && !p[1].show().contains("-scheme"));
     }
 
