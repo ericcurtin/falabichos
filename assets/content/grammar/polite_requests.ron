@@ -1,0 +1,56 @@
+// Grammar concept: Polite requests
+(
+    id: "polite_requests",
+    title: "Polite requests",
+    summary: "To ask for things politely use 'queria' (I would like), 'pode ...?' and 'se faz favor'.",
+    rules: [
+        "Queria um café, por favor. (I would like a coffee.)",
+        "Pode trazer-me a ementa, se faz favor? (Could you bring me the menu?)",
+        "Com licença is for passing; desculpe is for getting attention or apologising.",
+        "Say obrigado (man) or obrigada (woman).",
+    ],
+    examples: [
+        (pt: "Queria um café, por favor.", en: "I would like a coffee, please."),
+        (pt: "A conta, se faz favor.", en: "The bill, please."),
+        (pt: "Desculpe, onde fica a casa de banho?", en: "Excuse me, where is the toilet?"),
+    ],
+    pt_pt_note: "'Queria' (imperfect) is the standard polite way to order. 'Quero' alone sounds blunt.",
+    exercises: [
+        (
+            id: "pr_1", kind: Choice,
+            prompt: "Ordering politely at a café:", prompt_lang: En,
+            options: ["Queria um café, por favor.", "Eu quero café!", "Dá café."],
+            answer: ["Queria um café, por favor."],
+            explanation: "Queria + por favor is the polite order.",
+        ),
+        (
+            id: "pr_2", kind: FillBlank,
+            prompt: "Pode ___-me a ementa, se faz favor?",
+            context: "Could you bring me the menu, please?",
+            options: ["trazer", "traz", "trazendo"],
+            answer: ["trazer"],
+            explanation: "Pode + infinitive.",
+        ),
+        (
+            id: "pr_3", kind: Choice,
+            prompt: "To get past someone politely you say:", prompt_lang: En,
+            options: ["Com licença.", "De nada.", "Adeus."],
+            answer: ["Com licença."],
+            explanation: "Com licença = excuse me (to pass).",
+        ),
+        (
+            id: "pr_4", kind: Order,
+            prompt: "Excuse me, where is the toilet?", prompt_lang: En,
+            answer: ["Desculpe, onde fica a casa de banho?"],
+            explanation: "onde fica = where is (located).",
+        ),
+        (
+            id: "pr_5", kind: Choice,
+            prompt: "'Thank you', said by a woman:", prompt_lang: En,
+            options: ["Obrigada.", "Obrigado."],
+            answer: ["Obrigada."],
+            explanation: "Obrigado/obrigada agrees with the speaker.",
+        ),
+    ],
+    needs_native_review: true,
+)

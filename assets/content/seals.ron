@@ -1,0 +1,5 @@
+// Seals ("Selos"): the badges won from Mestres.
+[
+    (id: "selo_polvo", name: "Selo do Polvo", description: "Won from Mestre Joaquim: ordering food politely.", art: "selo_polvo"),
+    (id: "selo_eletrico", name: "Selo do Elétrico", description: "Won from Mestra Beatriz: transport and polite register.", art: "selo_eletrico"),
+]

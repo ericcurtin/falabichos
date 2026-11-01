@@ -1,0 +1,15 @@
+// Bicho #5: Elétrico
+(
+    id: "eletrico",
+    name: "Elétrico",
+    dex_no: 5,
+    kind: Vocab,
+    theme: "transport: trams, trains, buses and tickets",
+    flavor_pt: "O Elétrico sobe as colinas devagar e toca a campainha.",
+    flavor_en: "The Elétrico climbs the hills slowly and rings its bell.",
+    vocab: ["autocarro", "comboio", "eletrico", "paragem", "bilhete", "estacao", "taxi", "bicicleta", "metro", "condutor"],
+    art: "eletrico",
+    trust_needed: 5,
+    cry_hz: 360,
+    needs_native_review: true,
+)

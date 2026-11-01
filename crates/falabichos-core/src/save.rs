@@ -42,6 +42,9 @@ pub struct SaveGame {
     pub srs: SrsStore,
     pub rng_state: u64,
     pub steps: u64,
+    /// Confidence carried between wild battles (`None` = full). Restored by the café or Avó.
+    #[serde(default)]
+    pub confidence: Option<u8>,
 }
 
 impl SaveGame {
@@ -55,6 +58,7 @@ impl SaveGame {
             srs: SrsStore::default(),
             rng_state: now as u64 ^ 0xFA1A_B1C0,
             steps: 0,
+            confidence: None,
         }
     }
 

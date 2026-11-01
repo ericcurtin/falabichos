@@ -1,0 +1,25 @@
+// The grocery: practise numbers and colours.
+(
+    id: "mercearia",
+    name: "Mercearia Dois Irmãos",
+    town: "setecolinas",
+    music: "indoor",
+    indoor: true,
+    rows: [
+        "NNNNNNNNNN",
+        "NNNNNNNNNN",
+        "NHHHFFHHHN",
+        "NFFFFFFFFN",
+        "NFXXXXXXFN",
+        "NFMFFFFMFN",
+        "NPFFFFFFFN",
+        "NNNNEENNNN",
+    ],
+    warps: [
+        (x: 4, y: 7, map: "setecolinas", to_x: 25, to_y: 6, facing: Down),
+        (x: 5, y: 7, map: "setecolinas", to_x: 25, to_y: 6, facing: Down),
+    ],
+    npcs: [
+        (id: "vendedora", x: 4, y: 3, art: "vendedora", facing: Down, dialogue: "vendedora"),
+    ],
+)

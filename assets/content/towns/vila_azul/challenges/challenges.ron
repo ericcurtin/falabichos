@@ -1,0 +1,27 @@
+// Trainers and the Mestre of Vila Azul.
+[
+    (
+        id: "mestre_joaquim", name: "Mestre Joaquim", kind: Mestre,
+        theme: "Ordering food politely",
+        pool: (categories: ["cafe"], grammar: ["polite_requests", "articles_gender"]),
+        questions: 7, pass_correct: 5, confidence: 3,
+        art: "joaquim", reward_flag: "beat_joaquim", seal: "selo_polvo",
+        win_dialogue: "joaquim_win", lose_dialogue: "joaquim_lose",
+    ),
+    (
+        id: "treino_pescador", name: "Pescador Zé", kind: Trainer,
+        theme: "Words of the sea",
+        pool: (vocab: ["mar", "barco", "praia", "peixe", "sardinha", "polvo", "farol", "pescador"]),
+        questions: 3, pass_correct: 2, confidence: 2,
+        art: "pescador", reward_flag: "beat_pescador",
+        win_dialogue: "pescador_win", lose_dialogue: "pescador_lose",
+    ),
+    (
+        id: "treino_tiago", name: "Tiago", kind: Trainer,
+        theme: "Farm animals and the little words",
+        pool: (categories: ["farm"], grammar: ["articles_gender"]),
+        questions: 3, pass_correct: 2, confidence: 2,
+        art: "menino", reward_flag: "beat_tiago",
+        win_dialogue: "tiago_win", lose_dialogue: "tiago_lose",
+    ),
+]

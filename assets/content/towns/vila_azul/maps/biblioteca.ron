@@ -1,0 +1,30 @@
+// The library: Professor Amelia gives you the Notebook (Bichodex).
+(
+    id: "biblioteca",
+    name: "Biblioteca",
+    town: "vila_azul",
+    music: "indoor",
+    indoor: true,
+    rows: [
+        "NNNNNNNNNNNN",
+        "NNNNNNNNNNNN",
+        "NGGGGFFGGGGN",
+        "NFFFFFFFFFFN",
+        "NFFFFCCFFFFN",
+        "NFFMFCCFMFFN",
+        "NPFFFFFFFFPN",
+        "NNNNNEENNNNN",
+    ],
+    warps: [
+        (x: 5, y: 7, map: "vila_azul", to_x: 24, to_y: 6, facing: Down),
+        (x: 6, y: 7, map: "vila_azul", to_x: 24, to_y: 6, facing: Down),
+    ],
+    npcs: [
+        (id: "amelia", x: 5, y: 3, art: "amelia", facing: Down, dialogue: "amelia"),
+        (id: "marta_leitora", x: 8, y: 6, art: "menina", facing: Up, dialogue: "menina_biblioteca"),
+    ],
+    signs: [
+        (x: 2, y: 2, dialogue: "shelf_books"),
+        (x: 9, y: 2, dialogue: "shelf_books"),
+    ],
+)

@@ -1,0 +1,54 @@
+// Grammar concept: Estar a + infinitive
+(
+    id: "estar_a_inf",
+    title: "Estar a + infinitive",
+    summary: "Portuguese in Portugal says 'I am eating' as 'estou a comer' (estar + a + infinitive).",
+    rules: [
+        "estar + a + infinitive: estou a comer, estás a falar, estamos a beber.",
+        "Do not use the gerund (-ndo: estou comendo) in standard European Portuguese; that is the Brazilian pattern.",
+        "The a never changes: it is not 'ao' or 'à'.",
+    ],
+    examples: [
+        (pt: "Estou a comer.", en: "I am eating."),
+        (pt: "Estamos a falar português.", en: "We are speaking Portuguese."),
+        (pt: "Ela está a beber café.", en: "She is drinking coffee."),
+    ],
+    pt_pt_note: "Key pt-PT marker. The -ndo gerund is heard in the south (Algarve, Alentejo) and Azores, but a + infinitive is the standard.",
+    exercises: [
+        (
+            id: "ea_1", kind: Choice,
+            prompt: "Which is standard European Portuguese for 'I am eating'?", prompt_lang: En,
+            options: ["Estou a comer.", "Estou comendo."],
+            answer: ["Estou a comer."],
+            explanation: "pt-PT: estar + a + infinitive.",
+        ),
+        (
+            id: "ea_2", kind: Order,
+            prompt: "I am speaking Portuguese.", prompt_lang: En,
+            answer: ["Estou a falar português."],
+            explanation: "estou + a + falar.",
+        ),
+        (
+            id: "ea_3", kind: FillBlank,
+            prompt: "Ela está ___ beber café.",
+            context: "She is drinking coffee.",
+            options: ["a", "em", "de"],
+            answer: ["a"],
+            explanation: "estar + a + infinitive.",
+        ),
+        (
+            id: "ea_4", kind: Order,
+            prompt: "We are eating fish.", prompt_lang: En,
+            answer: ["Estamos a comer peixe."],
+            explanation: "estamos + a + comer.",
+        ),
+        (
+            id: "ea_5", kind: Type,
+            prompt: "Estou a ___ água. (beber)",
+            context: "I am drinking water.",
+            answer: ["beber"],
+            explanation: "After 'a' the verb stays in the infinitive.",
+        ),
+    ],
+    needs_native_review: true,
+)

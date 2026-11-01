@@ -1,0 +1,15 @@
+// Bicho #6: Saudade
+(
+    id: "saudade",
+    name: "Saudade",
+    dex_no: 6,
+    kind: Vocab,
+    theme: "feelings and the untranslatable saudade",
+    flavor_pt: "A Saudade aparece quando alguém está longe. É tímida e um pouco triste.",
+    flavor_en: "The Saudade appears when someone is far away. It is shy and a little sad.",
+    vocab: ["saudade", "alegria", "tristeza", "medo", "fome", "sede", "cansado", "contente"],
+    art: "saudade",
+    trust_needed: 6,
+    cry_hz: 300,
+    needs_native_review: true,
+)

@@ -1,0 +1,67 @@
+// Grammar concept: Ser vs estar
+(
+    id: "ser_estar",
+    title: "Ser vs estar",
+    summary: "Two verbs for 'to be'. Ser = who/what something is. Estar = how or where something is right now.",
+    rules: [
+        "Ser: identity, origin, profession, permanent traits (Eu sou português. Ela é professora.).",
+        "Estar: location and temporary states or feelings (Estou em Lisboa. Estou cansado.).",
+        "Present of ser: sou, és, é, somos, são.",
+        "Present of estar: estou, estás, está, estamos, estão.",
+    ],
+    examples: [
+        (pt: "Eu sou português.", en: "I am Portuguese."),
+        (pt: "O café está quente.", en: "The coffee is hot (right now)."),
+        (pt: "Estamos em Lisboa.", en: "We are in Lisbon."),
+    ],
+    pt_pt_note: "In Portugal 'estar' is also used for location of fixed things less than in some other languages: 'Lisboa fica em Portugal' (ficar) is common.",
+    exercises: [
+        (
+            id: "se_1", kind: FillBlank,
+            prompt: "Eu ___ português.",
+            context: "I am Portuguese.",
+            options: ["sou", "estou"],
+            answer: ["sou"],
+            explanation: "Nationality is identity: ser.",
+        ),
+        (
+            id: "se_2", kind: FillBlank,
+            prompt: "O café ___ quente.",
+            context: "The coffee is hot (right now).",
+            options: ["é", "está"],
+            answer: ["está"],
+            explanation: "Temperature right now is a temporary state: estar.",
+        ),
+        (
+            id: "se_3", kind: FillBlank,
+            prompt: "Ela ___ professora.",
+            context: "She is a teacher.",
+            options: ["é", "está"],
+            answer: ["é"],
+            explanation: "Profession: ser.",
+        ),
+        (
+            id: "se_4", kind: FillBlank,
+            prompt: "Nós ___ em Lisboa.",
+            context: "We are in Lisbon.",
+            options: ["somos", "estamos"],
+            answer: ["estamos"],
+            explanation: "Location: estar.",
+        ),
+        (
+            id: "se_5", kind: FillBlank,
+            prompt: "A minha avó ___ muito simpática.",
+            context: "My grandmother is very kind.",
+            options: ["é", "está"],
+            answer: ["é"],
+            explanation: "A personality trait: ser.",
+        ),
+        (
+            id: "se_6", kind: Order,
+            prompt: "I am tired.", prompt_lang: En,
+            answer: ["Estou cansado.", "Estou cansada."],
+            explanation: "Tiredness is a state: estar.",
+        ),
+    ],
+    needs_native_review: true,
+)

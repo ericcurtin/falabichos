@@ -1,0 +1,16 @@
+// Bicho #3: Gaivota
+(
+    id: "gaivota",
+    name: "Gaivota",
+    dex_no: 3,
+    kind: Vocab,
+    theme: "greetings, politeness and the formal 'you'",
+    flavor_pt: "A Gaivota cumprimenta toda a gente com muita educação.",
+    flavor_en: "The Gaivota greets everybody very politely.",
+    vocab: ["ola", "bom_dia", "boa_tarde", "boa_noite", "adeus", "ate_logo", "por_favor", "obrigado", "de_nada", "desculpe", "com_licenca", "tudo_bem", "como_esta", "sim", "nao", "muito_prazer"],
+    grammar: ["tu_voce", "polite_requests", "clitics"],
+    art: "gaivota",
+    trust_needed: 6,
+    cry_hz: 880,
+    needs_native_review: true,
+)

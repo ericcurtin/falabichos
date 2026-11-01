@@ -115,6 +115,10 @@ pub fn lint(assets: &Assets) -> LintReport {
         // font coverage of every string literal in content + i18n
         let mut missing: BTreeSet<(char, String)> = BTreeSet::new();
         for path in assets.list("content/").chain(assets.list("i18n/")) {
+            // tile legends and map rows are layout data, not displayed text
+            if path.ends_with("tiles.ron") || path.contains("/maps/") {
+                continue;
+            }
             if let Some(text) = assets.text(path) {
                 let lits = if path.ends_with(".ron") { string_literals(text) } else { vec![text.to_string()] };
                 for l in lits {

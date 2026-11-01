@@ -1,0 +1,54 @@
+// Grammar concept: Pronouns after the verb
+(
+    id: "clitics",
+    title: "Pronouns after the verb",
+    summary: "In Portugal the little object pronouns (me, te, lhe, nos) usually go AFTER the verb, joined with a hyphen: dá-me, disse-lhe.",
+    rules: [
+        "Affirmative sentences: verb-pronoun. Dá-me água. Chamo-me Rita. Disse-lhe a verdade.",
+        "Negatives, question words and some adverbs 'pull' the pronoun before the verb: Não me chamo Rita. Quem te disse?",
+        "With an infinitive the pronoun attaches to it: Podes ajudar-me?",
+        "Never start a sentence with the pronoun in standard pt-PT (Me dá água is Brazilian).",
+    ],
+    examples: [
+        (pt: "Dá-me água, por favor.", en: "Give me water, please."),
+        (pt: "Chamo-me Rita.", en: "My name is Rita."),
+        (pt: "Não me chamo João.", en: "My name is not João."),
+    ],
+    pt_pt_note: "Biggest grammar difference from pt-BR. Native speakers of Portugal almost never say 'Me dá...' at the start of a sentence.",
+    exercises: [
+        (
+            id: "cl_1", kind: Choice,
+            prompt: "Say 'Give me water, please' in European Portuguese:", prompt_lang: En,
+            options: ["Dá-me água, por favor.", "Me dá água, por favor."],
+            answer: ["Dá-me água, por favor."],
+            explanation: "Affirmative sentence: pronoun after the verb with a hyphen.",
+        ),
+        (
+            id: "cl_2", kind: Order,
+            prompt: "My name is Rita.", prompt_lang: En,
+            answer: ["Chamo-me Rita."],
+            explanation: "Chamar-se: the pronoun follows the verb.",
+        ),
+        (
+            id: "cl_3", kind: Choice,
+            prompt: "Which is correct?", prompt_lang: En,
+            options: ["Não me chamo João.", "Não chamo-me João."],
+            answer: ["Não me chamo João."],
+            explanation: "'Não' attracts the pronoun before the verb.",
+        ),
+        (
+            id: "cl_4", kind: Choice,
+            prompt: "Say 'I told her the truth':", prompt_lang: En,
+            options: ["Disse-lhe a verdade.", "Lhe disse a verdade."],
+            answer: ["Disse-lhe a verdade."],
+            explanation: "Enclisis: disse-lhe.",
+        ),
+        (
+            id: "cl_5", kind: Order,
+            prompt: "Can you help me?", prompt_lang: En,
+            answer: ["Podes ajudar-me?"],
+            explanation: "The pronoun attaches to the infinitive: ajudar-me.",
+        ),
+    ],
+    needs_native_review: true,
+)

@@ -1,0 +1,15 @@
+// Bicho #9: Camaleão
+(
+    id: "camaleao",
+    name: "Camaleão",
+    dex_no: 9,
+    kind: Grammar,
+    theme: "verbs: ser and estar, present tense, estar a + infinitive, ir + infinitive",
+    flavor_pt: "O Camaleão muda de cor conforme o estado: é ou está?",
+    flavor_en: "The Camaleão changes colour with its state: is it ser or estar?",
+    grammar: ["ser_estar", "present_ar", "present_er_ir", "estar_a_inf", "ir_future"],
+    art: "camaleao",
+    trust_needed: 6,
+    cry_hz: 420,
+    needs_native_review: true,
+)

@@ -1,0 +1,13 @@
+// Pronunciation tips for the pt-PT learning points (PronTag in the data model).
+[
+    (tag: NasalVowel, title: "Nasal vowels", tip: "Let air flow through your nose and do not close the mouth with an 'n' or 'm'. In 'bom' the vowel itself is nasal: /bõ/.", examples: ["bom", "sim", "um", "campo"]),
+    (tag: NasalDiphthong, title: "Nasal diphthongs: ão, ões, ães", tip: "'ão' glides from a nasal /ɐ̃/ to a nasal /w̃/, like 'ow' said through your nose. Plurals: pão → pães, estação → estações.", examples: ["pão", "não", "estação", "paragem"]),
+    (tag: ReducedVowel, title: "Reduced unstressed vowels", tip: "Unstressed 'e' is very short or silent (/ɨ/ or nothing): 'leite' sounds like /ˈlejt/. Unstressed 'o' sounds like 'u' and unstressed 'a' like /ɐ/. This is the biggest difference from Brazil.", examples: ["leite", "bilhete", "obrigado", "casa"]),
+    (tag: SibilantS, title: "S at the end of words and before consonants", tip: "In Portugal 's' before a consonant or at the end of a word sounds like 'sh' /ʃ/ (or /ʒ/ before voiced sounds): 'dois' /dojʃ/, 'estação' /ɨʃtɐˈsɐ̃w/.", examples: ["dois", "três", "adeus", "peixe"]),
+    (tag: OpenClosedVowel, title: "Open and closed vowels", tip: "'é' is open /ɛ/ (café), 'ê' is closed /e/ (você), 'ó' is open /ɔ/ (avó), 'ô' is closed /o/ (avô). Accents tell you which.", examples: ["café", "avó", "avô", "elétrico"]),
+    (tag: Digraph, title: "lh, nh and ch", tip: "'lh' is like the 'lli' in 'million' /ʎ/, 'nh' is like the 'ni' in 'onion' /ɲ/, and 'ch' is 'sh' /ʃ/.", examples: ["bilhete", "sardinha", "chá", "ovelha"]),
+    (tag: RhoticR, title: "The two r sounds", tip: "A single 'r' between vowels is a quick tap /ɾ/ (caro). At the start of a word or as 'rr' it is a guttural /ʁ/ like the French r (rua, carro).", examples: ["rua", "carro", "mar", "autocarro"]),
+    (tag: SoftC, title: "Soft c and ç", tip: "'c' before e or i, and 'ç', sounds like 's': 'cinco', 'praça'. Before a, o, u it is 'k': 'casa'.", examples: ["cinco", "praça", "criança", "conta"]),
+    (tag: SilentLetter, title: "Silent letters", tip: "'h' is never pronounced. Unstressed vowels can disappear in fast speech: 'pequeno' sounds like /pkenu/.", examples: ["hora", "hoje", "pequeno"]),
+    (tag: DarkL, title: "Dark l", tip: "'l' at the end of a syllable is dark /ɫ/, pronounced with the back of the tongue: 'azul', 'Portugal', 'pastel'.", examples: ["azul", "farol", "pastel"]),
+]

@@ -1,0 +1,40 @@
+// Rooster Field: the first countryside route. Tall grass patches hold farm Bichos and grammar Bichos.
+(
+    id: "vila_azul_campo",
+    name: "Campo do Galo",
+    town: "vila_azul",
+    music: "town",
+    rows: [
+        "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+        "TTT.TT.TT.TT.TT.TT.TT.TT.TT.TT",
+        "T...TO..T...T.:::...T...T...TT",
+        "T...........,,::...\"\"\"\"\"\"\"\"\".T",
+        "T.\"\"\"\"\"\"\"\"....::...\"\"\"\"\"\"\"\"\".T",
+        "T.\"\"\"\"\"\"\"\"....::,,.\"\"\"\"\"\"\"\"\".T",
+        "T.\"\"\"\"\"\"\"\".,..::...\"\"\"\"\"\"\"\"\".T",
+        "T.\"\"\"\"\"\"\"\"....::.............T",
+        "T..........OO.::..,..........T",
+        "T..\"\"\"\"\"\"\"....::...\"\"\"\"\"\"\"\"..T",
+        "T..\"\"\"\"\"\"\"..,.::...\"\"\"\"\"\"\"\"..T",
+        "T..\"\"\"\"\"\"\"...S::.,.\"\"\"\"\"\"\"\"..T",
+        "T.............::.........O...T",
+        "TTTTTTTTTTTTTT::TTTTTTTTTTTTTT",
+    ],
+    warps: [
+        (x: 14, y: 13, map: "vila_azul", to_x: 14, to_y: 1, facing: Down),
+        (x: 15, y: 13, map: "vila_azul", to_x: 15, to_y: 1, facing: Down),
+    ],
+    npcs: [
+        (id: "tiago", x: 13, y: 6, art: "menino", facing: Right, dialogue: "tiago", trainer: (sight: 4, challenge: "treino_tiago", spot_dialogue: "tiago_spot")),
+    ],
+    signs: [
+        (x: 13, y: 11, dialogue: "sign_campo"),
+    ],
+    encounters: [
+        (species: "galo", weight: 45),
+        (species: "cegonha", weight: 25),
+        (species: "camaleao", weight: 15),
+        (species: "gaivota", weight: 15),
+    ],
+    encounter_rate: 14,
+)

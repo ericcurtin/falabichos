@@ -1,0 +1,62 @@
+// Grammar concept: Making plurals
+(
+    id: "plurals",
+    title: "Making plurals",
+    summary: "Most nouns add -s. Nouns in -ão, -l, -m, -r and -z change in regular ways.",
+    rules: [
+        "Vowel + s: casa → casas, bilhete → bilhetes.",
+        "-ão usually becomes -ões (estação → estações), sometimes -ães (pão → pães) or -ãos (mão → mãos).",
+        "-l becomes -is (animal → animais); -el becomes -éis (pastel → pastéis).",
+        "-m becomes -ns (paragem → paragens); -r and -z add -es (rapaz → rapazes).",
+    ],
+    examples: [
+        (pt: "os pastéis", en: "the custard tarts"),
+        (pt: "as estações", en: "the stations"),
+        (pt: "as paragens", en: "the stops"),
+    ],
+    pt_pt_note: "Same rules in both varieties. Pronunciation of plural -s differs: final /ʃ/ in Portugal.",
+    exercises: [
+        (
+            id: "pl_1", kind: Choice,
+            prompt: "Plural of 'pastel':", prompt_lang: En,
+            options: ["pastéis", "pastels", "pasteles"],
+            answer: ["pastéis"],
+            explanation: "-el → -éis: pastel → pastéis.",
+        ),
+        (
+            id: "pl_2", kind: Choice,
+            prompt: "Plural of 'pão':", prompt_lang: En,
+            options: ["pães", "pãos", "pões"],
+            answer: ["pães"],
+            explanation: "pão → pães (irregular, learn it).",
+        ),
+        (
+            id: "pl_3", kind: Choice,
+            prompt: "Plural of 'estação':", prompt_lang: En,
+            options: ["estações", "estaçãos", "estaçães"],
+            answer: ["estações"],
+            explanation: "Most -ão nouns → -ões.",
+        ),
+        (
+            id: "pl_4", kind: Choice,
+            prompt: "Plural of 'paragem':", prompt_lang: En,
+            options: ["paragens", "paragems", "paragemes"],
+            answer: ["paragens"],
+            explanation: "-m becomes -ns: paragem → paragens.",
+        ),
+        (
+            id: "pl_5", kind: Type,
+            prompt: "Plural of 'bilhete':", prompt_lang: En,
+            answer: ["bilhetes"],
+            explanation: "Just add -s.",
+        ),
+        (
+            id: "pl_6", kind: Choice,
+            prompt: "Plural of 'rapaz':", prompt_lang: En,
+            options: ["rapazes", "rapazs", "rapazis"],
+            answer: ["rapazes"],
+            explanation: "Words ending in -z add -es.",
+        ),
+    ],
+    needs_native_review: true,
+)

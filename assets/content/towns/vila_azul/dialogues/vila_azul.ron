@@ -1,0 +1,235 @@
+// Dialogues of Vila Azul. The first branch whose `when` conditions hold is played.
+// Every line has a Portuguese (pt-PT) text, an English gloss, and optional per-word glosses.
+[
+    (
+        id: "intro",
+        branches: [(
+            lines: [
+                (pt: "Chegas a Vila Azul para passar o verão com a tua avó.", en: "You arrive in Vila Azul to spend the summer with your grandmother.",
+                 words: {"chegas": "you arrive (tu)", "verão": "summer", "passar": "to spend (time)", "tua": "your (informal)"}),
+                (pt: "Aqui, os Bichos vivem dentro das palavras. Para os conhecer, tens de falar com eles!", en: "Here, the Bichos live inside words. To meet them, you have to speak to them!",
+                 words: {"dentro": "inside", "tens de": "you have to", "conhecer": "to meet, to know"}),
+                (pt: "Usa as setas para andar. Carrega em A para falar com as pessoas.", en: "Use the arrow keys to walk. Press A to talk to people.",
+                 words: {"carrega": "press (tu command)", "andar": "to walk"}, needs_native_review: true),
+            ],
+        )],
+    ),
+    (
+        id: "avo",
+        branches: [
+            (when: [Flag("beat_joaquim")], lines: [
+                (who: "Avó", pt: "Ganhaste o Selo do Polvo! Estou tão orgulhosa de ti.", en: "You won the Octopus Seal! I'm so proud of you.", words: {"ganhaste": "you won", "orgulhosa": "proud (f.)"}),
+                (who: "Avó", pt: "Segue o caminho para leste, até Setecolinas. Leva um casaco!", en: "Follow the path east, to Setecolinas. Take a jacket!", words: {"leste": "east", "leva": "take (tu command)"}),
+            ], then: [Heal]),
+            (when: [Flag("got_caderno")], lines: [
+                (who: "Avó", pt: "Estás com cara de cansaço. Senta-te e bebe um chá.", en: "You look tired. Sit down and have some tea.", words: {"senta-te": "sit down (tu)", "chá": "tea"}),
+                (who: "Avó", pt: "Já estás melhor? Então vai lá, e fala devagar com os Bichos.", en: "Feeling better? Then off you go, and speak slowly to the Bichos.", words: {"devagar": "slowly"}),
+            ], then: [Heal]),
+            (when: [Flag("met_avo")], lines: [
+                (who: "Avó", pt: "Já falaste com a Professora Amélia? Ela está na biblioteca, aqui ao lado.", en: "Have you spoken to Professor Amélia yet? She is in the library, right next door.", words: {"já": "already, yet", "ao lado": "next door"}),
+            ]),
+            (lines: [
+                (who: "Avó", pt: "Bom dia! Dormiste bem?", en: "Good morning! Did you sleep well?", register: "tu", words: {"dormiste": "you slept"}),
+                (who: "Avó", pt: "Hoje vais conhecer a Professora Amélia. Ela está na biblioteca, aqui ao lado.", en: "Today you will meet Professor Amélia. She is in the library, right next door.", words: {"vais conhecer": "you are going to meet"}),
+                (who: "Avó", pt: "Vai com calma e fala sempre com educação.", en: "Take it easy and always speak politely.", words: {"calma": "calm", "educação": "politeness, manners"}),
+            ], then: [SetFlag("met_avo")]),
+        ],
+    ),
+    (
+        id: "amelia",
+        branches: [
+            (when: [Flag("beat_joaquim")], lines: [
+                (who: "Professora Amélia", pt: "Parabéns! O Mestre Joaquim é muito exigente.", en: "Congratulations! Master Joaquim is very demanding.", words: {"exigente": "demanding"}),
+                (who: "Professora Amélia", pt: "Em Setecolinas há outra Mestra: a Beatriz. Boa sorte!", en: "In Setecolinas there is another Master: Beatriz. Good luck!"),
+            ]),
+            (when: [Flag("got_caderno"), PartyAtLeast(1)], lines: [
+                (who: "Professora Amélia", pt: "Já tens um Bicho! Excelente.", en: "You already have a Bicho! Excellent."),
+                (who: "Professora Amélia", pt: "Agora fala com o Mestre Joaquim, no restaurante O Polvo. Ele vai testar-te.", en: "Now speak to Master Joaquim, at the restaurant O Polvo. He will test you.", words: {"testar-te": "to test you"}),
+                (who: "Professora Amélia", pt: "Abre o menu e escolhe 'Practice' para treinares as palavras dos teus Bichos.", en: "Open the menu and choose 'Practice' to train your Bichos' words.", needs_native_review: true),
+            ]),
+            (when: [Flag("got_caderno")], lines: [
+                (who: "Professora Amélia", pt: "Procura um Bicho na erva alta, junto à praia.", en: "Look for a Bicho in the tall grass, by the beach.", words: {"erva": "grass", "junto à": "next to the"}),
+                (who: "Professora Amélia", pt: "Responde às perguntas e ganha a confiança dele. Se te enganares, perdes confiança. Não faz mal: aprende-se a errar!", en: "Answer the questions and win its trust. If you make a mistake, you lose confidence. No problem: we learn by making mistakes!", words: {"enganares": "you make a mistake", "aprende-se": "one learns"}, needs_native_review: true),
+            ]),
+            (lines: [
+                (who: "Professora Amélia", pt: "Olá! Eu sou a Professora Amélia.", en: "Hello! I am Professor Amélia.", words: {"eu sou": "I am"}),
+                (who: "Professora Amélia", pt: "Em Portugal, os Bichos vivem nas palavras. Cada Bicho é tímido: tens de falar com ele.", en: "In Portugal, the Bichos live in words. Every Bicho is shy: you have to speak to it.", words: {"tímido": "shy"}),
+                (who: "Professora Amélia", pt: "Toma este Caderno. Aqui ficam os teus Bichos e as palavras novas.", en: "Take this Notebook. Your Bichos and the new words will be kept here.", words: {"toma": "take (tu command)"}),
+                (pt: "Recebeste o Bichodex! Abre-o com a tecla Esc ou com o botão do menu.", en: "You received the Bichodex! Open it with the Esc key or the menu button.", needs_native_review: true),
+            ], then: [SetFlag("got_caderno")]),
+        ],
+    ),
+    (
+        id: "dona_rosa",
+        branches: [
+            (when: [Flag("beat_joaquim")], lines: [
+                (who: "Dona Rosa", pt: "Ouvi dizer que ganhaste o Selo do Polvo! O pastel é por conta da casa.", en: "I heard you won the Octopus Seal! The pastry is on the house.", words: {"ouvi": "I heard", "por conta da casa": "on the house"}),
+            ], then: [Heal]),
+            (lines: [
+                (who: "Dona Rosa", pt: "Olá! Tens fome?", en: "Hello! Are you hungry?", register: "tu"),
+                (who: "Dona Rosa", pt: "Come um pastel de nata e bebe uma bica.", en: "Eat a custard tart and drink an espresso.", words: {"come": "eat (tu command)", "bebe": "drink (tu command)"}),
+                (who: "Dona Rosa", pt: "Já estás melhor?", en: "Feeling better now?"),
+            ], then: [Heal]),
+        ],
+    ),
+    (
+        id: "turista_cafe",
+        branches: [(
+            lines: [
+                (who: "Turista", pt: "Desculpe, onde fica a casa de banho?", en: "Excuse me, where is the toilet?", register: "formal"),
+                (who: "Dona Rosa", pt: "É ali ao fundo, à direita.", en: "It's over there at the back, on the right.", words: {"ao fundo": "at the back", "à direita": "on the right"}),
+                (who: "Turista", pt: "Muito obrigado!", en: "Thank you very much!"),
+            ],
+        )],
+    ),
+    (
+        id: "menina_biblioteca",
+        branches: [(
+            lines: [
+                (who: "Marta", pt: "Shh! Estou a ler.", en: "Shh! I am reading.", words: {"estou a ler": "I am reading (estar a + infinitive)"}),
+                (who: "Marta", pt: "Este livro é sobre um galo muito simpático.", en: "This book is about a very friendly rooster.", words: {"sobre": "about"}),
+            ],
+        )],
+    ),
+    (
+        id: "joaquim",
+        branches: [
+            (when: [Flag("beat_joaquim")], lines: [
+                (who: "Mestre Joaquim", pt: "O Selo do Polvo é teu. Volta sempre!", en: "The Octopus Seal is yours. Come back anytime!", words: {"volta": "come back (tu command)", "sempre": "always"}),
+            ]),
+            (when: [PartyAtLeast(1)], lines: [
+                (who: "Mestre Joaquim", pt: "Boa tarde! Eu sou o Mestre Joaquim, o dono do restaurante O Polvo.", en: "Good afternoon! I am Master Joaquim, the owner of the restaurant O Polvo.", words: {"dono": "owner"}),
+                (who: "Mestre Joaquim", pt: "Aqui, o cliente tem sempre razão... mas tem de pedir com educação!", en: "Here, the customer is always right... but must ask politely!", words: {"cliente": "customer", "razão": "reason, right", "pedir": "to ask for, to order"}, needs_native_review: true),
+                (who: "Mestre Joaquim", pt: "O teu teste é pedir uma refeição. Vamos começar!", en: "Your test is to order a meal. Let's begin!", words: {"refeição": "meal"}),
+            ], then: [Challenge("mestre_joaquim")]),
+            (lines: [
+                (who: "Mestre Joaquim", pt: "Boa tarde! Ainda não tens nenhum Bicho.", en: "Good afternoon! You don't have any Bicho yet."),
+                (who: "Mestre Joaquim", pt: "Vai à praia, procura na erva alta e volta cá.", en: "Go to the beach, look in the tall grass and come back.", words: {"volta cá": "come back here"}),
+            ]),
+        ],
+    ),
+    (
+        id: "joaquim_win",
+        branches: [(
+            lines: [
+                (who: "Mestre Joaquim", pt: "Muito bem! Pediste tudo com educação.", en: "Very good! You ordered everything politely.", words: {"pediste": "you ordered/asked"}),
+                (pt: "Recebeste o Selo do Polvo!", en: "You received the Octopus Seal!"),
+                (who: "Mestre Joaquim", pt: "Agora podes seguir para Setecolinas. O caminho fica a leste.", en: "Now you can go on to Setecolinas. The path is to the east.", words: {"fica": "is located"}),
+            ],
+        )],
+    ),
+    (
+        id: "joaquim_lose",
+        branches: [(
+            lines: [
+                (who: "Mestre Joaquim", pt: "Não faz mal. Treina com os teus Bichos e volta cá.", en: "Never mind. Practise with your Bichos and come back.", words: {"treina": "practise (tu command)"}),
+            ],
+        )],
+    ),
+    (
+        id: "pescador_spot",
+        branches: [(
+            lines: [
+                (who: "Pescador Zé", pt: "Eh, tu! Sabes falar português? Vamos ver!", en: "Hey, you! Can you speak Portuguese? Let's see!", words: {"eh": "hey", "sabes": "you know (how to)"}),
+            ],
+        )],
+    ),
+    (
+        id: "pescador",
+        branches: [
+            (when: [Flag("beat_pescador")], lines: [
+                (who: "Pescador Zé", pt: "O mar é a minha casa. A sardinha é a minha amiga.", en: "The sea is my home. The sardine is my friend."),
+            ]),
+            (lines: [
+                (who: "Pescador Zé", pt: "Bom dia! Hoje o mar está calmo.", en: "Good morning! The sea is calm today.", words: {"calmo": "calm"}),
+                (who: "Pescador Zé", pt: "Queres treinar comigo?", en: "Do you want to train with me?", register: "tu"),
+            ], then: [Challenge("treino_pescador")]),
+        ],
+    ),
+    (
+        id: "pescador_win",
+        branches: [(lines: [(who: "Pescador Zé", pt: "Fixe! Falas bem.", en: "Cool! You speak well.", words: {"fixe": "cool, great (very pt-PT)"})])],
+    ),
+    (
+        id: "pescador_lose",
+        branches: [(lines: [(who: "Pescador Zé", pt: "Treina mais, pá. Não desistas!", en: "Practise more, mate. Don't give up!", words: {"pá": "mate, pal (informal)", "desistas": "give up (don't)"}, needs_native_review: true)])],
+    ),
+    (
+        id: "tiago_spot",
+        branches: [(lines: [(who: "Tiago", pt: "Olá! Gosto muito de galos. E tu? Vamos falar!", en: "Hi! I like roosters a lot. And you? Let's talk!", words: {"gosto": "I like"})])],
+    ),
+    (
+        id: "tiago",
+        branches: [
+            (when: [Flag("beat_tiago")], lines: [(who: "Tiago", pt: "O galo da minha avó canta às cinco da manhã!", en: "My grandmother's rooster sings at five in the morning!")]),
+            (lines: [
+                (who: "Tiago", pt: "Já viste um galo hoje?", en: "Have you seen a rooster today?"),
+            ], then: [Challenge("treino_tiago")]),
+        ],
+    ),
+    (
+        id: "tiago_win",
+        branches: [(lines: [(who: "Tiago", pt: "Tu falas muito bem!", en: "You speak very well!")])],
+    ),
+    (
+        id: "tiago_lose",
+        branches: [(lines: [(who: "Tiago", pt: "Não faz mal. Tenta outra vez!", en: "Never mind. Try again!", words: {"tenta": "try (tu command)"})])],
+    ),
+    (
+        id: "guarda_leste",
+        branches: [(lines: [
+            (who: "Senhor", pt: "Vais para Setecolinas? Ainda não!", en: "Are you going to Setecolinas? Not yet!", register: "tu"),
+            (who: "Senhor", pt: "Primeiro, tens de ganhar o Selo do Polvo. Fala com o Mestre Joaquim.", en: "First, you have to win the Octopus Seal. Talk to Master Joaquim.", words: {"ganhar": "to win", "tens de": "you have to"}),
+        ])],
+    ),
+    (
+        id: "padeiro",
+        branches: [(lines: [
+            (who: "Padeiro", pt: "Bom dia! Pão fresquinho, quentinho!", en: "Good morning! Fresh bread, nice and warm!", words: {"fresquinho": "nice and fresh", "quentinho": "nice and warm"}),
+            (who: "Padeiro", pt: "Um pão e um queijo? São dois euros, se faz favor.", en: "A bread roll and a cheese? That's two euros, please."),
+        ])],
+    ),
+    (
+        id: "menino_praca",
+        branches: [(lines: [
+            (who: "Rapaz", pt: "A praia está cheia de Bichos, mas eles são tímidos.", en: "The beach is full of Bichos, but they are shy.", words: {"cheia": "full (f.)"}),
+            (who: "Rapaz", pt: "Se não sabes uma palavra, usa a dica!", en: "If you don't know a word, use the hint!", words: {"dica": "hint"}),
+        ])],
+    ),
+    (
+        id: "sign_vila",
+        branches: [(lines: [(pt: "VILA AZUL: Bem-vindos!", en: "VILA AZUL: Welcome!", words: {"bem-vindos": "welcome (plural)"})])],
+    ),
+    (
+        id: "sign_casa_avo",
+        branches: [(lines: [(pt: "Casa da Avó", en: "Grandma's house")])],
+    ),
+    (
+        id: "sign_biblioteca",
+        branches: [(lines: [(pt: "Biblioteca Municipal. Aberta das 9h às 17h.", en: "Municipal Library. Open from 9am to 5pm.")])],
+    ),
+    (
+        id: "sign_polvo",
+        branches: [(lines: [(pt: "Restaurante O Polvo. Ementa do dia: sardinhas assadas.", en: "Restaurant O Polvo. Menu of the day: grilled sardines.")])],
+    ),
+    (
+        id: "sign_cafe",
+        branches: [(lines: [(pt: "Café Dona Rosa. Pastéis de nata quentinhos!", en: "Café Dona Rosa. Warm custard tarts!")])],
+    ),
+    (
+        id: "sign_praia",
+        branches: [(lines: [(pt: "Cuidado! Na erva alta vivem Bichos tímidos.", en: "Careful! Shy Bichos live in the tall grass.", words: {"cuidado": "careful"})])],
+    ),
+    (
+        id: "sign_campo",
+        branches: [(lines: [(pt: "Campo do Galo. Silêncio, por favor: os Bichos estão a dormir.", en: "Rooster Field. Quiet please: the Bichos are sleeping.", words: {"silêncio": "silence"})])],
+    ),
+    (
+        id: "sign_leste",
+        branches: [(lines: [(pt: "Setecolinas: 5 quilómetros.", en: "Setecolinas: 5 kilometres.", words: {"quilómetros": "kilometres (pt-PT spelling)"})])],
+    ),
+    (
+        id: "shelf_books",
+        branches: [(lines: [(pt: "Há muitos livros sobre o mar e sobre os Bichos.", en: "There are many books about the sea and about the Bichos.")])],
+    ),
+]

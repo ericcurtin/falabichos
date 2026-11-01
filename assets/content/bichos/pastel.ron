@@ -1,0 +1,15 @@
+// Bicho #4: Pastel
+(
+    id: "pastel",
+    name: "Pastel",
+    dex_no: 4,
+    kind: Vocab,
+    theme: "café life: coffee, pastries and ordering",
+    flavor_pt: "O Pastel é quentinho e fica tímido quando ouve o seu nome.",
+    flavor_en: "The Pastel is warm and gets shy when it hears its name.",
+    vocab: ["cafe", "bica", "pastel_de_nata", "pao", "agua", "leite", "sumo", "queijo", "fruta", "laranja", "pequeno_almoco", "conta", "ementa"],
+    art: "pastel",
+    trust_needed: 5,
+    cry_hz: 600,
+    needs_native_review: true,
+)

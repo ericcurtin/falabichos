@@ -1,0 +1,8 @@
+(
+    id: "setecolinas",
+    name: "Setecolinas",
+    blurb: "A hilly city of yellow trams, steep stairs and viewpoints.",
+    inspired_by: "Lisbon and its seven hills",
+    start_map: "setecolinas",
+    needs_native_review: true,
+)

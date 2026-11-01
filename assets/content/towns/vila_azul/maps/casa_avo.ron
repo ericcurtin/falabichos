@@ -1,0 +1,28 @@
+// Grandma's house. The story starts here.
+(
+    id: "casa_avo",
+    name: "Casa da Avó",
+    town: "vila_azul",
+    music: "indoor",
+    indoor: true,
+    rows: [
+        "NNNNNNNNNN",
+        "NNNNNNNNNN",
+        "NJJFFGGFIN",
+        "NFFFFFFFFN",
+        "NFFCCCCFMN",
+        "NFFCCCCFPN",
+        "NPFFFFFFFN",
+        "NNNNEENNNN",
+    ],
+    warps: [
+        (x: 4, y: 7, map: "vila_azul", to_x: 6, to_y: 6, facing: Down),
+        (x: 5, y: 7, map: "vila_azul", to_x: 6, to_y: 6, facing: Down),
+    ],
+    npcs: [
+        (id: "avo", x: 5, y: 3, art: "avo", facing: Down, dialogue: "avo"),
+    ],
+    signs: [
+        (x: 5, y: 2, dialogue: "shelf_books"),
+    ],
+)

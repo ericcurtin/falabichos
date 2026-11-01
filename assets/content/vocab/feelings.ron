@@ -1,0 +1,68 @@
+// Feelings (Saudade)
+// One entry per word or phrase. Field reference: docs/CONTENT_FORMAT.md
+[
+    (
+        id: "saudade", pt: "saudade", en: ["longing", "missing someone"], category: "feelings",
+        kind: Noun, gender: Fem, level: 2,
+        ipa: "sɐwˈdadɨ", pron_tags: [ReducedVowel],
+        example: (pt: "Tenho saudades da minha terra.", en: "I miss my homeland."),
+        note: "Famously hard to translate. 'Ter saudades de' = to miss.",
+        forms: ["saudades"],
+        needs_native_review: true,
+    ),
+    (
+        id: "alegria", pt: "alegria", en: ["joy"], category: "feelings",
+        kind: Noun, gender: Fem, level: 2,
+        ipa: "ɐlɨˈgɾiɐ", pron_tags: [ReducedVowel, RhoticR],
+        example: (pt: "A festa está cheia de alegria.", en: "The party is full of joy."),
+        needs_native_review: true,
+    ),
+    (
+        id: "tristeza", pt: "tristeza", en: ["sadness"], category: "feelings",
+        kind: Noun, gender: Fem, level: 2,
+        ipa: "tɾiʃˈtezɐ", pron_tags: [SibilantS, RhoticR],
+        example: (pt: "Sinto tristeza quando chove.", en: "I feel sad when it rains."),
+        needs_native_review: true,
+    ),
+    (
+        id: "medo", pt: "medo", en: ["fear"], category: "feelings",
+        kind: Noun, gender: Masc,
+        ipa: "ˈmedu", pron_tags: [ReducedVowel],
+        example: (pt: "Tenho medo do escuro.", en: "I am afraid of the dark."),
+        note: "'Ter medo de' = to be afraid of.",
+        needs_native_review: true,
+    ),
+    (
+        id: "fome", pt: "fome", en: ["hunger"], category: "feelings",
+        kind: Noun, gender: Fem,
+        ipa: "ˈfomɨ", pron_tags: [ReducedVowel],
+        example: (pt: "Tenho fome, vamos comer?", en: "I am hungry, shall we eat?"),
+        note: "Portuguese says 'I have hunger': 'tenho fome'.",
+        needs_native_review: true,
+    ),
+    (
+        id: "sede", pt: "sede", en: ["thirst"], category: "feelings",
+        kind: Noun, gender: Fem,
+        ipa: "ˈsedɨ", pron_tags: [ReducedVowel],
+        example: (pt: "Tenho sede, quero água.", en: "I am thirsty, I want water."),
+        needs_native_review: true,
+    ),
+    (
+        id: "cansado", pt: "cansado", en: ["tired (male)"], category: "feelings",
+        kind: Adjective,
+        ipa: "kɐ̃ˈsadu", pron_tags: [NasalVowel, ReducedVowel],
+        example: (pt: "Estou cansado depois da viagem.", en: "I am tired after the trip."),
+        note: "Feminine: 'cansada'. Tiredness is a state, so use 'estar'.",
+        forms: ["cansada"],
+        needs_native_review: true,
+    ),
+    (
+        id: "contente", pt: "contente", en: ["happy", "pleased"], category: "feelings",
+        kind: Adjective,
+        ipa: "kõˈtẽtɨ", pron_tags: [NasalVowel, ReducedVowel],
+        example: (pt: "Estou contente por te ver.", en: "I am happy to see you."),
+        note: "Same form for masculine and feminine.",
+        forms: ["contentes"],
+        needs_native_review: true,
+    ),
+]

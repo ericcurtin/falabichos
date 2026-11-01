@@ -1,0 +1,57 @@
+// Grammar concept: Ir + infinitive (near future)
+(
+    id: "ir_future",
+    title: "Ir + infinitive (near future)",
+    summary: "To say what you are going to do, use ir + infinitive: vou comer.",
+    rules: [
+        "ir: vou, vais, vai, vamos, vão.",
+        "Vou comer. (I am going to eat.) Vamos beber café. (Let's / We will drink coffee.)",
+        "Ir + a place needs a: Vou ao mercado. Vou à praia.",
+    ],
+    examples: [
+        (pt: "Vou comer um pastel.", en: "I am going to eat a pastry."),
+        (pt: "Vais ao mercado?", en: "Are you going to the market?"),
+        (pt: "Vamos comer peixe.", en: "We are going to eat fish."),
+    ],
+    pt_pt_note: "'vamos' also means 'let's'.",
+    exercises: [
+        (
+            id: "fu_1", kind: FillBlank,
+            prompt: "Eu ___ comer um pastel.",
+            context: "I am going to eat a pastry.",
+            options: ["vou", "vais", "vão"],
+            answer: ["vou"],
+            explanation: "eu → vou.",
+        ),
+        (
+            id: "fu_2", kind: FillBlank,
+            prompt: "Tu ___ ao mercado?",
+            context: "Are you going to the market?",
+            options: ["vais", "vai", "vamos"],
+            answer: ["vais"],
+            explanation: "tu → vais.",
+        ),
+        (
+            id: "fu_3", kind: Order,
+            prompt: "We are going to eat fish.", prompt_lang: En,
+            answer: ["Vamos comer peixe."],
+            explanation: "vamos + infinitive.",
+        ),
+        (
+            id: "fu_4", kind: FillBlank,
+            prompt: "Eles ___ de comboio.",
+            context: "They are going by train.",
+            options: ["vão", "vai", "vamos"],
+            answer: ["vão"],
+            explanation: "eles → vão.",
+        ),
+        (
+            id: "fu_5", kind: Type,
+            prompt: "Ela ___ beber café. (ir)",
+            context: "She is going to drink coffee.",
+            answer: ["vai"],
+            explanation: "ela → vai.",
+        ),
+    ],
+    needs_native_review: true,
+)

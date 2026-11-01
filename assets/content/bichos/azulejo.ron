@@ -1,0 +1,15 @@
+// Bicho #7: Azulejo
+(
+    id: "azulejo",
+    name: "Azulejo",
+    dex_no: 7,
+    kind: Vocab,
+    theme: "colours and numbers",
+    flavor_pt: "O Azulejo mostra desenhos azuis e brancos. Sabe contar até dez!",
+    flavor_en: "The Azulejo shows blue and white patterns. It can count to ten!",
+    vocab: ["azul", "vermelho", "amarelo", "verde", "branco", "preto", "um", "dois", "tres", "quatro", "cinco", "dez"],
+    art: "azulejo",
+    trust_needed: 5,
+    cry_hz: 780,
+    needs_native_review: true,
+)

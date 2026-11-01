@@ -1,0 +1,43 @@
+// The road between Vila Azul and Setecolinas.
+(
+    id: "rota_colinas",
+    name: "Caminho de Setecolinas",
+    town: "setecolinas",
+    music: "town",
+    rows: [
+        "TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+        "TT.TT.TT.TT.TT.TT.TT.TT.TT.T",
+        "T..\"\"\"\"\"\"..........\"\"\"\"\"...T",
+        "T..\"\"\"\"\"\"......O...\"\"\"\"\"...T",
+        "T..\"\"\"\"\"\".,.,......\"\"\"\"\"...T",
+        "T.S.............,.,......S.T",
+        "::::::::::::::::::::::::::::",
+        "::::::::::::::::::::::::::::",
+        "T........,..............,..T",
+        "T...\"\"\"\"\"..\"\"\"\"\"\"\".......,.T",
+        "T...\"\"\"\"\"..\"\"\"O\"\"\".........T",
+        "T...\"\"\"\"\"..\"\"\"\"\"\"\".........T",
+        "TTT.TT.TT.TT.TT.TT.TT.TT.TTT",
+        "TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    ],
+    warps: [
+        (x: 0, y: 6, map: "vila_azul", to_x: 27, to_y: 14, facing: Left),
+        (x: 0, y: 7, map: "vila_azul", to_x: 27, to_y: 14, facing: Left),
+        (x: 27, y: 6, map: "setecolinas", to_x: 1, to_y: 8, facing: Right),
+        (x: 27, y: 7, map: "setecolinas", to_x: 1, to_y: 8, facing: Right),
+    ],
+    npcs: [
+        (id: "marta", x: 14, y: 4, art: "menina", facing: Down, dialogue: "marta", trainer: (sight: 3, challenge: "treino_menina", spot_dialogue: "marta_spot")),
+    ],
+    signs: [
+        (x: 2, y: 5, dialogue: "sign_oeste"),
+        (x: 25, y: 5, dialogue: "sign_rota"),
+    ],
+    encounters: [
+        (species: "galo", weight: 25),
+        (species: "camaleao", weight: 25),
+        (species: "cegonha", weight: 20),
+        (species: "azulejo", weight: 30),
+    ],
+    encounter_rate: 14,
+)

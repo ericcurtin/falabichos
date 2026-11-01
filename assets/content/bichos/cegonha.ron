@@ -1,0 +1,15 @@
+// Bicho #8: Cegonha
+(
+    id: "cegonha",
+    name: "Cegonha",
+    dex_no: 8,
+    kind: Grammar,
+    theme: "the little words: articles, plurals, possessives, contractions",
+    flavor_pt: "A Cegonha traz os artigos certos: o, a, um, uma.",
+    flavor_en: "The Cegonha delivers the right articles: o, a, um, uma.",
+    grammar: ["articles_gender", "plurals", "possessives", "contractions"],
+    art: "cegonha",
+    trust_needed: 6,
+    cry_hz: 480,
+    needs_native_review: true,
+)

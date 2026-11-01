@@ -1,0 +1,60 @@
+// Grammar concept: Articles and gender
+(
+    id: "articles_gender",
+    title: "Articles and gender",
+    summary: "Every Portuguese noun is masculine or feminine, and the article must agree: o/a (the), um/uma (a).",
+    rules: [
+        "Definite articles: o (masc.), a (fem.), os / as (plural).",
+        "Indefinite articles: um (masc.), uma (fem.), uns / umas (plural).",
+        "Nouns ending in -o are usually masculine and in -a feminine. Learn the article together with the noun.",
+        "Watch out: o dia (day), o mapa (map) are masculine; a mão (hand), a tribo are feminine.",
+    ],
+    examples: [
+        (pt: "a casa", en: "the house"),
+        (pt: "o livro", en: "the book"),
+        (pt: "uma amiga", en: "a (female) friend"),
+    ],
+    pt_pt_note: "Same system as Brazilian Portuguese. A few words differ in gender between regions, so check unusual nouns.",
+    exercises: [
+        (
+            id: "ag_1", kind: FillBlank,
+            prompt: "___ casa é azul.",
+            context: "The house is blue.",
+            options: ["o", "a"],
+            answer: ["a"],
+            explanation: "'casa' is feminine, so the article is 'a'.",
+        ),
+        (
+            id: "ag_2", kind: FillBlank,
+            prompt: "___ livro é novo.",
+            context: "The book is new.",
+            options: ["o", "a"],
+            answer: ["o"],
+            explanation: "'livro' is masculine, so the article is 'o'.",
+        ),
+        (
+            id: "ag_3", kind: FillBlank,
+            prompt: "Eu tenho ___ amiga portuguesa.",
+            context: "I have a Portuguese (female) friend.",
+            options: ["um", "uma"],
+            answer: ["uma"],
+            explanation: "'amiga' is feminine: 'uma'.",
+        ),
+        (
+            id: "ag_4", kind: Choice,
+            prompt: "Which article goes with 'dia' (day)?", prompt_lang: En,
+            options: ["o dia", "a dia"],
+            answer: ["o dia"],
+            explanation: "'dia' ends in -a but is masculine: o dia. Exceptions like this are why you learn article + noun.",
+        ),
+        (
+            id: "ag_5", kind: FillBlank,
+            prompt: "Queria ___ pastel de nata, por favor.",
+            context: "I would like a custard tart, please.",
+            options: ["um", "uma"],
+            answer: ["um"],
+            explanation: "'pastel' is masculine: 'um pastel'.",
+        ),
+    ],
+    needs_native_review: true,
+)

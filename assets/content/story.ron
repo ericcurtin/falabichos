@@ -1,0 +1,9 @@
+// Where the story starts and how the vertical slice ends.
+(
+    start_map: "casa_avo",
+    start_x: 5,
+    start_y: 5,
+    intro_dialogue: "intro",
+    finale_flag: "beat_beatriz",
+    finale_dialogue: "finale",
+)

@@ -1,0 +1,59 @@
+// Grammar concept: Possessives
+(
+    id: "possessives",
+    title: "Possessives",
+    summary: "In Portugal possessives usually take the definite article: o meu livro, a minha casa.",
+    rules: [
+        "my: o meu / a minha / os meus / as minhas.",
+        "your (tu): o teu / a tua. Polite or formal your: o seu / a sua.",
+        "The possessive agrees with the thing owned, not with the owner.",
+        "Dropping the article (meu livro) is the Brazilian habit, though both varieties omit it before family names in some contexts.",
+    ],
+    examples: [
+        (pt: "O meu pai chama-se Rui.", en: "My father is called Rui."),
+        (pt: "A minha avó mora aqui.", en: "My grandmother lives here."),
+        (pt: "Onde está o teu telemóvel?", en: "Where is your phone?"),
+    ],
+    pt_pt_note: "'telemóvel' (mobile phone) is the pt-PT word; Brazil says 'celular'.",
+    exercises: [
+        (
+            id: "po_1", kind: FillBlank,
+            prompt: "___ casa é pequena.",
+            context: "My house is small.",
+            options: ["A minha", "O meu", "Minha"],
+            answer: ["A minha"],
+            explanation: "'casa' is feminine: a minha casa.",
+        ),
+        (
+            id: "po_2", kind: FillBlank,
+            prompt: "Este é ___ amigo.",
+            context: "This is my friend.",
+            options: ["o meu", "a minha", "meu"],
+            answer: ["o meu"],
+            explanation: "Article + possessive: o meu amigo.",
+        ),
+        (
+            id: "po_3", kind: Choice,
+            prompt: "Which is more natural in Portugal?", prompt_lang: En,
+            options: ["O meu pai chama-se Rui.", "Meu pai chama-se Rui."],
+            answer: ["O meu pai chama-se Rui."],
+            explanation: "pt-PT keeps the article: o meu pai.",
+        ),
+        (
+            id: "po_4", kind: FillBlank,
+            prompt: "Onde está ___ telemóvel?",
+            context: "Where is your (informal) phone?",
+            options: ["o teu", "a tua", "o seu"],
+            answer: ["o teu"],
+            explanation: "Informal 'your' = teu/tua; 'telemóvel' is masculine.",
+        ),
+        (
+            id: "po_5", kind: Type,
+            prompt: "___ avó (my, with the article)",
+            context: "my grandmother",
+            answer: ["a minha"],
+            explanation: "a minha avó.",
+        ),
+    ],
+    needs_native_review: true,
+)

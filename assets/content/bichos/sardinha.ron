@@ -1,0 +1,15 @@
+// Bicho #2: Sardinha
+(
+    id: "sardinha",
+    name: "Sardinha",
+    dex_no: 2,
+    kind: Vocab,
+    theme: "the sea, fish and the seaside",
+    flavor_pt: "A Sardinha nada em grupo e adora conversas de praia.",
+    flavor_en: "The Sardinha swims in a school and loves beach chatter.",
+    vocab: ["sardinha", "peixe", "polvo", "mar", "barco", "praia", "arroz", "farol"],
+    art: "sardinha",
+    trust_needed: 5,
+    cry_hz: 700,
+    needs_native_review: true,
+)

@@ -415,7 +415,7 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
             q.push_back(p);
         }
     }
-    let npc_blocks: BTreeSet<(i32, i32)> = m.npcs.iter().map(|n| (n.x, n.y)).collect();
+    let npc_blocks: BTreeSet<(i32, i32)> = m.npcs.iter().filter(|n| n.show_when.is_empty()).map(|n| (n.x, n.y)).collect();
     while let Some((x, y)) = q.pop_front() {
         for (dx, dy) in [(0, 1), (0, -1), (1, 0), (-1, 0)] {
             let p = (x + dx, y + dy);

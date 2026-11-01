@@ -1,0 +1,112 @@
+// Dialogues of Setecolinas and the road to it.
+[
+    (
+        id: "beatriz",
+        branches: [
+            (when: [Flag("beat_beatriz")], lines: [
+                (who: "Mestra Beatriz", pt: "O Selo do Elétrico é teu. Fizeste uma ótima viagem!", en: "The Tram Seal is yours. You made a great journey!", words: {"fizeste": "you made/did", "viagem": "journey", "ótima": "great (f.)"}),
+            ]),
+            (lines: [
+                (who: "Mestra Beatriz", pt: "Bom dia! Eu sou a Mestra Beatriz, condutora do elétrico.", en: "Good morning! I am Master Beatriz, the tram driver.", words: {"condutora": "driver (f.)"}),
+                (who: "Mestra Beatriz", pt: "Aqui, o respeito é importante. Tratamos os mais velhos por 'o senhor' e 'a senhora'.", en: "Here, respect is important. We address older people as 'o senhor' and 'a senhora'.", words: {"respeito": "respect", "tratamos": "we address, we treat", "velhos": "old (people)"}, register: "formal", needs_native_review: true),
+                (who: "Mestra Beatriz", pt: "O teu teste: transportes e boas maneiras. Vamos a isso!", en: "Your test: transport and good manners. Let's go!", words: {"maneiras": "manners"}),
+            ], then: [Challenge("mestre_beatriz")]),
+        ],
+    ),
+    (
+        id: "beatriz_win",
+        branches: [(lines: [
+            (who: "Mestra Beatriz", pt: "Excelente! Falas como uma verdadeira lisboeta.", en: "Excellent! You speak like a true Lisboner.", words: {"verdadeira": "true, real", "lisboeta": "person from Lisbon"}),
+            (pt: "Recebeste o Selo do Elétrico!", en: "You received the Tram Seal!"),
+        ])],
+    ),
+    (
+        id: "beatriz_lose",
+        branches: [(lines: [
+            (who: "Mestra Beatriz", pt: "Ainda não é desta. Treina e volta cá!", en: "Not this time. Practise and come back!", words: {"ainda não é desta": "not this time (idiom)"}, needs_native_review: true),
+        ])],
+    ),
+    (
+        id: "finale",
+        branches: [(lines: [
+            (pt: "Parabéns! Ganhaste dois Selos e conheceste muitos Bichos.", en: "Congratulations! You won two Seals and met many Bichos.", words: {"conheceste": "you met"}),
+            (pt: "A aventura vai continuar: o Porto, o Alentejo, o Algarve e as ilhas esperam por ti!", en: "The adventure will continue: Porto, the Alentejo, the Algarve and the islands are waiting for you!", words: {"esperam": "they wait"}),
+            (pt: "Obrigado por jogares a Parte 1 do Falabichos. Continua a treinar!", en: "Thank you for playing Part 1 of Falabichos. Keep practising!", needs_native_review: true),
+        ])],
+    ),
+    (
+        id: "rui_spot",
+        branches: [(lines: [(who: "Condutor Rui", pt: "Bilhete, por favor! Primeiro, um teste.", en: "Ticket, please! First, a test.", words: {"bilhete": "ticket"})])],
+    ),
+    (
+        id: "rui",
+        branches: [
+            (when: [Flag("beat_rui")], lines: [(who: "Condutor Rui", pt: "O elétrico passa de dez em dez minutos.", en: "The tram comes every ten minutes.", words: {"de dez em dez minutos": "every ten minutes"})]),
+            (lines: [(who: "Condutor Rui", pt: "Olá! Estás à espera do elétrico?", en: "Hello! Are you waiting for the tram?", words: {"à espera de": "waiting for"})], then: [Challenge("treino_rui")]),
+        ],
+    ),
+    (id: "rui_win", branches: [(lines: [(who: "Condutor Rui", pt: "Muito bem! Boa viagem!", en: "Well done! Have a good trip!")])]),
+    (id: "rui_lose", branches: [(lines: [(who: "Condutor Rui", pt: "Não faz mal. O próximo elétrico já vem aí.", en: "Never mind. The next tram is coming soon.", needs_native_review: true)])]),
+    (
+        id: "ines_spot",
+        branches: [(lines: [(who: "Inês", pt: "Olá! Estás a aprender português? Vamos treinar!", en: "Hi! Are you learning Portuguese? Let's practise!", words: {"aprender": "to learn"})])],
+    ),
+    (
+        id: "ines",
+        branches: [
+            (when: [Flag("beat_ines")], lines: [(who: "Inês", pt: "Adoro o azul e o branco dos azulejos.", en: "I love the blue and white of the tiles.", words: {"adoro": "I love"})]),
+            (lines: [(who: "Inês", pt: "Sabes contar até dez?", en: "Can you count to ten?")], then: [Challenge("treino_ines")]),
+        ],
+    ),
+    (id: "ines_win", branches: [(lines: [(who: "Inês", pt: "Fantástico! Sabes mesmo contar.", en: "Fantastic! You really can count.", words: {"mesmo": "really"})])]),
+    (id: "ines_lose", branches: [(lines: [(who: "Inês", pt: "Quase! Tenta outra vez.", en: "Almost! Try again.", words: {"quase": "almost"})])]),
+    (
+        id: "marta_spot",
+        branches: [(lines: [(who: "Marta", pt: "Ei! Como te sentes hoje? Vamos falar de sentimentos!", en: "Hey! How do you feel today? Let's talk about feelings!", words: {"sentes": "you feel", "sentimentos": "feelings"})])],
+    ),
+    (
+        id: "marta",
+        branches: [
+            (when: [Flag("beat_marta")], lines: [(who: "Marta", pt: "Tenho saudades da minha avó, mas hoje estou contente.", en: "I miss my grandmother, but today I'm happy.")]),
+            (lines: [(who: "Marta", pt: "Olá outra vez! Queres ouvir uma coisa?", en: "Hello again! Do you want to hear something?")], then: [Challenge("treino_menina")]),
+        ],
+    ),
+    (id: "marta_win", branches: [(lines: [(who: "Marta", pt: "Que bom! Estou contente por ti.", en: "How nice! I'm happy for you.")])]),
+    (id: "marta_lose", branches: [(lines: [(who: "Marta", pt: "Não faz mal. Eu também me engano às vezes.", en: "Never mind. I make mistakes sometimes too.", words: {"engano": "I make a mistake", "às vezes": "sometimes"}, needs_native_review: true)])]),
+    (
+        id: "lisboeta",
+        branches: [(lines: [
+            (who: "Lisboeta", pt: "Esta cidade tem sete colinas. Por isso há tantas escadas!", en: "This city has seven hills. That's why there are so many stairs!", words: {"escadas": "stairs", "tantas": "so many"}),
+            (who: "Lisboeta", pt: "Apanha o elétrico. É fixe!", en: "Catch the tram. It's great!", words: {"apanha": "catch (tu command)", "fixe": "cool, great"}),
+        ])],
+    ),
+    (
+        id: "vendedora",
+        branches: [(lines: [
+            (who: "Vendedora", pt: "Bom dia! Quer laranjas? São fresquinhas.", en: "Good morning! Would you like oranges? They are very fresh.", register: "formal", words: {"quer": "do you want (polite)"}),
+            (who: "Vendedora", pt: "São três euros, se faz favor.", en: "That's three euros, please."),
+            (who: "Vendedora", pt: "Obrigada e boa tarde!", en: "Thank you and good afternoon!", words: {"obrigada": "thank you (said by a woman)"}),
+        ])],
+    ),
+    (
+        id: "senhor_banco",
+        branches: [(lines: [
+            (who: "Senhor", pt: "Boa tarde, jovem. Tu és de fora? Não és daqui.", en: "Good afternoon, young one. Are you from out of town? You're not from here.", words: {"jovem": "young person", "de fora": "from elsewhere"}),
+            (who: "Senhor", pt: "Em Setecolinas, ao entrar numa loja, diz-se sempre 'bom dia' ou 'boa tarde'.", en: "In Setecolinas, when you enter a shop, you always say 'bom dia' or 'boa tarde'.", words: {"diz-se": "one says"}, needs_native_review: true),
+        ])],
+    ),
+    (
+        id: "turista_colina",
+        branches: [(lines: [
+            (who: "Turista", pt: "Desculpe, onde é a paragem do elétrico?", en: "Excuse me, where is the tram stop?", register: "formal"),
+            (who: "Turista", pt: "Ah, é ali em frente! Muito obrigada.", en: "Ah, it's right over there! Thank you very much.", words: {"em frente": "in front, straight ahead"}),
+        ])],
+    ),
+    (id: "sign_rota", branches: [(lines: [(pt: "Caminho de Setecolinas. Cuidado com a erva alta!", en: "Path to Setecolinas. Careful with the tall grass!")])]),
+    (id: "sign_oeste", branches: [(lines: [(pt: "Vila Azul: 5 quilómetros.", en: "Vila Azul: 5 kilometres.")])]),
+    (id: "sign_setecolinas", branches: [(lines: [(pt: "SETECOLINAS: Cidade das Sete Colinas.", en: "SETECOLINAS: City of the Seven Hills.")])]),
+    (id: "sign_estacao", branches: [(lines: [(pt: "Estação do Elétrico. Bilhetes à venda.", en: "Tram Station. Tickets on sale.", words: {"à venda": "on sale"})])]),
+    (id: "sign_mercearia", branches: [(lines: [(pt: "Mercearia Dois Irmãos. Fruta fresca todos os dias.", en: "Two Brothers Grocery. Fresh fruit every day.")])]),
+    (id: "sign_jardim", branches: [(lines: [(pt: "Jardim das Colinas. Não pises a erva alta... a não ser que queiras conhecer um Bicho!", en: "Hill Garden. Don't step on the tall grass... unless you want to meet a Bicho!", words: {"pises": "you step (don't)", "a não ser que": "unless"}, needs_native_review: true)])]),
+    (id: "sign_paragem", branches: [(lines: [(pt: "Paragem do Elétrico 28. Próximo elétrico em 5 minutos.", en: "Tram stop, line 28. Next tram in 5 minutes.")])]),
+]

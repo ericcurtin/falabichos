@@ -1,0 +1,26 @@
+// Cafe: a bica and a pastel de nata restore your confidence.
+(
+    id: "cafe_dona_rosa",
+    name: "Café Dona Rosa",
+    town: "vila_azul",
+    music: "indoor",
+    indoor: true,
+    rows: [
+        "NNNNNNNNNNNN",
+        "NNNNNNNNNNNN",
+        "NHHKUKKHHKFN",
+        "NXXAAXXXUXFN",
+        "NFFFFFFFFFFN",
+        "NFFFFCCFFFFN",
+        "NFMFFFFFFMPN",
+        "NNNNNEENNNNN",
+    ],
+    warps: [
+        (x: 5, y: 7, map: "vila_azul", to_x: 24, to_y: 12, facing: Down),
+        (x: 6, y: 7, map: "vila_azul", to_x: 24, to_y: 12, facing: Down),
+    ],
+    npcs: [
+        (id: "dona_rosa", x: 5, y: 2, art: "dona_rosa", facing: Down, dialogue: "dona_rosa"),
+        (id: "turista_cafe", x: 8, y: 5, art: "turista", facing: Left, dialogue: "turista_cafe"),
+    ],
+)

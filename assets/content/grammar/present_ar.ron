@@ -1,0 +1,59 @@
+// Grammar concept: Present tense: -ar verbs
+(
+    id: "present_ar",
+    title: "Present tense: -ar verbs",
+    summary: "Regular -ar verbs (falar, comprar, gostar) share one set of endings.",
+    rules: [
+        "falar: eu falo, tu falas, ele/ela fala, nós falamos, eles/elas falam.",
+        "Endings: -o, -as, -a, -amos, -am.",
+        "Subject pronouns are optional: Falo português.",
+    ],
+    examples: [
+        (pt: "Falo português.", en: "I speak Portuguese."),
+        (pt: "Tu falas inglês?", en: "Do you speak English?"),
+        (pt: "Eles falam muito.", en: "They talk a lot."),
+    ],
+    pt_pt_note: "'vós' forms (falais) are not used in everyday speech in Portugal either.",
+    exercises: [
+        (
+            id: "ar_1", kind: FillBlank,
+            prompt: "Eu ___ português.",
+            context: "I speak Portuguese.",
+            options: ["falo", "falas", "fala"],
+            answer: ["falo"],
+            explanation: "eu → -o.",
+        ),
+        (
+            id: "ar_2", kind: FillBlank,
+            prompt: "Tu ___ inglês?",
+            context: "Do you speak English?",
+            options: ["falas", "fala", "falam"],
+            answer: ["falas"],
+            explanation: "tu → -as.",
+        ),
+        (
+            id: "ar_3", kind: FillBlank,
+            prompt: "Nós ___ com a avó.",
+            context: "We talk with grandma.",
+            options: ["falamos", "falam", "falo"],
+            answer: ["falamos"],
+            explanation: "nós → -amos.",
+        ),
+        (
+            id: "ar_4", kind: FillBlank,
+            prompt: "Eles ___ muito.",
+            context: "They talk a lot.",
+            options: ["falam", "fala", "falamos"],
+            answer: ["falam"],
+            explanation: "eles → -am.",
+        ),
+        (
+            id: "ar_5", kind: Type,
+            prompt: "Eu ___ pão. (comprar)",
+            context: "I buy bread.",
+            answer: ["compro"],
+            explanation: "eu → -o: compro.",
+        ),
+    ],
+    needs_native_review: true,
+)

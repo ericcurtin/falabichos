@@ -1,0 +1,15 @@
+// Bicho #1: Galo
+(
+    id: "galo",
+    name: "Galo",
+    dex_no: 1,
+    kind: Vocab,
+    theme: "farm animals and the countryside",
+    flavor_pt: "O Galo canta ao nascer do sol e acorda a vila inteira.",
+    flavor_en: "The Galo sings at sunrise and wakes the whole village.",
+    vocab: ["galo", "galinha", "vaca", "cavalo", "porco", "ovelha", "quinta", "campo", "ovo"],
+    art: "galo",
+    trust_needed: 5,
+    cry_hz: 520,
+    needs_native_review: true,
+)

@@ -1,0 +1,26 @@
+// Restaurant O Polvo: Mestre Joaquim's test (ordering food politely). Winning gives the Selo do Polvo.
+(
+    id: "restaurante_polvo",
+    name: "Restaurante O Polvo",
+    town: "vila_azul",
+    music: "indoor",
+    indoor: true,
+    rows: [
+        "NNNNNNNNNNNN",
+        "NNNNNNNNNNNN",
+        "NHHFFFFFFHIN",
+        "NFMFFFFFFMFN",
+        "NFFFFCCFFFFN",
+        "NFFFFCCFFFFN",
+        "NFMFFCCFFMFN",
+        "NPFFFFFFFFPN",
+        "NNNNNEENNNNN",
+    ],
+    warps: [
+        (x: 5, y: 8, map: "vila_azul", to_x: 6, to_y: 12, facing: Down),
+        (x: 6, y: 8, map: "vila_azul", to_x: 6, to_y: 12, facing: Down),
+    ],
+    npcs: [
+        (id: "joaquim", x: 6, y: 3, art: "joaquim", facing: Down, dialogue: "joaquim"),
+    ],
+)

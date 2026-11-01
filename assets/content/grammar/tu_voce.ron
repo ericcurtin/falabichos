@@ -1,0 +1,57 @@
+// Grammar concept: Tu, o senhor and você
+(
+    id: "tu_voce",
+    title: "Tu, o senhor and você",
+    summary: "Portuguese has several ways to say 'you', and picking the right one is about politeness.",
+    rules: [
+        "tu: friends, family, children, people your age. The verb ends in -s: tu falas, tu és.",
+        "o senhor / a senhora: polite, to older people or strangers. Use the 3rd person verb: O senhor quer café?",
+        "Using the person's name or title (a professora, o senhor Joaquim) is also polite.",
+        "In Portugal 'você' can sound cold or even rude. Beginners are safest with tu or o senhor / a senhora.",
+    ],
+    examples: [
+        (pt: "Tu és português?", en: "Are you Portuguese? (informal)"),
+        (pt: "O senhor é português?", en: "Are you Portuguese? (polite)"),
+        (pt: "Como está a senhora?", en: "How are you, madam?"),
+    ],
+    pt_pt_note: "This is a big pt-PT vs pt-BR difference: in Brazil 'você' is the normal everyday 'you'; in Portugal it is not.",
+    exercises: [
+        (
+            id: "tv_1", kind: Choice,
+            prompt: "You meet an elderly lady you do not know. How do you ask how she is?", prompt_lang: En,
+            options: ["Como está a senhora?", "Como estás?", "Como estás tu?"],
+            answer: ["Como está a senhora?"],
+            explanation: "Polite register: a senhora + 3rd person (está).",
+        ),
+        (
+            id: "tv_2", kind: FillBlank,
+            prompt: "(To a friend) Tu ___ muito simpático.",
+            context: "You are very nice.",
+            options: ["és", "é"],
+            answer: ["és"],
+            explanation: "With tu the verb ends in -s: tu és.",
+        ),
+        (
+            id: "tv_3", kind: FillBlank,
+            prompt: "(To a shopkeeper) O senhor ___ português?",
+            context: "Are you Portuguese, sir?",
+            options: ["é", "és"],
+            answer: ["é"],
+            explanation: "O senhor takes the 3rd person: é.",
+        ),
+        (
+            id: "tv_4", kind: Choice,
+            prompt: "Which sentence is polite to an older stranger?", prompt_lang: En,
+            options: ["O senhor quer um café?", "Tu queres um café?"],
+            answer: ["O senhor quer um café?"],
+            explanation: "'O senhor' + 3rd person is the polite form.",
+        ),
+        (
+            id: "tv_5", kind: Type,
+            prompt: "you (informal) are:", prompt_lang: En,
+            answer: ["és"],
+            explanation: "tu és.",
+        ),
+    ],
+    needs_native_review: true,
+)

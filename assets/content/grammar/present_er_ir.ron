@@ -1,0 +1,59 @@
+// Grammar concept: Present tense: -er and -ir verbs
+(
+    id: "present_er_ir",
+    title: "Present tense: -er and -ir verbs",
+    summary: "Regular -er (comer, beber) and -ir (partir, abrir) verbs differ only a little.",
+    rules: [
+        "comer: como, comes, come, comemos, comem.",
+        "partir: parto, partes, parte, partimos, partem.",
+        "The only difference between -er and -ir is the nós form (-emos vs -imos).",
+    ],
+    examples: [
+        (pt: "Eu como um pastel.", en: "I eat a custard tart."),
+        (pt: "O comboio parte às oito.", en: "The train leaves at eight."),
+        (pt: "Eles bebem sumo.", en: "They drink juice."),
+    ],
+    pt_pt_note: "Same conjugation as in Brazil; pronunciation of the unstressed endings differs.",
+    exercises: [
+        (
+            id: "ei_1", kind: FillBlank,
+            prompt: "Eu ___ um pastel. (comer)",
+            context: "I eat a custard tart.",
+            options: ["como", "come", "comes"],
+            answer: ["como"],
+            explanation: "eu → -o.",
+        ),
+        (
+            id: "ei_2", kind: FillBlank,
+            prompt: "Tu ___ água? (beber)",
+            context: "Do you drink water?",
+            options: ["bebes", "bebe", "bebem"],
+            answer: ["bebes"],
+            explanation: "tu → -es.",
+        ),
+        (
+            id: "ei_3", kind: FillBlank,
+            prompt: "O comboio ___ às oito. (partir)",
+            context: "The train leaves at eight.",
+            options: ["parte", "partes", "partem"],
+            answer: ["parte"],
+            explanation: "ele/ela/o comboio → -e.",
+        ),
+        (
+            id: "ei_4", kind: FillBlank,
+            prompt: "Nós ___ peixe. (comer)",
+            context: "We eat fish.",
+            options: ["comemos", "comem", "como"],
+            answer: ["comemos"],
+            explanation: "nós → -emos.",
+        ),
+        (
+            id: "ei_5", kind: Type,
+            prompt: "Eles ___ sumo. (beber)",
+            context: "They drink juice.",
+            answer: ["bebem"],
+            explanation: "eles → -em.",
+        ),
+    ],
+    needs_native_review: true,
+)

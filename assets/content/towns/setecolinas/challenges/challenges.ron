@@ -1,0 +1,35 @@
+// Trainers and the Mestra of Setecolinas.
+[
+    (
+        id: "mestre_beatriz", name: "Mestra Beatriz", kind: Mestre,
+        theme: "Transport and polite register",
+        pool: (categories: ["transport"], grammar: ["tu_voce", "contractions", "ir_future"]),
+        questions: 8, pass_correct: 6, confidence: 3,
+        art: "beatriz", reward_flag: "beat_beatriz", seal: "selo_eletrico",
+        win_dialogue: "beatriz_win", lose_dialogue: "beatriz_lose",
+    ),
+    (
+        id: "treino_rui", name: "Condutor Rui", kind: Trainer,
+        theme: "Trams, trains and buses",
+        pool: (categories: ["transport"]),
+        questions: 3, pass_correct: 2, confidence: 2,
+        art: "condutor", reward_flag: "beat_rui",
+        win_dialogue: "rui_win", lose_dialogue: "rui_lose",
+    ),
+    (
+        id: "treino_ines", name: "Inês", kind: Trainer,
+        theme: "Colours and numbers",
+        pool: (categories: ["colours_numbers"]),
+        questions: 4, pass_correct: 3, confidence: 2,
+        art: "estudante", reward_flag: "beat_ines",
+        win_dialogue: "ines_win", lose_dialogue: "ines_lose",
+    ),
+    (
+        id: "treino_menina", name: "Marta", kind: Trainer,
+        theme: "Feelings",
+        pool: (categories: ["feelings"]),
+        questions: 3, pass_correct: 2, confidence: 2,
+        art: "menina", reward_flag: "beat_marta",
+        win_dialogue: "marta_win", lose_dialogue: "marta_lose",
+    ),
+]

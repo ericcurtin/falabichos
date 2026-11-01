@@ -1,0 +1,8 @@
+(
+    id: "vila_azul",
+    name: "Vila Azul",
+    blurb: "A sleepy fishing village of white houses and blue tiles, where every summer begins.",
+    inspired_by: "Portuguese fishing villages of the Atlantic coast (Alentejo and Algarve coast, Nazaré)",
+    start_map: "vila_azul",
+    needs_native_review: true,
+)

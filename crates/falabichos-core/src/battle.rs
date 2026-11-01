@@ -111,6 +111,7 @@ impl Battle {
         progress: &mut Progress,
         srs: &SrsStore,
         policy: AnswerPolicy,
+        start_confidence: Option<u8>,
         rng: &mut Rng,
         now: i64,
     ) -> Result<Battle, BattleError> {
@@ -123,7 +124,7 @@ impl Battle {
         let mut b = Battle::base(BattleKind::Wild { species: species.to_string() }, sp.name.clone(), pool);
         let (conf, hints) = party_bonus(content, srs, progress);
         b.max_confidence = 4 + conf;
-        b.confidence = b.max_confidence;
+        b.confidence = start_confidence.map(|c| c.clamp(1, b.max_confidence)).unwrap_or(b.max_confidence);
         b.hints_left = hints;
         b.trust_needed = sp.trust_needed.max(1);
         b.policy = policy;
@@ -436,7 +437,7 @@ mod tests {
         let mut p = Progress::default();
         let mut srs = SrsStore::default();
         let mut rng = Rng::new(11);
-        let mut b = Battle::wild(&c, "galo", &mut p, &srs, AnswerPolicy::default(), &mut rng, 1000).unwrap();
+        let mut b = Battle::wild(&c, "galo", &mut p, &srs, AnswerPolicy::default(), None, &mut rng, 1000).unwrap();
         assert!(p.dex_seen.contains("galo"));
         let mut now = 1000;
         let mut guard = 0;
@@ -463,7 +464,7 @@ mod tests {
         let mut p = Progress::default();
         let mut srs = SrsStore::default();
         let mut rng = Rng::new(3);
-        let mut b = Battle::wild(&c, "galo", &mut p, &srs, AnswerPolicy::default(), &mut rng, 0).unwrap();
+        let mut b = Battle::wild(&c, "galo", &mut p, &srs, AnswerPolicy::default(), None, &mut rng, 0).unwrap();
         assert_eq!(b.max_confidence, 4);
         for _ in 0..4 {
             assert!(!b.is_over());
@@ -524,7 +525,7 @@ mod tests {
         let mut p = Progress::default();
         let mut srs = SrsStore::default();
         let mut rng = Rng::new(8);
-        let mut b = Battle::wild(&c, "galo", &mut p, &srs, AnswerPolicy::default(), &mut rng, 0).unwrap();
+        let mut b = Battle::wild(&c, "galo", &mut p, &srs, AnswerPolicy::default(), None, &mut rng, 0).unwrap();
         assert_eq!(b.hints_left, 1);
         assert!(b.use_hint(&mut rng).is_some());
         assert!(b.use_hint(&mut rng).is_none());
@@ -557,7 +558,7 @@ mod tests {
         let srs = SrsStore::default();
         let mut rng = Rng::new(1);
         assert_eq!(
-            Battle::wild(&c, "nope", &mut p, &srs, AnswerPolicy::default(), &mut rng, 0).unwrap_err(),
+            Battle::wild(&c, "nope", &mut p, &srs, AnswerPolicy::default(), None, &mut rng, 0).unwrap_err(),
             BattleError::UnknownSpecies("nope".into())
         );
         assert!(Battle::challenge(&c, "nope", &srs, AnswerPolicy::default(), &mut rng, 0).is_err());

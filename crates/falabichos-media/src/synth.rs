@@ -48,6 +48,17 @@ pub struct Song {
     channels: Vec<Channel>,
 }
 
+/// Strip a trailing `# comment` (a `#` at line start or after whitespace; `C#4` is a note).
+fn strip_comment(line: &str) -> &str {
+    let bytes = line.as_bytes();
+    for (i, b) in bytes.iter().enumerate() {
+        if *b == b'#' && (i == 0 || bytes[i - 1].is_ascii_whitespace()) {
+            return &line[..i];
+        }
+    }
+    line
+}
+
 pub fn note_freq(name: &str) -> Option<f32> {
     let mut cs = name.chars();
     let letter = cs.next()?;
@@ -76,7 +87,7 @@ impl Song {
     pub fn parse(text: &str) -> Result<Song, String> {
         let mut song = Song { name: String::new(), bpm: 120.0, looped: true, channels: vec![] };
         for (n, raw) in text.lines().enumerate() {
-            let line = raw.split('#').next().unwrap_or("").trim();
+            let line = strip_comment(raw).trim();
             if line.is_empty() {
                 continue;
             }

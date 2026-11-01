@@ -1,0 +1,26 @@
+// Tram station: Mestra Beatriz's test (transport and polite register). Winning gives the Selo do Eletrico.
+(
+    id: "estacao_eletrico",
+    name: "Estação do Elétrico",
+    town: "setecolinas",
+    music: "indoor",
+    indoor: true,
+    rows: [
+        "NNNNNNNNNNNN",
+        "NNNNNNNNNNNN",
+        "NHHHFFFFGGGN",
+        "NFFFFFFFFFFN",
+        "NFFFXXXXFFFN",
+        "NFFFFCCFFFFN",
+        "NFMFFCCFFMFN",
+        "NPFFFFFFFFPN",
+        "NNNNNEENNNNN",
+    ],
+    warps: [
+        (x: 5, y: 8, map: "setecolinas", to_x: 6, to_y: 6, facing: Down),
+        (x: 6, y: 8, map: "setecolinas", to_x: 6, to_y: 6, facing: Down),
+    ],
+    npcs: [
+        (id: "beatriz", x: 5, y: 3, art: "beatriz", facing: Down, dialogue: "beatriz"),
+    ],
+)
