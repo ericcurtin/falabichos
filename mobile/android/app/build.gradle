@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: Apache-2.0
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'org.falabichos'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'org.falabichos.falabichos'
+        minSdk 28
+        targetSdk 34
+        versionCode 1
+        versionName '0.1.0'
+        // Only the ABIs that cargo-ndk produced are packaged.
+        ndk { abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64' }
+    }
+
+    buildTypes {
+        release {
+            // Unsigned by default: sign with your own key (see docs/BUILDING.md) or via CI secrets.
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    sourceSets {
+        main {
+            // libfalabichos.so per ABI, produced by `cargo ndk` (see `cargo xtask android`).
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+    buildFeatures { prefab true }
+}
+
+dependencies {
+    // GameActivity is the activity flavour enabled by the `android-game-activity` cargo feature.
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.core:core:1.13.1'
+    implementation 'androidx.games:games-activity:2.0.2'
+}

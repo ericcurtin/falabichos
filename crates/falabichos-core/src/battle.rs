@@ -3,7 +3,7 @@
 //! and practice sessions. Pure state machine: the UI feeds answers in and reads state out.
 
 use crate::content::Content;
-use crate::exercise::{Answer, Exercise, GenOptions, Hint, Judgement, generate};
+use crate::exercise::{Answer, Exercise, Hint, Judgement, generate};
 use crate::normalize::{AnswerPolicy, Verdict};
 use crate::progress::{Progress, party_bonus};
 use crate::rng::Rng;
@@ -225,7 +225,7 @@ impl Battle {
                 return;
             };
             self.last_skill = Some(skill.clone());
-            let ex = generate(content, &skill, srs.card(&skill), rng, |_| GenOptions::default());
+            let ex = generate(content, &skill, srs.card(&skill), rng);
             if ex.is_some() || tries > 20 {
                 self.current = ex;
                 return;

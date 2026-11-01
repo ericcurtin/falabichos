@@ -255,36 +255,17 @@ fn place_correct(options: &mut Vec<String>, correct: String, rng: &mut Rng) -> u
     at
 }
 
-/// Controls which exercise flavours are possible.
-#[derive(Debug, Clone, Copy, Default)]
-pub struct GenOptions {
-    /// True when the clip for the vocab item exists (listening exercises use real audio).
-    pub audio_available: bool,
-}
-
 /// Generate an exercise for a skill (vocab id or grammar exercise id).
-pub fn generate(
-    content: &Content,
-    skill: &str,
-    card: Option<&Card>,
-    rng: &mut Rng,
-    opts: impl Fn(&str) -> GenOptions,
-) -> Option<Exercise> {
+pub fn generate(content: &Content, skill: &str, card: Option<&Card>, rng: &mut Rng) -> Option<Exercise> {
     if let Some(def) = content.grammar_exercise(skill) {
         return Some(from_def(def, rng));
     }
     let item = content.vocab.get(skill)?;
-    Some(generate_vocab(content, item, card, rng, opts(skill)))
+    Some(generate_vocab(content, item, card, rng))
 }
 
 /// Pick a flavour appropriate to how well the card is known, then build it.
-pub fn generate_vocab(
-    content: &Content,
-    item: &VocabItem,
-    card: Option<&Card>,
-    rng: &mut Rng,
-    gen_opts: GenOptions,
-) -> Exercise {
+pub fn generate_vocab(content: &Content, item: &VocabItem, card: Option<&Card>, rng: &mut Rng) -> Exercise {
     #[derive(Clone, Copy)]
     enum Pick {
         PtToEn,
@@ -403,9 +384,11 @@ pub fn generate_vocab(
             });
         }
         Pick::Listen => {
-            let real = gen_opts.audio_available && item.audio.is_some();
+            // A real recording makes this a listening exercise; without one it degrades to reading the IPA.
+            let slot = item.audio_slot();
+            let real = content.has_clip(&slot);
             base.flavor = if real { Flavor::Listen } else { Flavor::ListenIpa };
-            base.audio = item.audio.clone().filter(|_| real);
+            base.audio = Some(slot).filter(|_| real);
             base.prompt = if real {
                 String::new()
             } else {
@@ -524,7 +507,7 @@ mod tests {
     fn grammar_choice_checks() {
         let c = sample_content();
         let mut rng = Rng::new(1);
-        let ex = generate(&c, "g1", None, &mut rng, |_| GenOptions::default()).unwrap();
+        let ex = generate(&c, "g1", None, &mut rng).unwrap();
         assert_eq!(ex.kind, ExKind::Choice);
         let right = ex.correct[0];
         assert!(ex.check(&Answer::Choice(right), AnswerPolicy::default()).correct);
@@ -536,7 +519,7 @@ mod tests {
     fn order_exercise_accepts_right_order_only() {
         let c = sample_content();
         let mut rng = Rng::new(5);
-        let ex = generate(&c, "g2", None, &mut rng, |_| GenOptions::default()).unwrap();
+        let ex = generate(&c, "g2", None, &mut rng).unwrap();
         assert_eq!(ex.kind, ExKind::Order);
         let mut idx: Vec<usize> = vec![];
         for w in ["Estou", "a", "comer"] {
@@ -562,10 +545,7 @@ mod tests {
                     ..Card::default()
                 };
                 for id in c.vocab.keys() {
-                    let ex = generate(&c, id, Some(&card), &mut rng, |_| GenOptions {
-                        audio_available: false,
-                    })
-                    .unwrap();
+                    let ex = generate(&c, id, Some(&card), &mut rng).unwrap();
                     match ex.kind {
                         ExKind::Choice => {
                             assert!(!ex.correct.is_empty());
@@ -614,7 +594,7 @@ mod tests {
                 phase: Phase::Review,
                 ..Card::default()
             };
-            let ex = generate_vocab(&c, item, Some(&card), &mut rng, GenOptions::default());
+            let ex = generate_vocab(&c, item, Some(&card), &mut rng);
             if ex.flavor == Flavor::Article {
                 let right = &ex.options[ex.correct[0]];
                 assert!(right == "a" || right == "uma", "got {right}");
@@ -635,7 +615,7 @@ mod tests {
         };
         let mut found = false;
         for _ in 0..200 {
-            let ex = generate_vocab(&c, &c.vocab["casa"], Some(&card), &mut rng, GenOptions::default());
+            let ex = generate_vocab(&c, &c.vocab["casa"], Some(&card), &mut rng);
             if ex.kind == ExKind::Type {
                 found = true;
                 assert!(
@@ -661,10 +641,40 @@ mod tests {
     }
 
     #[test]
+    fn listening_uses_a_real_clip_when_one_exists_and_degrades_to_ipa_otherwise() {
+        let mut c = sample_content();
+        let card = Card {
+            seen: 3,
+            phase: Phase::Review,
+            ..Card::default()
+        };
+        let flavours = |c: &Content| {
+            let mut seen = vec![];
+            for seed in 0..300 {
+                let mut rng = Rng::new(seed);
+                let ex = generate_vocab(c, &c.vocab["casa"], Some(&card), &mut rng);
+                if matches!(ex.flavor, Flavor::Listen | Flavor::ListenIpa) {
+                    seen.push((ex.flavor, ex.audio.clone()));
+                }
+            }
+            seen
+        };
+        let before = flavours(&c);
+        assert!(!before.is_empty() && before.iter().all(|(f, a)| *f == Flavor::ListenIpa && a.is_none()));
+        c.audio_clips.insert("stuff/casa".to_string()); // the default slot is <category>/<id>
+        let after = flavours(&c);
+        assert!(
+            after
+                .iter()
+                .all(|(f, a)| *f == Flavor::Listen && a.as_deref() == Some("stuff/casa"))
+        );
+    }
+
+    #[test]
     fn hints() {
         let c = sample_content();
         let mut rng = Rng::new(9);
-        let ex = generate(&c, "g1", None, &mut rng, |_| GenOptions::default()).unwrap();
+        let ex = generate(&c, "g1", None, &mut rng).unwrap();
         match ex.hint(&mut rng) {
             Some(Hint::Eliminate(v)) => {
                 assert!(!v.is_empty());

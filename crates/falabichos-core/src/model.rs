@@ -97,7 +97,8 @@ pub struct VocabItem {
     /// IPA for European Portuguese (broad transcription, no slashes).
     #[serde(default)]
     pub ipa: Option<String>,
-    /// Clip name relative to `assets/audio/pt-PT/`, without extension (e.g. `cafe/bica`).
+    /// Optional override of the clip name relative to `assets/audio/pt-PT/`, without extension.
+    /// By default the slot is `<category>/<id>` (see [`VocabItem::audio_slot`]).
     #[serde(default)]
     pub audio: Option<String>,
     #[serde(default)]
@@ -125,6 +126,14 @@ fn one() -> u8 {
 }
 
 impl VocabItem {
+    /// The audio slot (`audio/pt-PT/<slot>.ogg`): the explicit `audio` field, or `<category>/<id>`.
+    /// Drop a recording at that path and the game picks it up with no data change.
+    pub fn audio_slot(&self) -> String {
+        self.audio
+            .clone()
+            .unwrap_or_else(|| format!("{}/{}", self.category, self.id))
+    }
+
     pub fn primary_en(&self) -> &str {
         self.en.first().map(String::as_str).unwrap_or("")
     }

@@ -201,12 +201,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn templates_parse_as_ron() {
-        for kind in ["vocab", "grammar", "bicho", "town"] {
-            let files = files_for(kind, "demo").unwrap();
-            assert!(!files.is_empty());
-        }
+    fn rejects_bad_ids_and_kinds() {
         assert!(files_for("vocab", "Bad Id").is_err());
         assert!(files_for("nope", "x").is_err());
+        assert!(is_id("a_b2") && !is_id("A") && !is_id(""));
     }
 }

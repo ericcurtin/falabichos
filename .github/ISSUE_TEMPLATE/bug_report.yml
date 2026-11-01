@@ -1,0 +1,31 @@
+name: Bug report
+description: Something is broken or looks wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did you see instead?
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. New game  2. Walk to the beach  3. ..."
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options: [Linux, macOS, Windows, Android, iOS]
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "Output of `falabichos --version`, or the release you installed"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshot
+      description: "Run from a terminal to see logs. Drag a screenshot in if it is a visual bug."

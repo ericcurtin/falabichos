@@ -1,0 +1,2 @@
+This project is built with a system Gradle (8.7 or newer) and JDK 17: `cargo xtask android` runs `gradle`.
+If you prefer the Gradle wrapper, run `gradle wrapper --gradle-version 8.9` once in this directory.

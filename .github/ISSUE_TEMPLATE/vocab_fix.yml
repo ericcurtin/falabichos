@@ -1,0 +1,25 @@
+name: Vocabulary fix / native review
+description: Report a wrong, unnatural or Brazilian word, a wrong IPA, or review flagged content
+labels: [native-review, content]
+body:
+  - type: input
+    id: id
+    attributes:
+      label: Item id or location
+      description: "e.g. vocab `cafe_bica`, grammar exercise `se_3`, dialogue `avo`"
+    validations: { required: true }
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong?
+      placeholder: "This is the pt-BR word / the accent is wrong / the IPA should be ... / this is not how people say it in Portugal."
+    validations: { required: true }
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested fix
+  - type: dropdown
+    id: who
+    attributes:
+      label: Are you a native pt-PT speaker?
+      options: ["Yes, from Portugal", "Yes, from elsewhere in the Portuguese-speaking world", "Fluent but not native", "Learner"]

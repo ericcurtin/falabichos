@@ -1,0 +1,22 @@
+name: Translation (game UI)
+description: Translate the game's interface into another language
+labels: [translation]
+body:
+  - type: input
+    id: lang
+    attributes:
+      label: Language
+      placeholder: "Spanish (es)"
+    validations: { required: true }
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: "The UI strings live in assets/i18n/en/ui.lang. Copy it to assets/i18n/<code>/ui.lang and translate the values. Mention if you want to help review other people's translations."
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Licence
+      options:
+        - label: "My translation may be used under the Apache License 2.0."
+          required: true

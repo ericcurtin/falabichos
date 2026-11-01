@@ -225,8 +225,8 @@ impl Game {
         if pad.a {
             self.sfx("sfx_confirm");
             match s.items[s.cursor] {
-                MenuItem::Dex => self.scene = Scene::Dex(DexState::new(DexMode::Dex)),
-                MenuItem::Party => self.scene = Scene::Dex(DexState::new(DexMode::Party)),
+                MenuItem::Dex => self.scene = Scene::Dex(self.dex_state(DexMode::Dex)),
+                MenuItem::Party => self.scene = Scene::Dex(self.dex_state(DexMode::Party)),
                 MenuItem::Practice => {
                     if self.save.progress.party.is_empty() {
                         let m = self.t("practice.need_bicho");
@@ -335,6 +335,20 @@ impl DexState {
 }
 
 impl Game {
+    /// A fresh Bichodex view whose cursor starts on the first Bicho you have met (not on a `???` row).
+    fn dex_state(&self, mode: DexMode) -> DexState {
+        let mut s = DexState::new(mode);
+        let p = &self.save.progress;
+        if let Some(i) = self
+            .dex_entries(mode)
+            .iter()
+            .position(|id| p.dex_seen.contains(id) || p.has_bicho(id))
+        {
+            s.cursor = i;
+        }
+        s
+    }
+
     fn dex_entries(&self, mode: DexMode) -> Vec<String> {
         let mut v: Vec<(u16, String)> = self
             .content
@@ -473,7 +487,7 @@ impl Game {
     fn draw_dex_detail(&self, c: &mut Canvas, ui: &Ui, id: &str, page: u8, wc: usize) {
         let sp = &self.content.species[id];
         let caught = self.save.progress.has_bicho(id);
-        ui.panel(c, 4, 20, 232, 134);
+        ui.panel(c, 4, 20, 232, 126);
         if let Some(spr) = self.bank.bicho(&sp.art) {
             c.rect_fill(10, 26, 52, 52, ui.col.highlight);
             c.rect_outline(10, 26, 52, 52, ui.col.border);
@@ -505,15 +519,19 @@ impl Game {
             ui.text(c, 70, 50, &self.t("dex.not_caught"), ui.col.dim);
         }
         if page == 0 {
-            ui.text(c, 10, 82, &clip(&self.t("dex.theme"), 10), ui.col.dim);
-            ui.text_wrap(c, 10, 93, 37, &sp.theme, ui.col.text, 2);
-            ui.text_wrap(c, 10, 117, 37, &sp.flavor_pt, ui.col.accent, 2);
-            let en = ui.bank.font.wrap(&sp.flavor_en, 37);
-            if let Some(l) = en.first() {
-                let y = 141;
-                if y < 152 {
-                    ui.text(c, 10, y, &clip(l, 37), ui.col.dim);
+            // Tight 10 px line pitch: a glyph cell is 10 px tall, so lines never collide.
+            let wrap = |t: &str| ui.bank.font.wrap(t, 37);
+            let mut y = 79;
+            for (text, col) in [
+                (&sp.theme, ui.col.text),
+                (&sp.flavor_pt, ui.col.accent),
+                (&sp.flavor_en, ui.col.dim),
+            ] {
+                for l in wrap(text).iter().take(2) {
+                    ui.text(c, 10, y, l, col);
+                    y += 10;
                 }
+                y += 2;
             }
         } else {
             self.draw_dex_words(c, ui, id, wc);
@@ -521,13 +539,16 @@ impl Game {
         ui.text(
             c,
             8,
-            146,
-            &format!(
-                "{}  {}",
-                if page == 0 { "1/2" } else { "2/2" },
-                self.t("dex.detail_hint")
+            149,
+            &clip(
+                &format!(
+                    "{}  {}",
+                    if page == 0 { "1/2" } else { "2/2" },
+                    self.t("dex.detail_hint")
+                ),
+                38,
             ),
-            ui.col.dim,
+            self.bank.pal('W'),
         );
     }
 
@@ -535,7 +556,7 @@ impl Game {
         let skills = self.content.species_skills(id);
         let top = wc.saturating_sub(3).min(skills.len().saturating_sub(5));
         for (row, sk) in skills.iter().enumerate().skip(top).take(5) {
-            let y = 80 + (row - top) as i32 * 11;
+            let y = 80 + (row - top) as i32 * 10;
             let label = if let Some(v) = self.content.vocab.get(sk) {
                 format!("{} - {}", v.with_article(), v.primary_en())
             } else if let Some(e) = self.content.grammar_exercise(sk) {
@@ -558,7 +579,7 @@ impl Game {
         // details for the selected word
         if let Some(sk) = skills.get(wc) {
             if let Some(v) = self.content.vocab.get(sk) {
-                let mut y = 136;
+                let mut y = 133;
                 if let Some(ipa) = &v.ipa {
                     ui.text(c, 12, y, &format!("[{ipa}]"), ui.col.accent);
                     y += 0;
@@ -573,7 +594,7 @@ impl Game {
                 .values()
                 .find(|g| g.exercises.iter().any(|e| &e.id == sk))
             {
-                ui.text(c, 12, 136, &clip(&g.title, 36), ui.col.accent);
+                ui.text(c, 12, 133, &clip(&g.title, 36), ui.col.accent);
             }
         }
     }

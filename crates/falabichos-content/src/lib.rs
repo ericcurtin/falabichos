@@ -203,6 +203,11 @@ pub fn load(assets: &Assets) -> Loaded {
             )),
         }
     }
+    content.audio_clips = assets
+        .list("audio/pt-PT/")
+        .filter_map(|p| p.strip_prefix("audio/pt-PT/")?.strip_suffix(".ogg"))
+        .map(String::from)
+        .collect();
     content.finalize();
     d.extend(validate(&content));
     Loaded {

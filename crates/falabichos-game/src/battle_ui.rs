@@ -98,6 +98,7 @@ impl Game {
     }
 
     pub(crate) fn start_battle(&mut self, pb: PendingBattle) {
+        self.toast = None;
         let now = self.now();
         let policy = self.settings.policy();
         let content = self.content.clone();
@@ -145,6 +146,7 @@ impl Game {
     }
 
     pub(crate) fn start_practice(&mut self) {
+        self.toast = None;
         let now = self.now();
         let policy = self.settings.policy();
         let content = self.content.clone();
@@ -247,6 +249,12 @@ impl Game {
             self.begin_outro(s);
             return;
         };
+        if ex.flavor == Flavor::Listen && !s.listened {
+            s.listened = true;
+            if let Some(a) = &ex.audio {
+                self.emit(GameEvent::Clip(a.clone()));
+            }
+        }
         if pad.select {
             let mut rng = self.rng.clone();
             if let Some(h) = s.battle.use_hint(&mut rng) {
@@ -298,9 +306,7 @@ impl Game {
                     self.sfx("sfx_select");
                 }
                 s.cursor = cur;
-                if pad.a && ex.flavor == Flavor::Listen && !s.listened {
-                    // first A replays the clip
-                    s.listened = true;
+                if pad.start && ex.flavor == Flavor::Listen {
                     if let Some(a) = &ex.audio {
                         self.emit(GameEvent::Clip(a.clone()));
                     }
@@ -423,10 +429,9 @@ impl Game {
                 if let Some(a) = &ex.audio {
                     self.emit(GameEvent::Clip(a.clone()));
                 } else if let Some(v) = self.content.vocab.get(&ex.skill)
-                    && let Some(a) = &v.audio
-                    && self.assets.contains(&format!("audio/pt-PT/{a}.ogg"))
+                    && self.content.has_clip(&v.audio_slot())
                 {
-                    self.emit(GameEvent::Clip(a.clone()));
+                    self.emit(GameEvent::Clip(v.audio_slot()));
                 }
                 s.judgement = Some(report.judgement);
                 s.phase = BPhase::Feedback { t: 0 };
@@ -585,7 +590,11 @@ impl Game {
     // ------------------------------------------------------------------ drawing
 
     pub(crate) fn draw_battle(&self, c: &mut Canvas, s: &BattleScene) {
-        let ui = Ui::new(&self.bank, self.settings.high_contrast, false);
+        let ui = Ui::new(
+            &self.bank,
+            self.settings.high_contrast,
+            self.settings.text_size == falabichos_core::save::TextSize::Large,
+        );
         let b = &self.bank;
         let hc = self.settings.high_contrast;
         // backdrop

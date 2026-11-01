@@ -1,0 +1,233 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000010 /* main.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A10000000000000000000010 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		A10000000000000000000011 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000000000000000000012 /* Falabichos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Falabichos.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A10000000000000000000020 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A10000000000000000000030 = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000031 /* Falabichos */,
+				A10000000000000000000032 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A10000000000000000000031 /* Falabichos */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000010 /* main.m */,
+				A10000000000000000000011 /* Info.plist */,
+			);
+			path = Falabichos;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000032 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000012 /* Falabichos.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000000000000000000040 /* Falabichos */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000060 /* Build configuration list for PBXNativeTarget "Falabichos" */;
+			buildPhases = (
+				A10000000000000000000050 /* Build Rust library */,
+				A10000000000000000000051 /* Sources */,
+				A10000000000000000000020 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Falabichos;
+			productName = Falabichos;
+			productReference = A10000000000000000000012 /* Falabichos.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000000000000000000070 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = A10000000000000000000061 /* Build configuration list for PBXProject "Falabichos" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A10000000000000000000030;
+			productRefGroup = A10000000000000000000032 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A10000000000000000000040 /* Falabichos */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A10000000000000000000050 /* Build Rust library */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Build Rust library";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nexport PATH=\"$HOME/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH\"\n# Pick the Rust target from the SDK / architecture Xcode is building for.\nif [ -n \"$FALABICHOS_RUST_TARGET\" ]; then\n  TARGET=\"$FALABICHOS_RUST_TARGET\"\nelif [ \"$PLATFORM_NAME\" = \"iphonesimulator\" ]; then\n  case \"$NATIVE_ARCH_ACTUAL\" in x86_64) TARGET=x86_64-apple-ios ;; *) TARGET=aarch64-apple-ios-sim ;; esac\nelse\n  TARGET=aarch64-apple-ios\nfi\nrustup target add \"$TARGET\" >/dev/null 2>&1 || true\ncd \"$SRCROOT/../..\"\ncargo build --release --lib -p falabichos --target \"$TARGET\" --target-dir \"$TARGET_TEMP_DIR/rust\"\nmkdir -p \"$TARGET_BUILD_DIR\"\ncp \"$TARGET_TEMP_DIR/rust/$TARGET/release/libfalabichos.a\" \"$TARGET_TEMP_DIR/libfalabichos.a\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A10000000000000000000051 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A10000000000000000000080 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+			};
+			name = Debug;
+		};
+		A10000000000000000000081 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+			};
+			name = Release;
+		};
+		A10000000000000000000082 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Falabichos/Info.plist;
+				LIBRARY_SEARCH_PATHS = "$(TARGET_TEMP_DIR)";
+				OTHER_LDFLAGS = (
+					"-lfalabichos",
+					"-lc++",
+					"-framework", UIKit,
+					"-framework", Metal,
+					"-framework", MetalKit,
+					"-framework", QuartzCore,
+					"-framework", CoreGraphics,
+					"-framework", Foundation,
+					"-framework", AudioToolbox,
+					"-framework", AVFoundation,
+					"-framework", CoreAudio,
+					"-framework", GameController,
+					"-framework", CoreHaptics,
+					"-framework", Security,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.falabichos.Falabichos;
+				PRODUCT_NAME = Falabichos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A10000000000000000000083 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Falabichos/Info.plist;
+				LIBRARY_SEARCH_PATHS = "$(TARGET_TEMP_DIR)";
+				OTHER_LDFLAGS = (
+					"-lfalabichos",
+					"-lc++",
+					"-framework", UIKit,
+					"-framework", Metal,
+					"-framework", MetalKit,
+					"-framework", QuartzCore,
+					"-framework", CoreGraphics,
+					"-framework", Foundation,
+					"-framework", AudioToolbox,
+					"-framework", AVFoundation,
+					"-framework", CoreAudio,
+					"-framework", GameController,
+					"-framework", CoreHaptics,
+					"-framework", Security,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.falabichos.Falabichos;
+				PRODUCT_NAME = Falabichos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000000000000000000060 /* Build configuration list for PBXNativeTarget "Falabichos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000082 /* Debug */,
+				A10000000000000000000083 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000061 /* Build configuration list for PBXProject "Falabichos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000080 /* Debug */,
+				A10000000000000000000081 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A10000000000000000000070 /* Project object */;
+}

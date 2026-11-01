@@ -206,6 +206,7 @@ pub struct Driver {
     shot_count: usize,
     pub ticks: u64,
     wrong_next: bool,
+    large_shot: bool,
     seen_kinds: Vec<(ExKind, bool)>,
 }
 
@@ -233,6 +234,7 @@ impl Driver {
             shot_count: 0,
             ticks: 0,
             wrong_next: false,
+            large_shot: false,
             seen_kinds: vec![],
         })
     }
@@ -326,6 +328,14 @@ impl Driver {
                     .battle_exercise()
                     .cloned()
                     .ok_or("battle without exercise")?;
+                // Render the question screen (normal and large text): a layout panic would fail the sim.
+                let mut scratch = Canvas::new(crate::LOGICAL_W, crate::LOGICAL_H);
+                self.game.draw(&mut scratch);
+                if !self.large_shot && self.game.settings.text_size == falabichos_core::save::TextSize::Large
+                {
+                    self.large_shot = true;
+                    self.capture("battle-large-text");
+                }
                 let wrong = std::mem::take(&mut self.wrong_next);
                 if !self.seen_kinds.contains(&(ex.kind, false)) {
                     self.seen_kinds.push((ex.kind, false));
@@ -844,6 +854,12 @@ impl Driver {
         for round in 0..30 {
             let species = ["camaleao", "sardinha", "gaivota"][round % 3];
             self.game.save.confidence = None;
+            // alternate text sizes: every question screen is drawn below, so a layout panic fails the sim
+            self.game.settings.text_size = if round % 2 == 0 {
+                falabichos_core::save::TextSize::Large
+            } else {
+                falabichos_core::save::TextSize::Normal
+            };
             self.game
                 .start_battle(crate::world::PendingBattle::Wild(species.to_string()));
             // answer everything through the UI; remember which kinds we met
@@ -866,6 +882,7 @@ impl Driver {
                 break;
             }
         }
+        self.game.settings.text_size = falabichos_core::save::TextSize::Normal;
         let need = ["Type", "Order", "Choice"];
         for n in need {
             if !styles.iter().any(|t| t.starts_with(n)) {

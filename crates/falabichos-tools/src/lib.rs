@@ -226,30 +226,27 @@ pub fn lint(assets: &Assets) -> LintReport {
         }
     }
 
-    // ---- audio clips
+    // ---- audio clips: the slot of a vocab item is `audio` or `<category>/<id>`
     let mut with_audio = 0usize;
     for v in c.vocab.values() {
-        if let Some(a) = &v.audio {
+        if c.has_clip(&v.audio_slot()) {
             with_audio += 1;
-            if !assets.contains(&format!("audio/pt-PT/{a}.ogg")) {
-                rep.missing_audio.push(v.id.clone());
-            }
         } else {
-            rep.missing_audio.push(v.id.clone());
+            rep.missing_audio.push(format!(
+                "{}  (record to audio/pt-PT/{}.ogg)",
+                v.id,
+                v.audio_slot()
+            ));
         }
     }
-    let have_clips = assets
-        .list("audio/pt-PT/")
-        .filter(|p| p.ends_with(".ogg"))
-        .count();
-    let referenced: BTreeSet<String> = c.vocab.values().filter_map(|v| v.audio.clone()).collect();
-    for p in assets.list("audio/pt-PT/").filter(|p| p.ends_with(".ogg")) {
-        let name = p.trim_start_matches("audio/pt-PT/").trim_end_matches(".ogg");
-        if !referenced.contains(name) {
+    let have_clips = c.audio_clips.len();
+    let slots: BTreeSet<String> = c.vocab.values().map(|v| v.audio_slot()).collect();
+    for clip in &c.audio_clips {
+        if !slots.contains(clip) {
             rep.diagnostics.push(diag(
-                Severity::Info,
-                p,
-                "clip is not referenced by any vocab item".into(),
+                Severity::Warning,
+                &format!("audio/pt-PT/{clip}.ogg"),
+                "clip does not match any vocab slot (<category>/<id>): misnamed?".into(),
             ));
         }
     }
@@ -347,7 +344,8 @@ pub fn lint(assets: &Assets) -> LintReport {
     let _ = writeln!(s, "  songs              {songs}");
     let _ = writeln!(
         s,
-        "  audio clips        {have_clips} files, {with_audio} vocab items reference a clip"
+        "  audio clips        {have_clips} files, {with_audio}/{} vocab items have a recording",
+        c.vocab.len()
     );
     let _ = writeln!(s, "  needs native review {}", rep.review_list.len());
     rep.summary = s;
@@ -372,6 +370,39 @@ mod tests {
         assert_eq!(
             string_literals(t),
             vec!["Olá, \"mundo\"".to_string(), "x".to_string()]
+        );
+    }
+
+    #[test]
+    fn scaffolded_files_load_and_lint_clean() {
+        // Scaffold a vocab file, a grammar concept and a whole town into a copy of the real assets.
+        let mut assets = Assets::embedded();
+        for kind in ["vocab", "grammar", "town"] {
+            for (path, body) in scaffold::files_for(kind, "demo").unwrap() {
+                assets.insert(&path, body.into_bytes());
+            }
+        }
+        let rep = lint(&assets);
+        let errs: Vec<String> = rep
+            .diagnostics
+            .iter()
+            .filter(|d| d.severity == Severity::Error)
+            .map(|d| d.to_string())
+            .collect();
+        assert!(
+            errs.is_empty(),
+            "scaffold templates must be valid out of the box:\n{}",
+            errs.join("\n")
+        );
+        // A scaffolded Bicho points at placeholder vocab ids, so the linter must complain until it is edited.
+        for (path, body) in scaffold::files_for("bicho", "demo").unwrap() {
+            assets.insert(&path, body.into_bytes());
+        }
+        let rep = lint(&assets);
+        assert!(
+            rep.diagnostics
+                .iter()
+                .any(|d| d.severity == Severity::Error && d.location == "species:demo")
         );
     }
 

@@ -224,9 +224,9 @@ pub fn plan(task: &str, extra: &[String], host_os: &str) -> Result<Vec<Cmd>, Str
             }
             v.push(Cmd::cargo(&ndk));
             let gradle = if host_os == "windows" {
-                "gradlew.bat"
+                "gradle.bat"
             } else {
-                "./gradlew"
+                "gradle"
             };
             let task = if extra.iter().any(|a| a == "--aab") {
                 "bundleRelease"
@@ -261,7 +261,7 @@ pub fn plan(task: &str, extra: &[String], host_os: &str) -> Result<Vec<Cmd>, Str
                     &[
                         "-project",
                         "mobile/ios/Falabichos.xcodeproj",
-                        "-scheme",
+                        "-target",
                         "Falabichos",
                         "-sdk",
                         sdk,
@@ -381,7 +381,7 @@ mod tests {
         assert_eq!(p[1].dir.as_deref(), Some(Path::new("mobile/android")));
         let aab = plan("android", &["--aab".into()], "linux").unwrap();
         assert_eq!(aab[1].args, vec!["bundleRelease"]);
-        assert_eq!(plan("android", &[], "windows").unwrap()[1].program, "gradlew.bat");
+        assert_eq!(plan("android", &[], "windows").unwrap()[1].program, "gradle.bat");
     }
 
     #[test]
@@ -391,6 +391,8 @@ mod tests {
         let d = plan("ios", &["--device".into()], "macos").unwrap();
         assert!(d[0].show().contains("--target aarch64-apple-ios"));
         assert!(!d[0].show().contains("-sim"));
+        // the hand-written Xcode project has no shared scheme: build by target
+        assert!(p[1].show().contains("-target Falabichos") && !p[1].show().contains("-scheme"));
     }
 
     #[test]

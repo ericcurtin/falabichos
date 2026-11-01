@@ -1,0 +1,33 @@
+name: New Bicho idea
+description: Propose a new Bicho (a creature that embodies vocabulary or a grammar concept)
+labels: [new-bicho, content]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Name (Portuguese)
+      placeholder: "Cegonha"
+    validations: { required: true }
+  - type: textarea
+    id: concept
+    attributes:
+      label: What does it teach?
+      description: "A vocabulary theme (farm words, weather, ...) or a grammar concept (por vs para, pretérito perfeito, ...)."
+    validations: { required: true }
+  - type: textarea
+    id: words
+    attributes:
+      label: Words or exercises (optional)
+      description: "A starting list of pt-PT words with English meanings, or sample exercises."
+  - type: textarea
+    id: look
+    attributes:
+      label: What does it look like?
+      description: "Describe it or link a sketch. See docs/BICHO_DESIGN.md for the 16x16 style guide. Original designs only."
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Licence
+      options:
+        - label: "My idea and any artwork I attach may be used under the Apache License 2.0."
+          required: true

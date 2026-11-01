@@ -3,7 +3,7 @@
 
 use crate::model::*;
 use crate::normalize::{fold, normalize};
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 /// A word-lookup result for the dialogue "tap a word" feature.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -27,6 +27,8 @@ pub struct Content {
     pub seals: BTreeMap<String, Seal>,
     pub pron_tips: Vec<PronTip>,
     pub story: Option<Story>,
+    /// Recorded pronunciation clips present in the assets (slot names, e.g. `cafe/bica`).
+    pub audio_clips: BTreeSet<String>,
     tile_index: HashMap<char, usize>,
     word_index: HashMap<String, String>,
     exercise_index: HashMap<String, String>,
@@ -57,6 +59,11 @@ impl Content {
             }
         }
         self.word_index = idx;
+    }
+
+    /// Is there a recorded clip for this slot?
+    pub fn has_clip(&self, slot: &str) -> bool {
+        self.audio_clips.contains(slot)
     }
 
     pub fn tile(&self, ch: char) -> Option<&TileDef> {
