@@ -1,0 +1,13 @@
+target/
+*.log
+.DS_Store
+# local saves/settings written when running with FALABICHOS_DATA_DIR=./.local-data
+.local-data/
+# mobile build outputs
+mobile/android/app/build/
+mobile/android/.gradle/
+mobile/android/app/src/main/jniLibs/
+mobile/android/local.properties
+mobile/ios/build/
+mobile/ios/*.xcodeproj/xcuserdata/
+dist/

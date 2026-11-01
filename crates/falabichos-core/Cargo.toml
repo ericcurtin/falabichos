@@ -1,0 +1,19 @@
+[package]
+name = "falabichos-core"
+description = "Engine-agnostic game logic for Falabichos: content model, SRS, exercises, battles, saves"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+serde.workspace = true
+ron.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

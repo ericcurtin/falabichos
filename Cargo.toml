@@ -1,0 +1,42 @@
+[workspace]
+resolver = "2"
+members = ["crates/*", "xtask"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+rust-version = "1.95"
+repository = "https://github.com/falabichos/falabichos"
+authors = ["The Falabichos contributors"]
+description = "Falabichos: an open-source critter-collecting game that teaches European Portuguese (pt-PT)"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+ron = "0.12"
+thiserror = "2"
+png = "0.18"
+proptest = "1"
+falabichos-core = { path = "crates/falabichos-core" }
+falabichos-content = { path = "crates/falabichos-content" }
+falabichos-media = { path = "crates/falabichos-media" }
+falabichos-game = { path = "crates/falabichos-game" }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+# Workspace crates: light optimisation so `cargo run` is playable.
+[profile.dev]
+opt-level = 1
+
+# Dependencies (Bevy, wgpu, ...): full optimisation, otherwise the game is a slideshow.
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
