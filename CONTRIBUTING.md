@@ -81,7 +81,7 @@ Everything visual is defined as small text files or PNGs under `assets/art/`. Re
 ## Track 4: I'm a Rust dev
 
 ```sh
-git clone https://github.com/falabichos/falabichos && cd falabichos
+git clone https://github.com/ericcurtin/falabichos && cd falabichos
 cargo run -p falabichos                 # play
 cargo xtask ci                          # fmt --check, clippy -D warnings, tests, lint, headless sim
 ```

@@ -2,7 +2,7 @@
 
 **Learn European Portuguese by befriending Bichos.**
 
-[![CI](https://github.com/falabichos/falabichos/actions/workflows/ci.yml/badge.svg)](https://github.com/falabichos/falabichos/actions/workflows/ci.yml)
+[![CI](https://github.com/ericcurtin/falabichos/actions/workflows/ci.yml/badge.svg)](https://github.com/ericcurtin/falabichos/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Rust 1.95](https://img.shields.io/badge/rust-1.95-orange.svg)](rust-toolchain.toml)
 [![Bevy 0.19.1](https://img.shields.io/badge/bevy-0.19.1-232326.svg)](https://bevy.org)
@@ -80,7 +80,7 @@ The honest, per-platform verification matrix lives in [docs/PLATFORM_STATUS.md](
 ## Quick start
 
 ```sh
-git clone https://github.com/falabichos/falabichos.git
+git clone https://github.com/ericcurtin/falabichos.git
 cd falabichos
 cargo run -p falabichos          # debug build, optimised enough to be playable
 cargo run --release -p falabichos

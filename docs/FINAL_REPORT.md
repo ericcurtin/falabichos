@@ -76,7 +76,7 @@ Full matrix: [PLATFORM_STATUS.md](PLATFORM_STATUS.md).
 6. The UI is English only; the learning gloss is English only (the structure for more languages exists: `assets/i18n/<lang>`, but the bitmap font covers Latin scripts only).
 7. The `.px`/RON content was initially authored with throwaway scripts outside the repo. The committed text files are the source of truth; no generators are part of the product.
 8. Placeholder contact addresses in CODE_OF_CONDUCT.md and SECURITY.md (`*.invalid`) must be replaced before publishing.
-9. The repository URL in badges and Cargo metadata (`github.com/falabichos/falabichos`) is a placeholder.
+9. The repository URL in badges and Cargo metadata points to github.com/ericcurtin/falabichos.
 
 ## 6. Native-review items
 
