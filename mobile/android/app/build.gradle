@@ -40,7 +40,7 @@ android {
 
 dependencies {
     // Align Kotlin: an older transitive kotlin-stdlib-jdk7/jdk8 duplicates classes now in kotlin-stdlib.
-    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.22')
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:2.4.21')
     // GameActivity is the activity flavour enabled by the `android-game-activity` cargo feature.
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.core:core:1.13.1'
