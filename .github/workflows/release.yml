@@ -26,7 +26,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev libvulkan-dev pkg-config clang mold
       - uses: Swatinem/rust-cache@v2
       - run: cargo xtask package-linux
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: linux, path: "dist/*.tar.gz" }
 
   macos:
@@ -39,7 +39,7 @@ jobs:
           targets: aarch64-apple-darwin,x86_64-apple-darwin
       - uses: Swatinem/rust-cache@v2
       - run: cargo xtask package-macos
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: macos, path: "dist/*.dmg" }
 
   windows:
@@ -52,7 +52,7 @@ jobs:
           targets: x86_64-pc-windows-msvc
       - uses: Swatinem/rust-cache@v2
       - run: cargo xtask package-windows
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: windows, path: "dist/*.zip" }
 
   android:
@@ -71,7 +71,7 @@ jobs:
         run: |
           cargo xtask android
           gradle -p mobile/android bundleRelease
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: android
           path: |
@@ -92,7 +92,7 @@ jobs:
         run: |
           APP=$(find ~/Library/Developer/Xcode/DerivedData mobile/ios/build -name Falabichos.app -type d 2>/dev/null | head -1)
           mkdir -p dist && ditto -c -k --keepParent "$APP" dist/Falabichos-ios-simulator.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: ios-simulator, path: "dist/*.zip" }
 
   publish:
