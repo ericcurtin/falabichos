@@ -13,7 +13,7 @@ updates:
       - dependency-name: "bevy"
         update-types: ["version-update:semver-minor", "version-update:semver-major"]
   - package-ecosystem: github-actions
-    directory: /
+    directories: [/, /.github/actions/setup-android]
     schedule: { interval: weekly }
   - package-ecosystem: gradle
     directory: /mobile/android
