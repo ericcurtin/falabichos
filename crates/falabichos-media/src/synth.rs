@@ -85,7 +85,12 @@ pub fn note_freq(name: &str) -> Option<f32> {
 
 impl Song {
     pub fn parse(text: &str) -> Result<Song, String> {
-        let mut song = Song { name: String::new(), bpm: 120.0, looped: true, channels: vec![] };
+        let mut song = Song {
+            name: String::new(),
+            bpm: 120.0,
+            looped: true,
+            channels: vec![],
+        };
         for (n, raw) in text.lines().enumerate() {
             let line = strip_comment(raw).trim();
             if line.is_empty() {
@@ -95,7 +100,9 @@ impl Song {
             if let Some((lhs, rhs)) = line.split_once(" = ") {
                 let mut spec = rhs.splitn(2, ':');
                 let head = spec.next().unwrap_or("");
-                let body = spec.next().ok_or(format!("line {ln}: missing `:` before notes"))?;
+                let body = spec
+                    .next()
+                    .ok_or(format!("line {ln}: missing `:` before notes"))?;
                 let mut h = head.split_whitespace();
                 let wave = match h.next() {
                     Some("square") => Wave::Square(0.5),
@@ -105,11 +112,17 @@ impl Song {
                     Some("noise") => Wave::Noise,
                     other => return Err(format!("line {ln}: unknown wave {other:?}")),
                 };
-                let vol: f32 = h.next().unwrap_or("0.5").parse().map_err(|_| format!("line {ln}: bad volume"))?;
+                let vol: f32 = h
+                    .next()
+                    .unwrap_or("0.5")
+                    .parse()
+                    .map_err(|_| format!("line {ln}: bad volume"))?;
                 let mut events = vec![];
                 for tok in body.split_whitespace() {
                     let (note, len) = tok.split_once(':').unwrap_or((tok, "1"));
-                    let steps: u32 = len.parse().map_err(|_| format!("line {ln}: bad length in `{tok}`"))?;
+                    let steps: u32 = len
+                        .parse()
+                        .map_err(|_| format!("line {ln}: bad length in `{tok}`"))?;
                     if steps == 0 {
                         return Err(format!("line {ln}: zero length in `{tok}`"));
                     }
@@ -155,7 +168,11 @@ impl Song {
     }
 
     pub fn total_steps(&self) -> u32 {
-        self.channels.iter().map(|c| c.events.iter().map(|e| e.steps).sum::<u32>()).max().unwrap_or(0)
+        self.channels
+            .iter()
+            .map(|c| c.events.iter().map(|e| e.steps).sum::<u32>())
+            .max()
+            .unwrap_or(0)
     }
 
     pub fn duration_secs(&self) -> f32 {
@@ -211,7 +228,11 @@ impl Song {
                                 phase = (phase + f / SAMPLE_RATE as f32).fract();
                                 match w {
                                     Wave::Square(d) => {
-                                        if phase < d { 1.0 } else { -1.0 }
+                                        if phase < d {
+                                            1.0
+                                        } else {
+                                            -1.0
+                                        }
                                     }
                                     Wave::Triangle => 4.0 * (phase - 0.5).abs() - 1.0,
                                     Wave::Saw => 2.0 * phase - 1.0,
@@ -229,7 +250,9 @@ impl Song {
             }
         }
         let peak = mix.iter().fold(0f32, |m, v| m.max(v.abs())).max(1.0);
-        mix.iter().map(|v| ((v / peak) * 0.8 * i16::MAX as f32) as i16).collect()
+        mix.iter()
+            .map(|v| ((v / peak) * 0.8 * i16::MAX as f32) as i16)
+            .collect()
     }
 }
 
@@ -241,7 +264,7 @@ pub fn cry(hz: u16) -> Vec<i16> {
     let mut phase = 0f32;
     for i in 0..n {
         let t = i as f32 / n as f32;
-        let f = hz * (0.8 + 0.5 * (t * 3.14159).sin());
+        let f = hz * (0.8 + 0.5 * (t * std::f32::consts::PI).sin());
         phase = (phase + f / SAMPLE_RATE as f32).fract();
         let wave = if phase < 0.35 { 1.0 } else { -1.0 };
         let env = (1.0 - t).powf(1.5) * (t * 40.0).min(1.0);

@@ -15,7 +15,11 @@ pub struct Canvas {
 
 impl Canvas {
     pub fn new(w: usize, h: usize) -> Canvas {
-        Canvas { w, h, px: vec![0; w * h * 4] }
+        Canvas {
+            w,
+            h,
+            px: vec![0; w * h * 4],
+        }
     }
 
     pub fn clear(&mut self, c: Rgba) {
@@ -35,8 +39,8 @@ impl Canvas {
         } else {
             // simple alpha blend
             let a = c[3] as u32;
-            for k in 0..3 {
-                self.px[i + k] = ((c[k] as u32 * a + self.px[i + k] as u32 * (255 - a)) / 255) as u8;
+            for (dst, src) in self.px[i..i + 3].iter_mut().zip(c.iter()) {
+                *dst = ((*src as u32 * a + *dst as u32 * (255 - a)) / 255) as u8;
             }
             self.px[i + 3] = 255;
         }
@@ -78,7 +82,14 @@ impl Canvas {
     }
 
     /// Draw only the sub-rectangle (`sx`,`sy`,`w`,`h`) of a frame (for clipped tiles).
-    pub fn blit_region(&mut self, s: &Sprite, frame: usize, region: (usize, usize, usize, usize), x: i32, y: i32) {
+    pub fn blit_region(
+        &mut self,
+        s: &Sprite,
+        frame: usize,
+        region: (usize, usize, usize, usize),
+        x: i32,
+        y: i32,
+    ) {
         let f = &s.frames[frame % s.frames.len()];
         let (rx, ry, rw, rh) = region;
         for sy in ry..(ry + rh).min(s.h) {
@@ -92,8 +103,8 @@ impl Canvas {
     pub fn fade_to(&mut self, c: Rgba, amount: u8) {
         let a = amount as u32;
         for p in self.px.chunks_exact_mut(4) {
-            for k in 0..3 {
-                p[k] = ((c[k] as u32 * a + p[k] as u32 * (255 - a)) / 255) as u8;
+            for (dst, src) in p[..3].iter_mut().zip(c.iter()) {
+                *dst = ((*src as u32 * a + *dst as u32 * (255 - a)) / 255) as u8;
             }
         }
     }

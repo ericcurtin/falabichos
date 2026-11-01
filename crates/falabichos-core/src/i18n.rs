@@ -34,11 +34,18 @@ pub fn parse_table(text: &str) -> HashMap<String, String> {
 
 impl Strings {
     pub fn new(lang_text: &str, fallback_text: &str) -> Strings {
-        Strings { map: parse_table(lang_text), fallback: parse_table(fallback_text) }
+        Strings {
+            map: parse_table(lang_text),
+            fallback: parse_table(fallback_text),
+        }
     }
 
     pub fn get<'a>(&'a self, key: &'a str) -> &'a str {
-        self.map.get(key).or_else(|| self.fallback.get(key)).map(String::as_str).unwrap_or(key)
+        self.map
+            .get(key)
+            .or_else(|| self.fallback.get(key))
+            .map(String::as_str)
+            .unwrap_or(key)
     }
 
     pub fn fmt(&self, key: &str, args: &[(&str, &str)]) -> String {

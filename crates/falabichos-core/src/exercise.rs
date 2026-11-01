@@ -97,21 +97,32 @@ impl Exercise {
                 (v.is_correct(), Some(v))
             }
             (ExKind::Order, Answer::Order(idx)) => {
-                let text: Vec<&str> = idx.iter().filter_map(|&i| self.options.get(i)).map(String::as_str).collect();
+                let text: Vec<&str> = idx
+                    .iter()
+                    .filter_map(|&i| self.options.get(i))
+                    .map(String::as_str)
+                    .collect();
                 let v = check_text(&text.join(" "), &self.accepted, policy, false);
                 (v.is_correct(), Some(v))
             }
             // A mismatched answer type is simply wrong.
             _ => (false, None),
         };
-        Judgement { correct, verdict, expected, explanation: self.explanation.clone() }
+        Judgement {
+            correct,
+            verdict,
+            expected,
+            explanation: self.explanation.clone(),
+        }
     }
 
     /// Produce a hint. `level` 0 gives a mild hint.
     pub fn hint(&self, rng: &mut Rng) -> Option<Hint> {
         match self.kind {
             ExKind::Choice => {
-                let mut wrong: Vec<usize> = (0..self.options.len()).filter(|i| !self.correct.contains(i)).collect();
+                let mut wrong: Vec<usize> = (0..self.options.len())
+                    .filter(|i| !self.correct.contains(i))
+                    .collect();
                 if wrong.len() <= 1 {
                     return self.hint.clone().map(Hint::Text);
                 }
@@ -186,7 +197,9 @@ pub fn from_def(def: &ExerciseDef, rng: &mut Rng) -> Exercise {
         }
         ExerciseKind::Order => {
             ex.kind = ExKind::Order;
-            let mut tiles = words_of(&strip_end_punct(def.answer.first().map(String::as_str).unwrap_or("")));
+            let mut tiles = words_of(&strip_end_punct(
+                def.answer.first().map(String::as_str).unwrap_or(""),
+            ));
             rng.shuffle(&mut tiles);
             ex.options = tiles;
             ex.accepted = def.answer.iter().map(|a| strip_end_punct(a)).collect();
@@ -393,7 +406,11 @@ pub fn generate_vocab(
             let real = gen_opts.audio_available && item.audio.is_some();
             base.flavor = if real { Flavor::Listen } else { Flavor::ListenIpa };
             base.audio = item.audio.clone().filter(|_| real);
-            base.prompt = if real { String::new() } else { format!("[{}]", item.ipa.clone().unwrap_or_default()) };
+            base.prompt = if real {
+                String::new()
+            } else {
+                format!("[{}]", item.ipa.clone().unwrap_or_default())
+            };
             base.prompt_lang = Lang::Pt;
             let d = pick_distractors(&pool, 3, rng, |v| v.with_article(), &item.with_article());
             let mut options: Vec<String> = d.iter().map(|v| v.with_article()).collect();
@@ -446,7 +463,10 @@ mod tests {
             category: cat.into(),
             gender: g,
             ipa: Some("x".into()),
-            example: Some(Example { pt: format!("Eu quero {pt} agora."), en: format!("I want {en} now.") }),
+            example: Some(Example {
+                pt: format!("Eu quero {pt} agora."),
+                en: format!("I want {en} now."),
+            }),
             ..VocabItem::default()
         };
         for (id, pt, en, g) in [
@@ -522,7 +542,10 @@ mod tests {
         for w in ["Estou", "a", "comer"] {
             idx.push(ex.options.iter().position(|o| o == w).unwrap());
         }
-        assert!(ex.check(&Answer::Order(idx.clone()), AnswerPolicy::default()).correct);
+        assert!(
+            ex.check(&Answer::Order(idx.clone()), AnswerPolicy::default())
+                .correct
+        );
         idx.reverse();
         assert!(!ex.check(&Answer::Order(idx), AnswerPolicy::default()).correct);
     }
@@ -533,9 +556,16 @@ mod tests {
         for seed in 0..60 {
             let mut rng = Rng::new(seed);
             for seen in [0u32, 3, 9] {
-                let card = Card { seen, phase: Phase::Review, ..Card::default() };
+                let card = Card {
+                    seen,
+                    phase: Phase::Review,
+                    ..Card::default()
+                };
                 for id in c.vocab.keys() {
-                    let ex = generate(&c, id, Some(&card), &mut rng, |_| GenOptions { audio_available: false }).unwrap();
+                    let ex = generate(&c, id, Some(&card), &mut rng, |_| GenOptions {
+                        audio_available: false,
+                    })
+                    .unwrap();
                     match ex.kind {
                         ExKind::Choice => {
                             assert!(!ex.correct.is_empty());
@@ -544,7 +574,10 @@ mod tests {
                             f.sort();
                             f.dedup();
                             assert_eq!(f.len(), ex.options.len(), "duplicate options in {ex:?}");
-                            assert!(ex.check(&Answer::Choice(ex.correct[0]), AnswerPolicy::default()).correct);
+                            assert!(
+                                ex.check(&Answer::Choice(ex.correct[0]), AnswerPolicy::default())
+                                    .correct
+                            );
                         }
                         ExKind::Type => {
                             let a = ex.accepted[0].clone();
@@ -555,7 +588,8 @@ mod tests {
                             let idx: Vec<usize> = canon
                                 .iter()
                                 .scan(vec![false; ex.options.len()], |used, w| {
-                                    let i = (0..ex.options.len()).find(|&i| !used[i] && ex.options[i] == *w)?;
+                                    let i =
+                                        (0..ex.options.len()).find(|&i| !used[i] && ex.options[i] == *w)?;
                                     used[i] = true;
                                     Some(i)
                                 })
@@ -575,7 +609,11 @@ mod tests {
         let item = &c.vocab["casa"];
         for seed in 0..40 {
             let mut rng = Rng::new(seed);
-            let card = Card { seen: 3, phase: Phase::Review, ..Card::default() };
+            let card = Card {
+                seen: 3,
+                phase: Phase::Review,
+                ..Card::default()
+            };
             let ex = generate_vocab(&c, item, Some(&card), &mut rng, GenOptions::default());
             if ex.flavor == Flavor::Article {
                 let right = &ex.options[ex.correct[0]];
@@ -590,16 +628,32 @@ mod tests {
         c.vocab.get_mut("casa").unwrap().pt = "pão".into();
         c.finalize();
         let mut rng = Rng::new(1);
-        let card = Card { seen: 20, phase: Phase::Review, ..Card::default() };
+        let card = Card {
+            seen: 20,
+            phase: Phase::Review,
+            ..Card::default()
+        };
         let mut found = false;
         for _ in 0..200 {
             let ex = generate_vocab(&c, &c.vocab["casa"], Some(&card), &mut rng, GenOptions::default());
             if ex.kind == ExKind::Type {
                 found = true;
-                assert!(ex.check(&Answer::Text("pao".into()), AnswerPolicy::default()).correct);
-                assert!(!ex.check(&Answer::Text("pao".into()), AnswerPolicy::STRICT).correct);
-                assert!(ex.check(&Answer::Text("a pão".into()), AnswerPolicy::default()).correct);
-                assert!(!ex.check(&Answer::Text("gato".into()), AnswerPolicy::default()).correct);
+                assert!(
+                    ex.check(&Answer::Text("pao".into()), AnswerPolicy::default())
+                        .correct
+                );
+                assert!(
+                    !ex.check(&Answer::Text("pao".into()), AnswerPolicy::STRICT)
+                        .correct
+                );
+                assert!(
+                    ex.check(&Answer::Text("a pão".into()), AnswerPolicy::default())
+                        .correct
+                );
+                assert!(
+                    !ex.check(&Answer::Text("gato".into()), AnswerPolicy::default())
+                        .correct
+                );
                 break;
             }
         }
@@ -614,7 +668,10 @@ mod tests {
         match ex.hint(&mut rng) {
             Some(Hint::Eliminate(v)) => {
                 assert!(!v.is_empty());
-                assert!(v.iter().all(|i| !ex.correct.contains(i)), "never eliminate the right answer");
+                assert!(
+                    v.iter().all(|i| !ex.correct.contains(i)),
+                    "never eliminate the right answer"
+                );
             }
             other => panic!("unexpected {other:?}"),
         }

@@ -59,7 +59,10 @@ impl Progress {
         if self.has_bicho(species) {
             return false;
         }
-        self.party.push(PartyBicho { species: species.to_string(), caught_at: now });
+        self.party.push(PartyBicho {
+            species: species.to_string(),
+            caught_at: now,
+        });
         true
     }
 
@@ -83,7 +86,11 @@ impl Progress {
                 }
                 Action::Heal => fx.push(Effect::Heal),
                 Action::Challenge(c) => fx.push(Effect::Challenge(c.clone())),
-                Action::Warp { map, x, y } => fx.push(Effect::Warp { map: map.clone(), x: *x, y: *y }),
+                Action::Warp { map, x, y } => fx.push(Effect::Warp {
+                    map: map.clone(),
+                    x: *x,
+                    y: *y,
+                }),
                 Action::Save => fx.push(Effect::Save),
             }
         }
@@ -123,7 +130,11 @@ pub fn species_learned(content: &Content, srs: &SrsStore, species: &str) -> (usi
     let skills = content.species_skills(species);
     let learned = skills
         .iter()
-        .filter(|s| srs.card(s).map(|c| c.phase != crate::srs::Phase::New).unwrap_or(false))
+        .filter(|s| {
+            srs.card(s)
+                .map(|c| c.phase != crate::srs::Phase::New)
+                .unwrap_or(false)
+        })
         .count();
     (learned, skills.len())
 }
@@ -131,7 +142,12 @@ pub fn species_learned(content: &Content, srs: &SrsStore, species: &str) -> (usi
 /// Battle bonuses from the party: (extra confidence, hints).
 pub fn party_bonus(content: &Content, srs: &SrsStore, progress: &Progress) -> (u8, u8) {
     let n = progress.party.len().min(3) as u8;
-    let best = progress.party.iter().map(|b| bicho_level(content, srs, &b.species)).max().unwrap_or(0);
+    let best = progress
+        .party
+        .iter()
+        .map(|b| bicho_level(content, srs, &b.species))
+        .max()
+        .unwrap_or(0);
     (n + best / 4, 1 + n.min(2))
 }
 
@@ -157,7 +173,10 @@ mod tests {
     fn effects_are_returned() {
         let mut p = Progress::default();
         let fx = p.apply(&[Action::Heal, Action::Challenge("c".into()), Action::Save], 0);
-        assert_eq!(fx, vec![Effect::Heal, Effect::Challenge("c".into()), Effect::Save]);
+        assert_eq!(
+            fx,
+            vec![Effect::Heal, Effect::Challenge("c".into()), Effect::Save]
+        );
     }
 
     #[test]

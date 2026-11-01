@@ -17,7 +17,9 @@ pub const SETTINGS_VERSION: u32 = 1;
 pub enum SaveError {
     #[error("could not parse save data: {0}")]
     Parse(String),
-    #[error("save was written by a newer game version (format {found}, this build understands up to {supported})")]
+    #[error(
+        "save was written by a newer game version (format {found}, this build understands up to {supported})"
+    )]
     TooNew { found: u32, supported: u32 },
     #[error("could not serialise: {0}")]
     Serialise(String),
@@ -95,7 +97,10 @@ struct VersionProbe {
 pub fn load(text: &str) -> Result<SaveGame, SaveError> {
     let probe: VersionProbe = ron::de::from_str(text).map_err(|e| SaveError::Parse(e.to_string()))?;
     match probe.version {
-        v if v > SAVE_VERSION => Err(SaveError::TooNew { found: v, supported: SAVE_VERSION }),
+        v if v > SAVE_VERSION => Err(SaveError::TooNew {
+            found: v,
+            supported: SAVE_VERSION,
+        }),
         0 => {
             let old: legacy::V0 = ron::de::from_str(text).map_err(|e| SaveError::Parse(e.to_string()))?;
             Ok(migrate_v0(old))
@@ -105,7 +110,15 @@ pub fn load(text: &str) -> Result<SaveGame, SaveError> {
 }
 
 fn migrate_v0(old: legacy::V0) -> SaveGame {
-    let mut s = SaveGame::new(PlayerState { map: old.map, x: old.x, y: old.y, facing: Dir::Down }, 0);
+    let mut s = SaveGame::new(
+        PlayerState {
+            map: old.map,
+            x: old.x,
+            y: old.y,
+            facing: Dir::Down,
+        },
+        0,
+    );
     for sp in old.caught {
         s.progress.add_bicho(&sp, 0);
     }
@@ -167,7 +180,10 @@ impl Settings {
     pub fn load(text: &str) -> Result<Settings, SaveError> {
         let mut s: Settings = ron::de::from_str(text).map_err(|e| SaveError::Parse(e.to_string()))?;
         if s.version > SETTINGS_VERSION {
-            return Err(SaveError::TooNew { found: s.version, supported: SETTINGS_VERSION });
+            return Err(SaveError::TooNew {
+                found: s.version,
+                supported: SETTINGS_VERSION,
+            });
         }
         s.version = SETTINGS_VERSION;
         s.music_volume = s.music_volume.min(10);
@@ -189,7 +205,15 @@ mod tests {
     use crate::srs::Grade;
 
     fn sample() -> SaveGame {
-        let mut s = SaveGame::new(PlayerState { map: "vila".into(), x: 3, y: 4, facing: Dir::Left }, 1234);
+        let mut s = SaveGame::new(
+            PlayerState {
+                map: "vila".into(),
+                x: 3,
+                y: 4,
+                facing: Dir::Left,
+            },
+            1234,
+        );
         s.progress.add_bicho("galo", 99);
         s.progress.flags.insert("met_avo".into());
         s.progress.award_seal("selo");
@@ -222,7 +246,10 @@ mod tests {
 
     #[test]
     fn rejects_future_versions_and_garbage() {
-        assert!(matches!(load("(version: 99)"), Err(SaveError::TooNew { found: 99, .. })));
+        assert!(matches!(
+            load("(version: 99)"),
+            Err(SaveError::TooNew { found: 99, .. })
+        ));
         assert!(matches!(load("not ron at all {{{"), Err(SaveError::Parse(_))));
     }
 

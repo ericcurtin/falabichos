@@ -108,24 +108,36 @@ impl Font {
             let mut it = line.split_whitespace();
             let key = it.next().ok_or("empty line")?;
             let ch = if let Some(hex) = key.strip_prefix("U+") {
-                char::from_u32(u32::from_str_radix(hex, 16).map_err(|_| format!("line {}: bad code point", n + 1))?)
-                    .ok_or(format!("line {}: bad code point", n + 1))?
+                char::from_u32(
+                    u32::from_str_radix(hex, 16).map_err(|_| format!("line {}: bad code point", n + 1))?,
+                )
+                .ok_or(format!("line {}: bad code point", n + 1))?
             } else {
                 let mut cs = key.chars();
                 let c = cs.next().unwrap();
                 if cs.next().is_some() {
-                    return Err(format!("line {}: key `{key}` must be one character or U+XXXX", n + 1));
+                    return Err(format!(
+                        "line {}: key `{key}` must be one character or U+XXXX",
+                        n + 1
+                    ));
                 }
                 c
             };
             let rows: Vec<&str> = it.collect();
             if rows.len() != 8 {
-                return Err(format!("line {}: glyph `{key}` needs 8 rows, has {}", n + 1, rows.len()));
+                return Err(format!(
+                    "line {}: glyph `{key}` needs 8 rows, has {}",
+                    n + 1,
+                    rows.len()
+                ));
             }
             let mut bits = [0u8; 8];
             for (r, row) in rows.iter().enumerate() {
                 if row.chars().count() != 5 || row.chars().any(|c| c != '#' && c != '.') {
-                    return Err(format!("line {}: glyph `{key}` row {r} must be 5 chars of # or .", n + 1));
+                    return Err(format!(
+                        "line {}: glyph `{key}` row {r} must be 5 chars of # or .",
+                        n + 1
+                    ));
                 }
                 for (x, c) in row.chars().enumerate() {
                     if c == '#' {
@@ -174,11 +186,22 @@ impl Font {
     pub fn draw(&self, c: &mut Canvas, s: &str, x: i32, y: i32, color: Rgba, scale: i32) -> i32 {
         let mut cx = x;
         for (base, mark) in Self::clusters(s) {
-            let bits = self.glyphs.get(&base).or_else(|| self.glyphs.get(&'?')).copied().unwrap_or([0; 8]);
+            let bits = self
+                .glyphs
+                .get(&base)
+                .or_else(|| self.glyphs.get(&'?'))
+                .copied()
+                .unwrap_or([0; 8]);
             for (r, row) in bits.iter().enumerate() {
                 for col in 0..5 {
                     if row & (1 << (4 - col)) != 0 {
-                        c.rect_fill(cx + col * scale, y + (ACCENT_ROWS + r as i32) * scale, scale, scale, color);
+                        c.rect_fill(
+                            cx + col * scale,
+                            y + (ACCENT_ROWS + r as i32) * scale,
+                            scale,
+                            scale,
+                            color,
+                        );
                     }
                 }
             }
@@ -195,7 +218,13 @@ impl Font {
                 for (i, row) in rows.iter().enumerate() {
                     for (col, ch) in row.chars().enumerate() {
                         if ch == '#' {
-                            c.rect_fill(cx + col as i32 * scale, y + (top_row + i as i32) * scale, scale, scale, color);
+                            c.rect_fill(
+                                cx + col as i32 * scale,
+                                y + (top_row + i as i32) * scale,
+                                scale,
+                                scale,
+                                color,
+                            );
                         }
                     }
                 }
@@ -205,10 +234,17 @@ impl Font {
         cx
     }
 
-    /// Draw with a 1px drop shadow.
-    pub fn draw_shadow(&self, c: &mut Canvas, s: &str, x: i32, y: i32, color: Rgba, shadow: Rgba, scale: i32) -> i32 {
-        self.draw(c, s, x + scale, y + scale, shadow, scale);
-        self.draw(c, s, x, y, color, scale)
+    /// Draw with a drop shadow. `colors` is (text, shadow); `at` is the top-left position.
+    pub fn draw_shadow(
+        &self,
+        c: &mut Canvas,
+        s: &str,
+        at: (i32, i32),
+        colors: (Rgba, Rgba),
+        scale: i32,
+    ) -> i32 {
+        self.draw(c, s, at.0 + scale, at.1 + scale, colors.1, scale);
+        self.draw(c, s, at.0, at.1, colors.0, scale)
     }
 
     /// Word-wrap to `cols` characters per line. Honours `\n`. Very long words are split.

@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = ["crates/*", "xtask"]
+default-members = ["crates/falabichos-core", "crates/falabichos-assets", "crates/falabichos-content", "crates/falabichos-media", "crates/falabichos-game", "crates/falabichos-tools", "crates/falabichos", "xtask"]
 
 [workspace.package]
 version = "0.1.0"

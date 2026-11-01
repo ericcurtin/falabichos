@@ -1,0 +1,47 @@
+[package]
+name = "falabichos"
+description = "Falabichos game client (Bevy): window, input, audio and the shell around falabichos-game"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+# `rlib` for the desktop binary, `cdylib` for Android (loaded by GameActivity), `staticlib` for iOS.
+[lib]
+name = "falabichos"
+crate-type = ["rlib", "cdylib", "staticlib"]
+
+[[bin]]
+name = "falabichos"
+path = "src/main.rs"
+
+[features]
+default = []
+# Android activity flavour (one of these is selected by mobile/android/build.gradle through cargo-ndk).
+android-game-activity = ["bevy/android-game-activity"]
+android-native-activity = ["bevy/android-native-activity"]
+
+[dependencies]
+falabichos-core.workspace = true
+falabichos-assets = { path = "../falabichos-assets" }
+falabichos-content.workspace = true
+falabichos-media.workspace = true
+falabichos-game.workspace = true
+# Bevy 0.19.1: the newest release that builds with rustc 1.95. Default features are OFF; only what the
+# game needs is enabled (2D sprite rendering, windowing, audio, gamepad). No web/wasm features.
+bevy = { version = "=0.19.1", default-features = false, features = [
+  "std", "async_executor", "multi_threaded", "bevy_log", "bevy_asset",
+  "bevy_window", "bevy_winit", "bevy_render", "bevy_core_pipeline", "bevy_sprite", "bevy_sprite_render",
+  "bevy_camera", "bevy_color", "bevy_image", "png", "bevy_audio", "vorbis", "wav", "bevy_gilrs",
+] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+bevy = { version = "=0.19.1", default-features = false, features = ["x11", "wayland"] }
+
+# Only the Android/iOS glue needs `unsafe` (the `no_mangle` entry points); everything else denies it.
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

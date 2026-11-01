@@ -70,16 +70,29 @@ impl Content {
             return None;
         }
         if let Some(en) = hand.get(&n).or_else(|| hand.get(word)) {
-            return Some(WordGloss { pt: word.to_string(), en: en.clone(), vocab_id: None });
+            return Some(WordGloss {
+                pt: word.to_string(),
+                en: en.clone(),
+                vocab_id: None,
+            });
         }
-        let id = self.word_index.get(&n).or_else(|| self.word_index.get(&fold(word)))?;
+        let id = self
+            .word_index
+            .get(&n)
+            .or_else(|| self.word_index.get(&fold(word)))?;
         let v = self.vocab.get(id)?;
-        Some(WordGloss { pt: v.pt.clone(), en: v.en.join(" / "), vocab_id: Some(v.id.clone()) })
+        Some(WordGloss {
+            pt: v.pt.clone(),
+            en: v.en.join(" / "),
+            vocab_id: Some(v.id.clone()),
+        })
     }
 
     /// Skill ids (SRS keys) a species embodies.
     pub fn species_skills(&self, species: &str) -> Vec<String> {
-        let Some(s) = self.species.get(species) else { return vec![] };
+        let Some(s) = self.species.get(species) else {
+            return vec![];
+        };
         let mut out: Vec<String> = s.vocab.clone();
         for g in &s.grammar {
             if let Some(g) = self.grammar.get(g) {

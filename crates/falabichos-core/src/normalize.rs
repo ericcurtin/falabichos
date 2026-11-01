@@ -86,12 +86,18 @@ pub struct AnswerPolicy {
 
 impl Default for AnswerPolicy {
     fn default() -> Self {
-        AnswerPolicy { accent_insensitive: true, typo_tolerance: true }
+        AnswerPolicy {
+            accent_insensitive: true,
+            typo_tolerance: true,
+        }
     }
 }
 
 impl AnswerPolicy {
-    pub const STRICT: AnswerPolicy = AnswerPolicy { accent_insensitive: false, typo_tolerance: false };
+    pub const STRICT: AnswerPolicy = AnswerPolicy {
+        accent_insensitive: false,
+        typo_tolerance: false,
+    };
 }
 
 /// Result of comparing a typed answer to the accepted answers.
@@ -100,9 +106,13 @@ pub enum Verdict {
     /// Exactly right (after case/punctuation normalisation).
     Exact,
     /// Right except for accents; `expected` is the correctly accented form.
-    AccentSlip { expected: String },
+    AccentSlip {
+        expected: String,
+    },
     /// Close enough: a small typo; `expected` is the right spelling.
-    Typo { expected: String },
+    Typo {
+        expected: String,
+    },
     Wrong,
 }
 
@@ -181,23 +191,41 @@ mod tests {
     #[test]
     fn exact_and_accent() {
         let a = acc(&["pão"]);
-        assert_eq!(check_text("Pão!", &a, AnswerPolicy::default(), true), Verdict::Exact);
-        assert!(matches!(check_text("pao", &a, AnswerPolicy::default(), true), Verdict::AccentSlip { .. }));
+        assert_eq!(
+            check_text("Pão!", &a, AnswerPolicy::default(), true),
+            Verdict::Exact
+        );
+        assert!(matches!(
+            check_text("pao", &a, AnswerPolicy::default(), true),
+            Verdict::AccentSlip { .. }
+        ));
         assert_eq!(check_text("pao", &a, AnswerPolicy::STRICT, true), Verdict::Wrong);
     }
 
     #[test]
     fn typo_tolerance_respects_length_and_optout() {
         let a = acc(&["autocarro"]);
-        assert!(matches!(check_text("autocaro", &a, AnswerPolicy::default(), true), Verdict::Typo { .. }));
-        assert_eq!(check_text("autocaro", &a, AnswerPolicy::default(), false), Verdict::Wrong);
+        assert!(matches!(
+            check_text("autocaro", &a, AnswerPolicy::default(), true),
+            Verdict::Typo { .. }
+        ));
+        assert_eq!(
+            check_text("autocaro", &a, AnswerPolicy::default(), false),
+            Verdict::Wrong
+        );
         // Short words never get typo tolerance: "mal" must not pass for "mau".
-        assert_eq!(check_text("mal", &acc(&["mau"]), AnswerPolicy::default(), true), Verdict::Wrong);
+        assert_eq!(
+            check_text("mal", &acc(&["mau"]), AnswerPolicy::default(), true),
+            Verdict::Wrong
+        );
     }
 
     #[test]
     fn empty_is_wrong() {
-        assert_eq!(check_text("  ", &acc(&["a"]), AnswerPolicy::default(), true), Verdict::Wrong);
+        assert_eq!(
+            check_text("  ", &acc(&["a"]), AnswerPolicy::default(), true),
+            Verdict::Wrong
+        );
     }
 
     #[test]

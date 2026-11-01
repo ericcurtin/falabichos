@@ -12,10 +12,16 @@ fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let flag = |f: &str| args.iter().any(|a| a == f);
     if flag("--help") || flag("-h") {
-        println!("falabichos-lint [--assets DIR] [--strict] [--review] [--missing-audio] [--quiet]\n  --strict         warnings fail the run\n  --review         list items flagged needs_native_review\n  --missing-audio  list vocab ids without a recorded clip\n  --quiet          hide info messages");
+        println!(
+            "falabichos-lint [--assets DIR] [--strict] [--review] [--missing-audio] [--quiet]\n  --strict         warnings fail the run\n  --review         list items flagged needs_native_review\n  --missing-audio  list vocab ids without a recorded clip\n  --quiet          hide info messages"
+        );
         return;
     }
-    let assets = match args.iter().position(|a| a == "--assets").and_then(|i| args.get(i + 1)) {
+    let assets = match args
+        .iter()
+        .position(|a| a == "--assets")
+        .and_then(|i| args.get(i + 1))
+    {
         Some(dir) => match Assets::from_dir(Path::new(dir)) {
             Ok(a) => a,
             Err(e) => {
@@ -26,7 +32,11 @@ fn main() {
         None => {
             // Prefer the working tree so contributors lint what they edited, not what was compiled in.
             let local = Path::new("assets");
-            if local.is_dir() { Assets::from_dir(local).unwrap_or_else(|_| Assets::embedded()) } else { Assets::embedded() }
+            if local.is_dir() {
+                Assets::from_dir(local).unwrap_or_else(|_| Assets::embedded())
+            } else {
+                Assets::embedded()
+            }
         }
     };
     let rep = lint(&assets);
@@ -49,7 +59,11 @@ fn main() {
         }
     }
     println!("\n{}", rep.summary);
-    let (e, w, i) = (rep.count(Severity::Error), rep.count(Severity::Warning), rep.count(Severity::Info));
+    let (e, w, i) = (
+        rep.count(Severity::Error),
+        rep.count(Severity::Warning),
+        rep.count(Severity::Info),
+    );
     println!("{e} error(s), {w} warning(s), {i} info");
     if e > 0 || (flag("--strict") && w > 0) {
         std::process::exit(1);

@@ -22,7 +22,14 @@ pub struct ArtBank {
 }
 
 /// Character role digits used in `_body_*.px` templates.
-const ROLES: [(char, &str); 6] = [('1', "hair"), ('2', "skin"), ('3', "shirt"), ('4', "pants"), ('5', "shoes"), ('6', "extra")];
+const ROLES: [(char, &str); 6] = [
+    ('1', "hair"),
+    ('2', "skin"),
+    ('3', "shirt"),
+    ('4', "pants"),
+    ('5', "shoes"),
+    ('6', "extra"),
+];
 
 impl ArtBank {
     pub fn load(assets: &Assets) -> Result<ArtBank, Vec<String>> {
@@ -45,7 +52,9 @@ impl ArtBank {
             let rel = &path["art/".len()..];
             let parts: Vec<&str> = rel.split('/').collect();
             let [cat, file] = parts.as_slice() else { continue };
-            let Some((stem, ext)) = file.rsplit_once('.') else { continue };
+            let Some((stem, ext)) = file.rsplit_once('.') else {
+                continue;
+            };
             if stem.starts_with('_') || !matches!(ext, "px" | "png") {
                 continue;
             }
@@ -91,7 +100,10 @@ impl ArtBank {
                     continue;
                 }
                 let Some((id, rest)) = line.split_once(':') else {
-                    errs.push(format!("art/chars.txt line {}: expected `id: role=letter ...`", n + 1));
+                    errs.push(format!(
+                        "art/chars.txt line {}: expected `id: role=letter ...`",
+                        n + 1
+                    ));
                     continue;
                 };
                 let mut roles: HashMap<char, char> = HashMap::new();
@@ -111,7 +123,10 @@ impl ArtBank {
                 }
                 let tpl_path = format!("art/chars/_body_{body}.px");
                 let Some(tpl) = assets.text(&tpl_path) else {
-                    errs.push(format!("art/chars.txt line {}: missing template {tpl_path}", n + 1));
+                    errs.push(format!(
+                        "art/chars.txt line {}: missing template {tpl_path}",
+                        n + 1
+                    ));
                     continue;
                 };
                 match parse_grid(tpl).and_then(|g| g.render(&palette, &roles)) {
@@ -122,7 +137,15 @@ impl ArtBank {
                 }
             }
         }
-        if errs.is_empty() { Ok(ArtBank { palette, font, sprites }) } else { Err(errs) }
+        if errs.is_empty() {
+            Ok(ArtBank {
+                palette,
+                font,
+                sprites,
+            })
+        } else {
+            Err(errs)
+        }
     }
 
     pub fn get(&self, cat: &str, id: &str) -> Option<&Sprite> {
@@ -147,7 +170,10 @@ impl ArtBank {
     /// All sprite ids in a category.
     pub fn names(&self, cat: &str) -> Vec<&str> {
         let p = format!("{cat}/");
-        self.sprites.keys().filter_map(|k| k.strip_prefix(p.as_str())).collect()
+        self.sprites
+            .keys()
+            .filter_map(|k| k.strip_prefix(p.as_str()))
+            .collect()
     }
 
     pub fn all(&self) -> impl Iterator<Item = (&str, &Sprite)> {

@@ -105,6 +105,7 @@ impl Battle {
     }
 
     /// Start a wild encounter.
+    #[allow(clippy::too_many_arguments)] // a bundle struct would only move the arguments around
     pub fn wild(
         content: &Content,
         species: &str,
@@ -115,16 +116,27 @@ impl Battle {
         rng: &mut Rng,
         now: i64,
     ) -> Result<Battle, BattleError> {
-        let sp = content.species.get(species).ok_or_else(|| BattleError::UnknownSpecies(species.to_string()))?;
+        let sp = content
+            .species
+            .get(species)
+            .ok_or_else(|| BattleError::UnknownSpecies(species.to_string()))?;
         progress.see(species);
         let pool = content.species_skills(species);
         if pool.is_empty() {
             return Err(BattleError::EmptyPool);
         }
-        let mut b = Battle::base(BattleKind::Wild { species: species.to_string() }, sp.name.clone(), pool);
+        let mut b = Battle::base(
+            BattleKind::Wild {
+                species: species.to_string(),
+            },
+            sp.name.clone(),
+            pool,
+        );
         let (conf, hints) = party_bonus(content, srs, progress);
         b.max_confidence = 4 + conf;
-        b.confidence = start_confidence.map(|c| c.clamp(1, b.max_confidence)).unwrap_or(b.max_confidence);
+        b.confidence = start_confidence
+            .map(|c| c.clamp(1, b.max_confidence))
+            .unwrap_or(b.max_confidence);
         b.hints_left = hints;
         b.trust_needed = sp.trust_needed.max(1);
         b.policy = policy;
@@ -141,12 +153,19 @@ impl Battle {
         rng: &mut Rng,
         now: i64,
     ) -> Result<Battle, BattleError> {
-        let ch = content.challenges.get(id).ok_or_else(|| BattleError::UnknownChallenge(id.to_string()))?;
+        let ch = content
+            .challenges
+            .get(id)
+            .ok_or_else(|| BattleError::UnknownChallenge(id.to_string()))?;
         let pool = content.pool_skills(&ch.pool);
         if pool.is_empty() {
             return Err(BattleError::EmptyPool);
         }
-        let mut b = Battle::base(BattleKind::Challenge { id: id.to_string() }, ch.name.clone(), pool);
+        let mut b = Battle::base(
+            BattleKind::Challenge { id: id.to_string() },
+            ch.name.clone(),
+            pool,
+        );
         b.max_confidence = ch.confidence.max(1);
         b.confidence = b.max_confidence;
         b.total = Some(ch.questions.max(1));
@@ -248,7 +267,7 @@ impl Battle {
                 _ => Grade::Good,
             };
             if matches!(self.kind, BattleKind::Wild { .. }) {
-                trust_gain = 1 + u8::from(self.streak >= 3 && self.streak % 3 == 0);
+                trust_gain = 1 + u8::from(self.streak >= 3 && self.streak.is_multiple_of(3));
                 self.trust = (self.trust + trust_gain).min(self.trust_needed);
             }
         } else {
@@ -260,7 +279,12 @@ impl Battle {
         }
         srs.review(&skill, grade, now);
         self.outcome = self.evaluate_outcome();
-        Some(AnswerReport { judgement, grade, trust_gain, outcome: self.outcome })
+        Some(AnswerReport {
+            judgement,
+            grade,
+            trust_gain,
+            outcome: self.outcome,
+        })
     }
 
     fn evaluate_outcome(&self) -> Option<Outcome> {
@@ -279,7 +303,11 @@ impl Battle {
                 if self.confidence == 0 {
                     Some(Outcome::Lost)
                 } else if self.asked >= total {
-                    Some(if self.correct >= self.pass_correct as u32 { Outcome::Won } else { Outcome::Lost })
+                    Some(if self.correct >= self.pass_correct as u32 {
+                        Outcome::Won
+                    } else {
+                        Outcome::Lost
+                    })
                 } else {
                     None
                 }
@@ -314,30 +342,21 @@ impl Battle {
 }
 
 /// Apply a finished battle to the player's progress. Returns a human-readable list of events.
-pub fn settle(
-    battle: &Battle,
-    content: &Content,
-    progress: &mut Progress,
-    now: i64,
-) -> Vec<SettleEvent> {
+pub fn settle(battle: &Battle, content: &Content, progress: &mut Progress, now: i64) -> Vec<SettleEvent> {
     let mut ev = vec![];
-    match (&battle.kind, battle.outcome) {
-        (BattleKind::Wild { species }, Some(Outcome::Caught)) => {
-            if progress.add_bicho(species, now) {
-                ev.push(SettleEvent::Caught(species.clone()));
-            }
+    if let (BattleKind::Wild { species }, Some(Outcome::Caught)) = (&battle.kind, battle.outcome) {
+        if progress.add_bicho(species, now) {
+            ev.push(SettleEvent::Caught(species.clone()));
         }
-        (BattleKind::Challenge { id }, Some(Outcome::Won)) => {
-            if let Some(ch) = content.challenges.get(id) {
-                progress.flags.insert(ch.reward_flag.clone());
-                if let Some(seal) = &ch.seal {
-                    if progress.award_seal(seal) {
-                        ev.push(SettleEvent::Seal(seal.clone()));
-                    }
-                }
-            }
+    } else if let (BattleKind::Challenge { id }, Some(Outcome::Won)) = (&battle.kind, battle.outcome)
+        && let Some(ch) = content.challenges.get(id)
+    {
+        progress.flags.insert(ch.reward_flag.clone());
+        if let Some(seal) = &ch.seal
+            && progress.award_seal(seal)
+        {
+            ev.push(SettleEvent::Seal(seal.clone()));
         }
-        _ => {}
     }
     ev
 }
@@ -356,11 +375,28 @@ mod tests {
 
     fn content() -> Content {
         let mut c = Content::default();
-        for (i, (pt, en)) in [("galo", "rooster"), ("vaca", "cow"), ("porco", "pig"), ("ovelha", "sheep"), ("cavalo", "horse"), ("ovo", "egg")].iter().enumerate() {
+        for (i, (pt, en)) in [
+            ("galo", "rooster"),
+            ("vaca", "cow"),
+            ("porco", "pig"),
+            ("ovelha", "sheep"),
+            ("cavalo", "horse"),
+            ("ovo", "egg"),
+        ]
+        .iter()
+        .enumerate()
+        {
             let id = format!("v{i}");
             c.vocab.insert(
                 id.clone(),
-                VocabItem { id, pt: pt.to_string(), en: vec![en.to_string()], category: "farm".into(), gender: Some(Gender::Masc), ..VocabItem::default() },
+                VocabItem {
+                    id,
+                    pt: pt.to_string(),
+                    en: vec![en.to_string()],
+                    category: "farm".into(),
+                    gender: Some(Gender::Masc),
+                    ..VocabItem::default()
+                },
             );
         }
         c.species.insert(
@@ -388,7 +424,10 @@ mod tests {
                 name: "Mestre".into(),
                 kind: ChallengeKind::Mestre,
                 theme: "t".into(),
-                pool: Pool { categories: vec!["farm".into()], ..Pool::default() },
+                pool: Pool {
+                    categories: vec!["farm".into()],
+                    ..Pool::default()
+                },
                 questions: 4,
                 pass_correct: 3,
                 confidence: 2,
@@ -414,7 +453,9 @@ mod tests {
                 let mut used = vec![false; ex.options.len()];
                 let mut idx = vec![];
                 for w in canon {
-                    let i = (0..ex.options.len()).find(|&i| !used[i] && ex.options[i] == w).unwrap();
+                    let i = (0..ex.options.len())
+                        .find(|&i| !used[i] && ex.options[i] == w)
+                        .unwrap();
                     used[i] = true;
                     idx.push(i);
                 }
@@ -426,7 +467,9 @@ mod tests {
     fn wrong(b: &Battle) -> Answer {
         let ex = b.current.as_ref().unwrap();
         match ex.kind {
-            ExKind::Choice => Answer::Choice((0..ex.options.len()).find(|i| !ex.correct.contains(i)).unwrap()),
+            ExKind::Choice => {
+                Answer::Choice((0..ex.options.len()).find(|i| !ex.correct.contains(i)).unwrap())
+            }
             _ => Answer::Text("zzzzz".into()),
         }
     }
@@ -437,7 +480,17 @@ mod tests {
         let mut p = Progress::default();
         let mut srs = SrsStore::default();
         let mut rng = Rng::new(11);
-        let mut b = Battle::wild(&c, "galo", &mut p, &srs, AnswerPolicy::default(), None, &mut rng, 1000).unwrap();
+        let mut b = Battle::wild(
+            &c,
+            "galo",
+            &mut p,
+            &srs,
+            AnswerPolicy::default(),
+            None,
+            &mut rng,
+            1000,
+        )
+        .unwrap();
         assert!(p.dex_seen.contains("galo"));
         let mut now = 1000;
         let mut guard = 0;
@@ -464,7 +517,17 @@ mod tests {
         let mut p = Progress::default();
         let mut srs = SrsStore::default();
         let mut rng = Rng::new(3);
-        let mut b = Battle::wild(&c, "galo", &mut p, &srs, AnswerPolicy::default(), None, &mut rng, 0).unwrap();
+        let mut b = Battle::wild(
+            &c,
+            "galo",
+            &mut p,
+            &srs,
+            AnswerPolicy::default(),
+            None,
+            &mut rng,
+            0,
+        )
+        .unwrap();
         assert_eq!(b.max_confidence, 4);
         for _ in 0..4 {
             assert!(!b.is_over());
@@ -477,7 +540,10 @@ mod tests {
         assert!(!p.has_bicho("galo"));
         // failed skills come back soon
         assert!(srs.cards.values().all(|c| c.due <= 60));
-        assert!(b.answer(&Answer::Choice(0), &mut srs, 0).is_none(), "no answers after the end");
+        assert!(
+            b.answer(&Answer::Choice(0), &mut srs, 0).is_none(),
+            "no answers after the end"
+        );
     }
 
     #[test]
@@ -525,7 +591,17 @@ mod tests {
         let mut p = Progress::default();
         let mut srs = SrsStore::default();
         let mut rng = Rng::new(8);
-        let mut b = Battle::wild(&c, "galo", &mut p, &srs, AnswerPolicy::default(), None, &mut rng, 0).unwrap();
+        let mut b = Battle::wild(
+            &c,
+            "galo",
+            &mut p,
+            &srs,
+            AnswerPolicy::default(),
+            None,
+            &mut rng,
+            0,
+        )
+        .unwrap();
         assert_eq!(b.hints_left, 1);
         assert!(b.use_hint(&mut rng).is_some());
         assert!(b.use_hint(&mut rng).is_none());
@@ -558,7 +634,17 @@ mod tests {
         let srs = SrsStore::default();
         let mut rng = Rng::new(1);
         assert_eq!(
-            Battle::wild(&c, "nope", &mut p, &srs, AnswerPolicy::default(), None, &mut rng, 0).unwrap_err(),
+            Battle::wild(
+                &c,
+                "nope",
+                &mut p,
+                &srs,
+                AnswerPolicy::default(),
+                None,
+                &mut rng,
+                0
+            )
+            .unwrap_err(),
             BattleError::UnknownSpecies("nope".into())
         );
         assert!(Battle::challenge(&c, "nope", &srs, AnswerPolicy::default(), &mut rng, 0).is_err());

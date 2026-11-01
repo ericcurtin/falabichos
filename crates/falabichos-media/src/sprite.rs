@@ -30,7 +30,9 @@ impl Palette {
             if line.is_empty() || line.starts_with('#') {
                 continue;
             }
-            let (k, rest) = line.split_once('=').ok_or(format!("palette line {}: expected `c = #rrggbb`", n + 1))?;
+            let (k, rest) = line
+                .split_once('=')
+                .ok_or(format!("palette line {}: expected `c = #rrggbb`", n + 1))?;
             let k = k.trim();
             let mut it = k.chars();
             let ch = it.next().ok_or("empty key")?;
@@ -96,7 +98,10 @@ pub fn parse_grid(text: &str) -> Result<Grid, String> {
     let mut cur: Vec<Vec<char>> = vec![];
     let parse_dim = |v: &str| -> Result<(usize, usize), String> {
         let (a, b) = v.split_once('x').ok_or(format!("bad size `{v}` (want WxH)"))?;
-        Ok((a.trim().parse().map_err(|_| format!("bad size `{v}`"))?, b.trim().parse().map_err(|_| format!("bad size `{v}`"))?))
+        Ok((
+            a.trim().parse().map_err(|_| format!("bad size `{v}`"))?,
+            b.trim().parse().map_err(|_| format!("bad size `{v}`"))?,
+        ))
     };
     for (n, raw) in text.lines().enumerate() {
         let line = raw.split('#').next().unwrap_or("").trim_end();
@@ -135,7 +140,11 @@ pub fn parse_grid(text: &str) -> Result<Grid, String> {
     let mut out_frames = vec![];
     for (fi, f) in frames.iter().enumerate() {
         if f.len() != ph || f.iter().any(|r| r.len() != pw) {
-            return Err(format!("frame {fi}: expected {pw}x{ph} rows, got {}x{}", f.first().map(|r| r.len()).unwrap_or(0), f.len()));
+            return Err(format!(
+                "frame {fi}: expected {pw}x{ph} rows, got {}x{}",
+                f.first().map(|r| r.len()).unwrap_or(0),
+                f.len()
+            ));
         }
         if repeat.is_some() {
             let mut full = vec![vec!['.'; w]; h];
@@ -149,7 +158,13 @@ pub fn parse_grid(text: &str) -> Result<Grid, String> {
             out_frames.push(f.clone());
         }
     }
-    Ok(Grid { w, h, outline, bob, frames: out_frames })
+    Ok(Grid {
+        w,
+        h,
+        outline,
+        bob,
+        frames: out_frames,
+    })
 }
 
 impl Grid {
@@ -161,7 +176,9 @@ impl Grid {
             for (y, row) in f.iter().enumerate() {
                 for (x, &ch) in row.iter().enumerate() {
                     let ch = roles.get(&ch).copied().unwrap_or(ch);
-                    let c = pal.get(ch).ok_or(format!("unknown palette letter `{ch}` at ({x},{y})"))?;
+                    let c = pal
+                        .get(ch)
+                        .ok_or(format!("unknown palette letter `{ch}` at ({x},{y})"))?;
                     px[y * self.w + x] = c;
                 }
             }
@@ -200,7 +217,11 @@ impl Grid {
             }
             frames.push(second);
         }
-        Ok(Sprite { w: self.w, h: self.h, frames })
+        Ok(Sprite {
+            w: self.w,
+            h: self.h,
+            frames,
+        })
     }
 }
 
@@ -222,7 +243,9 @@ impl Sprite {
             other => return Err(format!("unsupported PNG colour type {other:?} (use RGBA)")),
         };
         if frame_h == 0 || h % frame_h != 0 {
-            return Err(format!("PNG height {h} is not a multiple of frame height {frame_h}"));
+            return Err(format!(
+                "PNG height {h} is not a multiple of frame height {frame_h}"
+            ));
         }
         let mut frames = vec![];
         for f in 0..h / frame_h {
@@ -230,16 +253,28 @@ impl Sprite {
             for y in 0..frame_h {
                 for x in 0..w {
                     let i = ((f * frame_h + y) * w + x) * bpp;
-                    px.push(if bpp == 4 { [buf[i], buf[i + 1], buf[i + 2], buf[i + 3]] } else { [buf[i], buf[i + 1], buf[i + 2], 255] });
+                    px.push(if bpp == 4 {
+                        [buf[i], buf[i + 1], buf[i + 2], buf[i + 3]]
+                    } else {
+                        [buf[i], buf[i + 1], buf[i + 2], 255]
+                    });
                 }
             }
             frames.push(px);
         }
-        Ok(Sprite { w, h: frame_h, frames })
+        Ok(Sprite {
+            w,
+            h: frame_h,
+            frames,
+        })
     }
 
     pub fn flat_color(w: usize, h: usize, c: Rgba) -> Sprite {
-        Sprite { w, h, frames: vec![vec![c; w * h]] }
+        Sprite {
+            w,
+            h,
+            frames: vec![vec![c; w * h]],
+        }
     }
 }
 
@@ -280,8 +315,16 @@ mod tests {
 
     #[test]
     fn errors_are_clear() {
-        assert!(parse_px("size: 2x2\nWW\n", &pal()).unwrap_err().contains("expected"));
-        assert!(parse_px("size: 2x2\nQW\nWW\n", &pal()).unwrap_err().contains("unknown palette letter"));
+        assert!(
+            parse_px("size: 2x2\nWW\n", &pal())
+                .unwrap_err()
+                .contains("expected")
+        );
+        assert!(
+            parse_px("size: 2x2\nQW\nWW\n", &pal())
+                .unwrap_err()
+                .contains("unknown palette letter")
+        );
         assert!(parse_px("WW\n", &pal()).unwrap_err().contains("size"));
         assert!(Palette::parse("KK = #000000").is_err());
     }

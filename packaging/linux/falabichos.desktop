@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Falabichos
+GenericName=Language-learning game
+Comment=Learn European Portuguese by befriending Bichos
+Exec=falabichos
+Icon=falabichos
+Terminal=false
+Categories=Game;Education;
+Keywords=portuguese;language;learning;critter-collecting;

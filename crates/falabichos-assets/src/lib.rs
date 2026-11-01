@@ -19,12 +19,21 @@ pub struct Assets {
 impl Assets {
     /// Everything under `assets/` as of compile time.
     pub fn embedded() -> Assets {
-        Assets { files: generated::EMBEDDED.iter().map(|(p, b)| (p.to_string(), Cow::Borrowed(*b))).collect() }
+        Assets {
+            files: generated::EMBEDDED
+                .iter()
+                .map(|(p, b)| (p.to_string(), Cow::Borrowed(*b)))
+                .collect(),
+        }
     }
 
     /// Read all files below `root` (recursively).
     pub fn from_dir(root: &Path) -> std::io::Result<Assets> {
-        fn walk(dir: &Path, root: &Path, out: &mut BTreeMap<String, Cow<'static, [u8]>>) -> std::io::Result<()> {
+        fn walk(
+            dir: &Path,
+            root: &Path,
+            out: &mut BTreeMap<String, Cow<'static, [u8]>>,
+        ) -> std::io::Result<()> {
             for e in std::fs::read_dir(dir)? {
                 let e = e?;
                 let p = e.path();
@@ -34,7 +43,11 @@ impl Assets {
                 if p.is_dir() {
                     walk(&p, root, out)?;
                 } else {
-                    let rel = p.strip_prefix(root).unwrap_or(&p).to_string_lossy().replace('\\', "/");
+                    let rel = p
+                        .strip_prefix(root)
+                        .unwrap_or(&p)
+                        .to_string_lossy()
+                        .replace('\\', "/");
                     out.insert(rel, Cow::Owned(std::fs::read(&p)?));
                 }
             }
@@ -70,7 +83,10 @@ impl Assets {
 
     /// Paths starting with `prefix`, in sorted order.
     pub fn list<'a>(&'a self, prefix: &'a str) -> impl Iterator<Item = &'a str> + 'a {
-        self.files.keys().filter(move |k| k.starts_with(prefix)).map(String::as_str)
+        self.files
+            .keys()
+            .filter(move |k| k.starts_with(prefix))
+            .map(String::as_str)
     }
 
     pub fn len(&self) -> usize {

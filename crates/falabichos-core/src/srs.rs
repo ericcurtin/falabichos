@@ -125,7 +125,11 @@ impl Card {
                             self.phase = Phase::Learning(step as u8 + 1);
                             self.due = now + LEARNING_STEPS[step + 1];
                         } else {
-                            let base = if self.interval_days >= 1.0 { self.interval_days } else { 1.0 };
+                            let base = if self.interval_days >= 1.0 {
+                                self.interval_days
+                            } else {
+                                1.0
+                            };
                             self.graduate(now, base);
                         }
                     }
@@ -205,7 +209,11 @@ impl SrsStore {
     ) -> Option<String> {
         let pool: Vec<&String> = {
             let filtered: Vec<&String> = candidates.iter().filter(|c| Some(c.as_str()) != avoid).collect();
-            if filtered.is_empty() { candidates.iter().collect() } else { filtered }
+            if filtered.is_empty() {
+                candidates.iter().collect()
+            } else {
+                filtered
+            }
         };
         if pool.is_empty() {
             return None;
@@ -250,7 +258,7 @@ impl SrsStore {
 mod tests {
     use super::*;
     use crate::rng::Rng;
-    use proptest::prelude::{Just, Strategy, prop_oneof, proptest, prop_assert, prop_assert_eq};
+    use proptest::prelude::{Just, Strategy, prop_assert, prop_assert_eq, prop_oneof, proptest};
 
     #[test]
     fn new_card_goes_through_steps_then_graduates() {
@@ -291,7 +299,11 @@ mod tests {
 
     #[test]
     fn mastery_monotone_with_interval() {
-        let mut c = Card { phase: Phase::Review, interval_days: 1.0, ..Card::default() };
+        let mut c = Card {
+            phase: Phase::Review,
+            interval_days: 1.0,
+            ..Card::default()
+        };
         let m1 = c.mastery();
         c.interval_days = 20.0;
         assert!(c.mastery() > m1);
@@ -305,9 +317,15 @@ mod tests {
         let mut rng = Rng::new(1);
         store.review("a", Grade::Again, 0); // learning, due at 60
         let cands: Vec<String> = vec!["a".into(), "b".into()];
-        assert_eq!(store.pick_next(&cands, 100, 50, None, &mut rng).as_deref(), Some("a"));
+        assert_eq!(
+            store.pick_next(&cands, 100, 50, None, &mut rng).as_deref(),
+            Some("a")
+        );
         // before it is due, the new card "b" is chosen
-        assert_eq!(store.pick_next(&cands, 10, 50, None, &mut rng).as_deref(), Some("b"));
+        assert_eq!(
+            store.pick_next(&cands, 10, 50, None, &mut rng).as_deref(),
+            Some("b")
+        );
     }
 
     #[test]
@@ -316,15 +334,26 @@ mod tests {
         let mut rng = Rng::new(2);
         let cands: Vec<String> = vec!["a".into(), "b".into()];
         for _ in 0..20 {
-            assert_eq!(store.pick_next(&cands, 0, 50, Some("a"), &mut rng).as_deref(), Some("b"));
+            assert_eq!(
+                store.pick_next(&cands, 0, 50, Some("a"), &mut rng).as_deref(),
+                Some("b")
+            );
         }
         let single: Vec<String> = vec!["a".into()];
-        assert_eq!(store.pick_next(&single, 0, 50, Some("a"), &mut rng).as_deref(), Some("a"));
+        assert_eq!(
+            store.pick_next(&single, 0, 50, Some("a"), &mut rng).as_deref(),
+            Some("a")
+        );
         assert_eq!(store.pick_next(&[], 0, 50, None, &mut rng), None);
     }
 
     fn grade_strategy() -> impl Strategy<Value = Grade> {
-        prop_oneof![Just(Grade::Again), Just(Grade::Hard), Just(Grade::Good), Just(Grade::Easy)]
+        prop_oneof![
+            Just(Grade::Again),
+            Just(Grade::Hard),
+            Just(Grade::Good),
+            Just(Grade::Easy)
+        ]
     }
 
     proptest! {

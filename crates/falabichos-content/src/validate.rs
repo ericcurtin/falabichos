@@ -7,7 +7,9 @@ use falabichos_core::model::*;
 use std::collections::{BTreeSet, VecDeque};
 
 fn is_snake_id(s: &str) -> bool {
-    !s.is_empty() && s.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
+    !s.is_empty()
+        && s.chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
 }
 
 /// Is a tile walkable for the player?
@@ -16,7 +18,10 @@ pub fn walkable_kind(k: TileKind) -> bool {
 }
 
 pub fn walkable(c: &Content, m: &MapDef, x: i32, y: i32) -> bool {
-    m.tile_char(x, y).and_then(|ch| c.tile(ch)).map(|t| walkable_kind(t.kind)).unwrap_or(false)
+    m.tile_char(x, y)
+        .and_then(|ch| c.tile(ch))
+        .map(|t| walkable_kind(t.kind))
+        .unwrap_or(false)
 }
 
 pub fn validate(c: &Content) -> Vec<Diagnostic> {
@@ -28,7 +33,10 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
     let mut chars = BTreeSet::new();
     for t in &c.tiles {
         if !chars.insert(t.ch) {
-            d.push(err(format!("tile:{}", t.name), format!("duplicate tile character `{}`", t.ch)));
+            d.push(err(
+                format!("tile:{}", t.name),
+                format!("duplicate tile character `{}`", t.ch),
+            ));
         }
         if t.art.is_empty() {
             d.push(err(format!("tile:{}", t.name), "tile has no art".into()));
@@ -56,22 +64,37 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
         if !(1..=5).contains(&v.level) {
             d.push(err(loc.clone(), "`level` must be 1..=5".into()));
         }
-        if let Some(a) = &v.audio {
-            if a.contains("..") || a.starts_with('/') || a.ends_with(".ogg") {
-                d.push(err(loc.clone(), "`audio` must be a relative clip name without extension".into()));
-            }
+        if let Some(a) = &v.audio
+            && (a.contains("..") || a.starts_with('/') || a.ends_with(".ogg"))
+        {
+            d.push(err(
+                loc.clone(),
+                "`audio` must be a relative clip name without extension".into(),
+            ));
         }
-        if let Some(e) = &v.example {
-            if e.pt.trim().is_empty() || e.en.trim().is_empty() {
-                d.push(err(loc.clone(), "example needs both `pt` and `en`".into()));
-            }
+        if let Some(e) = &v.example
+            && (e.pt.trim().is_empty() || e.en.trim().is_empty())
+        {
+            d.push(err(loc.clone(), "example needs both `pt` and `en`".into()));
         }
     }
     // Brazilian-form guard: flag headwords that are known pt-BR-only forms.
-    const BR_ONLY: &[&str] = &["ônibus", "celular", "café da manhã", "banheiro", "trem", "geladeira", "suco", "menina"];
+    const BR_ONLY: &[&str] = &[
+        "ônibus",
+        "celular",
+        "café da manhã",
+        "banheiro",
+        "trem",
+        "geladeira",
+        "suco",
+        "menina",
+    ];
     for v in c.vocab.values() {
         if BR_ONLY.contains(&v.pt.to_lowercase().as_str()) {
-            d.push(warn(format!("vocab:{}", v.id), format!("`{}` looks like a Brazilian-only form; use the pt-PT word", v.pt)));
+            d.push(warn(
+                format!("vocab:{}", v.id),
+                format!("`{}` looks like a Brazilian-only form; use the pt-PT word", v.pt),
+            ));
         }
     }
 
@@ -88,7 +111,10 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
                 d.push(err(eloc.clone(), "id must be lowercase snake_case ASCII".into()));
             }
             if !ex_ids.insert(e.id.clone()) || c.vocab.contains_key(&e.id) {
-                d.push(err(eloc.clone(), "exercise id collides with another exercise or vocab id".into()));
+                d.push(err(
+                    eloc.clone(),
+                    "exercise id collides with another exercise or vocab id".into(),
+                ));
             }
             if e.answer.is_empty() {
                 d.push(err(eloc.clone(), "no accepted `answer`".into()));
@@ -100,7 +126,10 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
                     }
                     for a in &e.answer {
                         if !e.options.iter().any(|o| o == a) {
-                            d.push(err(eloc.clone(), format!("answer `{a}` is not among the options")));
+                            d.push(err(
+                                eloc.clone(),
+                                format!("answer `{a}` is not among the options"),
+                            ));
                         }
                     }
                     let mut u = e.options.clone();
@@ -144,8 +173,12 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
             }
         }
         match s.kind {
-            SpeciesKind::Vocab if s.vocab.len() < 3 => d.push(err(loc.clone(), "needs at least 3 vocab items".into())),
-            SpeciesKind::Grammar if s.grammar.is_empty() => d.push(err(loc.clone(), "grammar Bicho needs a grammar concept".into())),
+            SpeciesKind::Vocab if s.vocab.len() < 3 => {
+                d.push(err(loc.clone(), "needs at least 3 vocab items".into()))
+            }
+            SpeciesKind::Grammar if s.grammar.is_empty() => {
+                d.push(err(loc.clone(), "grammar Bicho needs a grammar concept".into()))
+            }
             _ => {}
         }
         if s.trust_needed == 0 {
@@ -163,14 +196,21 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
     // ---- towns
     for t in c.towns.values() {
         if !c.maps.contains_key(&t.start_map) {
-            d.push(err(format!("town:{}", t.id), format!("unknown start_map `{}`", t.start_map)));
+            d.push(err(
+                format!("town:{}", t.id),
+                format!("unknown start_map `{}`", t.start_map),
+            ));
         }
     }
 
     // ---- dialogues
     let check_cond = |loc: &str, cond: &Cond, d: &mut Vec<Diagnostic>| match cond {
-        Cond::HasBicho(s) if !c.species.contains_key(s) => d.push(err(loc.into(), format!("unknown species `{s}` in condition"))),
-        Cond::HasSeal(s) if !c.seals.contains_key(s) => d.push(err(loc.into(), format!("unknown seal `{s}` in condition"))),
+        Cond::HasBicho(s) if !c.species.contains_key(s) => {
+            d.push(err(loc.into(), format!("unknown species `{s}` in condition")))
+        }
+        Cond::HasSeal(s) if !c.seals.contains_key(s) => {
+            d.push(err(loc.into(), format!("unknown seal `{s}` in condition")))
+        }
         _ => {}
     };
     for dlg in c.dialogues.values() {
@@ -179,7 +219,10 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
             d.push(err(loc.clone(), "no branches".into()));
         }
         if dlg.branches.last().map(|b| !b.when.is_empty()).unwrap_or(false) {
-            d.push(warn(loc.clone(), "last branch has conditions; nothing plays if none hold".into()));
+            d.push(warn(
+                loc.clone(),
+                "last branch has conditions; nothing plays if none hold".into(),
+            ));
         }
         for b in &dlg.branches {
             if b.lines.is_empty() {
@@ -206,9 +249,10 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
                     }
                     Action::Warp { map, x, y } => match c.maps.get(map) {
                         None => d.push(err(loc.clone(), format!("warp to unknown map `{map}`"))),
-                        Some(m) if !walkable(c, m, *x, *y) => {
-                            d.push(err(loc.clone(), format!("warp target {map}({x},{y}) is not walkable")))
-                        }
+                        Some(m) if !walkable(c, m, *x, *y) => d.push(err(
+                            loc.clone(),
+                            format!("warp target {map}({x},{y}) is not walkable"),
+                        )),
                         _ => {}
                     },
                     _ => {}
@@ -245,10 +289,10 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
                 d.push(err(loc.clone(), format!("unknown grammar `{g}`")));
             }
         }
-        if let Some(s) = &ch.seal {
-            if !c.seals.contains_key(s) {
-                d.push(err(loc.clone(), format!("unknown seal `{s}`")));
-            }
+        if let Some(s) = &ch.seal
+            && !c.seals.contains_key(s)
+        {
+            d.push(err(loc.clone(), format!("unknown seal `{s}`")));
         }
         if ch.kind == ChallengeKind::Mestre && ch.seal.is_none() {
             d.push(warn(loc.clone(), "Mestre without a seal".into()));
@@ -270,7 +314,10 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
         None => d.push(err("story.ron".into(), "missing story.ron".into())),
         Some(s) => {
             match c.maps.get(&s.start_map) {
-                None => d.push(err("story.ron".into(), format!("unknown start_map `{}`", s.start_map))),
+                None => d.push(err(
+                    "story.ron".into(),
+                    format!("unknown start_map `{}`", s.start_map),
+                )),
                 Some(m) if !walkable(c, m, s.start_x, s.start_y) => {
                     d.push(err("story.ron".into(), "start position is not walkable".into()))
                 }
@@ -297,7 +344,10 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
     let width = m.width();
     for (y, r) in m.rows.iter().enumerate() {
         if r.chars().count() != width {
-            d.push(e(format!("row {y} has width {} but row 0 has {width}", r.chars().count())));
+            d.push(e(format!(
+                "row {y} has width {} but row 0 has {width}",
+                r.chars().count()
+            )));
         }
         for (x, ch) in r.chars().enumerate() {
             if c.tile(ch).is_none() {
@@ -315,7 +365,10 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
             None => d.push(e(format!("warp to unknown map `{}`", wp.map))),
             Some(t) => {
                 if !walkable(c, t, wp.to_x, wp.to_y) {
-                    d.push(e(format!("warp arrival {}({},{}) is not walkable", wp.map, wp.to_x, wp.to_y)));
+                    d.push(e(format!(
+                        "warp arrival {}({},{}) is not walkable",
+                        wp.map, wp.to_x, wp.to_y
+                    )));
                 }
             }
         }
@@ -332,10 +385,10 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
         if !occupied.insert((n.x, n.y)) {
             d.push(e(format!("{nl} overlaps another NPC at ({},{})", n.x, n.y)));
         }
-        if let Some(dl) = &n.dialogue {
-            if !c.dialogues.contains_key(dl) {
-                d.push(e(format!("{nl}: unknown dialogue `{dl}`")));
-            }
+        if let Some(dl) = &n.dialogue
+            && !c.dialogues.contains_key(dl)
+        {
+            d.push(e(format!("{nl}: unknown dialogue `{dl}`")));
         }
         if let Some(t) = &n.trainer {
             if !c.challenges.contains_key(&t.challenge) {
@@ -347,8 +400,12 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
         }
         for cond in &n.show_when {
             match cond {
-                Cond::HasBicho(s) if !c.species.contains_key(s) => d.push(e(format!("{nl}: unknown species `{s}`"))),
-                Cond::HasSeal(s) if !c.seals.contains_key(s) => d.push(e(format!("{nl}: unknown seal `{s}`"))),
+                Cond::HasBicho(s) if !c.species.contains_key(s) => {
+                    d.push(e(format!("{nl}: unknown species `{s}`")))
+                }
+                Cond::HasSeal(s) if !c.seals.contains_key(s) => {
+                    d.push(e(format!("{nl}: unknown seal `{s}`")))
+                }
                 _ => {}
             }
         }
@@ -370,7 +427,11 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
         }
     }
     if !m.encounters.is_empty() {
-        let has_grass = m.rows.iter().flat_map(|r| r.chars()).any(|ch| c.tile(ch).map(|t| t.kind == TileKind::TallGrass).unwrap_or(false));
+        let has_grass = m
+            .rows
+            .iter()
+            .flat_map(|r| r.chars())
+            .any(|ch| c.tile(ch).map(|t| t.kind == TileKind::TallGrass).unwrap_or(false));
         if !has_grass {
             d.push(w("has encounters but no tall-grass tiles".into()));
         }
@@ -384,7 +445,11 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
         }
     }
     if m.encounters.is_empty() {
-        let has_grass = m.rows.iter().flat_map(|r| r.chars()).any(|ch| c.tile(ch).map(|t| t.kind == TileKind::TallGrass).unwrap_or(false));
+        let has_grass = m
+            .rows
+            .iter()
+            .flat_map(|r| r.chars())
+            .any(|ch| c.tile(ch).map(|t| t.kind == TileKind::TallGrass).unwrap_or(false));
         if has_grass {
             d.push(w("has tall-grass tiles but no encounters".into()));
         }
@@ -399,13 +464,17 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
             }
         }
     }
-    if let Some(s) = &c.story {
-        if s.start_map == m.id {
-            entries.push((s.start_x, s.start_y));
-        }
+    if let Some(s) = &c.story
+        && s.start_map == m.id
+    {
+        entries.push((s.start_x, s.start_y));
     }
     if entries.is_empty() {
-        d.push(diag(Severity::Info, loc.clone(), "map has no entry point (nothing warps here)"));
+        d.push(diag(
+            Severity::Info,
+            loc.clone(),
+            "map has no entry point (nothing warps here)",
+        ));
         return;
     }
     let mut seen: BTreeSet<(i32, i32)> = BTreeSet::new();
@@ -415,7 +484,12 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
             q.push_back(p);
         }
     }
-    let npc_blocks: BTreeSet<(i32, i32)> = m.npcs.iter().filter(|n| n.show_when.is_empty()).map(|n| (n.x, n.y)).collect();
+    let npc_blocks: BTreeSet<(i32, i32)> = m
+        .npcs
+        .iter()
+        .filter(|n| n.show_when.is_empty())
+        .map(|n| (n.x, n.y))
+        .collect();
     while let Some((x, y)) = q.pop_front() {
         for (dx, dy) in [(0, 1), (0, -1), (1, 0), (-1, 0)] {
             let p = (x + dx, y + dy);
@@ -426,13 +500,20 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
     }
     for wp in &m.warps {
         if walkable(c, m, wp.x, wp.y) && !seen.contains(&(wp.x, wp.y)) {
-            d.push(e(format!("warp at ({},{}) is unreachable from the map entry points", wp.x, wp.y)));
+            d.push(e(format!(
+                "warp at ({},{}) is unreachable from the map entry points",
+                wp.x, wp.y
+            )));
         }
     }
     for n in &m.npcs {
-        let near = [(0, 1), (0, -1), (1, 0), (-1, 0)].iter().any(|(dx, dy)| seen.contains(&(n.x + dx, n.y + dy)));
+        let near = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+            .iter()
+            .any(|(dx, dy)| seen.contains(&(n.x + dx, n.y + dy)));
         // Counters: NPCs behind a counter are talked to across it, so check one more tile out.
-        let across = [(0, 2), (0, -2), (2, 0), (-2, 0)].iter().any(|(dx, dy)| seen.contains(&(n.x + dx, n.y + dy)));
+        let across = [(0, 2), (0, -2), (2, 0), (-2, 0)]
+            .iter()
+            .any(|(dx, dy)| seen.contains(&(n.x + dx, n.y + dy)));
         if !near && !across && n.show_when.is_empty() {
             d.push(w(format!("npc `{}` has no reachable neighbouring tile", n.id)));
         }

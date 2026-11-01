@@ -1,0 +1,17 @@
+[package]
+name = "falabichos-game"
+description = "Engine-agnostic Falabichos game: scenes, world, battle UI, menus, software renderer, headless simulation"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+falabichos-core.workspace = true
+falabichos-assets = { path = "../falabichos-assets" }
+falabichos-content.workspace = true
+falabichos-media.workspace = true
+
+[lints]
+workspace = true

@@ -40,7 +40,11 @@ impl Rng {
         }
     }
     pub fn pick<'a, T>(&mut self, v: &'a [T]) -> Option<&'a T> {
-        if v.is_empty() { None } else { v.get(self.below(v.len())) }
+        if v.is_empty() {
+            None
+        } else {
+            v.get(self.below(v.len()))
+        }
     }
 }
 

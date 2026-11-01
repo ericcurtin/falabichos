@@ -26,7 +26,11 @@ fn main() {
     let out = Path::new(args.first().map(String::as_str).unwrap_or("preview"));
     std::fs::create_dir_all(out).expect("create outdir");
     let local = Path::new("assets");
-    let assets = if local.is_dir() { Assets::from_dir(local).unwrap_or_else(|_| Assets::embedded()) } else { Assets::embedded() };
+    let assets = if local.is_dir() {
+        Assets::from_dir(local).unwrap_or_else(|_| Assets::embedded())
+    } else {
+        Assets::embedded()
+    };
     let bank = match ArtBank::load(&assets) {
         Ok(b) => b,
         Err(e) => {
@@ -43,7 +47,13 @@ fn main() {
     let mut c = Canvas::new(240, 80);
     c.clear(bank.pal('n'));
     let w = bank.pal('W');
-    let lines = ["ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz 0123456789", "Olá! Pão, coração, avó, avô, é, à, ü", "Português: ão õe ç ã ê ú í Ó É Á Ç", "IPA: ɐ ɛ ɔ ə ɨ ʃ ʒ ʁ ɾ ɲ ʎ ŋ ɫ ˈ ː ɐ̃ ẽ"];
+    let lines = [
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "abcdefghijklmnopqrstuvwxyz 0123456789",
+        "Olá! Pão, coração, avó, avô, é, à, ü",
+        "Português: ão õe ç ã ê ú í Ó É Á Ç",
+        "IPA: ɐ ɛ ɔ ə ɨ ʃ ʒ ʁ ɾ ɲ ʎ ŋ ɫ ˈ ː ɐ̃ ẽ",
+    ];
     for (i, l) in lines.iter().enumerate() {
         bank.font.draw(&mut c, l, 2, 2 + i as i32 * 14, w, 1);
     }
@@ -53,7 +63,11 @@ fn main() {
         let name = p.trim_start_matches("music/").trim_end_matches(".song");
         match Song::parse(assets.text(p).unwrap_or("")) {
             Ok(s) => {
-                std::fs::write(out.join(format!("{name}.wav")), wav_bytes(&s.render(), SAMPLE_RATE)).expect("write wav");
+                std::fs::write(
+                    out.join(format!("{name}.wav")),
+                    wav_bytes(&s.render(), SAMPLE_RATE),
+                )
+                .expect("write wav");
                 println!("wrote {}/{name}.wav ({:.1}s)", out.display(), s.duration_secs());
             }
             Err(e) => eprintln!("{p}: {e}"),

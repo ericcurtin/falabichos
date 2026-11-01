@@ -2,13 +2,17 @@
 //! Templates for `falabichos-new`.
 
 pub fn is_id(s: &str) -> bool {
-    !s.is_empty() && s.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
+    !s.is_empty()
+        && s.chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
 }
 
 /// Returns `(relative path under assets/, file contents)` pairs.
 pub fn files_for(kind: &str, id: &str) -> Result<Vec<(String, String)>, String> {
     if !is_id(id) {
-        return Err(format!("`{id}` is not a valid id (lowercase letters, digits and `_` only)"));
+        return Err(format!(
+            "`{id}` is not a valid id (lowercase letters, digits and `_` only)"
+        ));
     }
     Ok(match kind {
         "vocab" => vec![(format!("content/vocab/{id}.ron"), vocab(id))],
@@ -22,7 +26,11 @@ pub fn files_for(kind: &str, id: &str) -> Result<Vec<(String, String)>, String> 
             (format!("content/towns/{id}/maps/{id}_outside.ron"), map(id)),
             (format!("content/towns/{id}/dialogues/{id}.ron"), dialogues(id)),
         ],
-        other => return Err(format!("unknown kind `{other}` (use: vocab, grammar, bicho, town)")),
+        other => {
+            return Err(format!(
+                "unknown kind `{other}` (use: vocab, grammar, bicho, town)"
+            ));
+        }
     })
 }
 
@@ -114,7 +122,9 @@ fn bicho(id: &str) -> String {
 "#,
         name = {
             let mut c = id.chars();
-            c.next().map(|f| f.to_uppercase().collect::<String>() + c.as_str()).unwrap_or_default()
+            c.next()
+                .map(|f| f.to_uppercase().collect::<String>() + c.as_str())
+                .unwrap_or_default()
         }
     )
 }

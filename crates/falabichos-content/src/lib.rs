@@ -54,8 +54,16 @@ impl fmt::Display for Diagnostic {
     }
 }
 
-pub(crate) fn diag(severity: Severity, location: impl Into<String>, message: impl Into<String>) -> Diagnostic {
-    Diagnostic { severity, location: location.into(), message: message.into() }
+pub(crate) fn diag(
+    severity: Severity,
+    location: impl Into<String>,
+    message: impl Into<String>,
+) -> Diagnostic {
+    Diagnostic {
+        severity,
+        location: location.into(),
+        message: message.into(),
+    }
 }
 
 /// Result of loading: a (possibly partial) content database plus everything that went wrong.
@@ -81,7 +89,11 @@ fn parse<T: DeserializeOwned>(path: &str, text: &str, diags: &mut Vec<Diagnostic
     match ron_options().from_str::<T>(text) {
         Ok(v) => Some(v),
         Err(e) => {
-            diags.push(diag(Severity::Error, path, format!("parse error at {}: {}", e.span.start, e.code)));
+            diags.push(diag(
+                Severity::Error,
+                path,
+                format!("parse error at {}: {}", e.span.start, e.code),
+            ));
             None
         }
     }
@@ -95,10 +107,16 @@ fn insert_unique<T>(
     path: &str,
     diags: &mut Vec<Diagnostic>,
 ) {
-    if map.contains_key(&id) {
-        diags.push(diag(Severity::Error, path, format!("duplicate {kind} id `{id}`")));
-    } else {
-        map.insert(id, value);
+    use std::collections::btree_map::Entry;
+    match map.entry(id) {
+        Entry::Occupied(e) => diags.push(diag(
+            Severity::Error,
+            path,
+            format!("duplicate {kind} id `{}`", e.key()),
+        )),
+        Entry::Vacant(e) => {
+            e.insert(value);
+        }
     }
 }
 
@@ -107,7 +125,11 @@ pub fn load(assets: &Assets) -> Loaded {
     let mut content = Content::default();
     let mut d: Vec<Diagnostic> = vec![];
     let prefix = "content/";
-    let paths: Vec<String> = assets.list(prefix).filter(|p| p.ends_with(".ron")).map(String::from).collect();
+    let paths: Vec<String> = assets
+        .list(prefix)
+        .filter(|p| p.ends_with(".ron"))
+        .map(String::from)
+        .collect();
     for path in &paths {
         let rel = &path[prefix.len()..];
         let Some(text) = assets.text(path) else {
@@ -164,22 +186,40 @@ pub fn load(assets: &Assets) -> Loaded {
             }
             ["towns", _, "challenges", _] => {
                 for x in parse::<Vec<Challenge>>(path, text, &mut d).unwrap_or_default() {
-                    insert_unique(&mut content.challenges, x.id.clone(), x, "challenge", path, &mut d);
+                    insert_unique(
+                        &mut content.challenges,
+                        x.id.clone(),
+                        x,
+                        "challenge",
+                        path,
+                        &mut d,
+                    );
                 }
             }
-            _ => d.push(diag(Severity::Warning, path, "unrecognised content file location (ignored)")),
+            _ => d.push(diag(
+                Severity::Warning,
+                path,
+                "unrecognised content file location (ignored)",
+            )),
         }
     }
     content.finalize();
     d.extend(validate(&content));
-    Loaded { content, diagnostics: d }
+    Loaded {
+        content,
+        diagnostics: d,
+    }
 }
 
 /// Load, failing with the list of errors if anything is wrong. Used by the game at startup.
 pub fn load_strict(assets: &Assets) -> Result<Content, Vec<Diagnostic>> {
     let l = load(assets);
     if l.has_errors() {
-        Err(l.diagnostics.into_iter().filter(|d| d.severity == Severity::Error).collect())
+        Err(l
+            .diagnostics
+            .into_iter()
+            .filter(|d| d.severity == Severity::Error)
+            .collect())
     } else {
         Ok(l.content)
     }
@@ -188,13 +228,38 @@ pub fn load_strict(assets: &Assets) -> Result<Content, Vec<Diagnostic>> {
 /// Every content entry flagged `needs_native_review`, as `(kind, id)`.
 pub fn review_items(c: &Content) -> Vec<(&'static str, String)> {
     let mut v = vec![];
-    v.extend(c.vocab.values().filter(|x| x.needs_native_review).map(|x| ("vocab", x.id.clone())));
-    v.extend(c.grammar.values().filter(|x| x.needs_native_review).map(|x| ("grammar", x.id.clone())));
+    v.extend(
+        c.vocab
+            .values()
+            .filter(|x| x.needs_native_review)
+            .map(|x| ("vocab", x.id.clone())),
+    );
+    v.extend(
+        c.grammar
+            .values()
+            .filter(|x| x.needs_native_review)
+            .map(|x| ("grammar", x.id.clone())),
+    );
     for g in c.grammar.values() {
-        v.extend(g.exercises.iter().filter(|e| e.needs_native_review).map(|e| ("exercise", e.id.clone())));
+        v.extend(
+            g.exercises
+                .iter()
+                .filter(|e| e.needs_native_review)
+                .map(|e| ("exercise", e.id.clone())),
+        );
     }
-    v.extend(c.species.values().filter(|x| x.needs_native_review).map(|x| ("species", x.id.clone())));
-    v.extend(c.towns.values().filter(|x| x.needs_native_review).map(|x| ("town", x.id.clone())));
+    v.extend(
+        c.species
+            .values()
+            .filter(|x| x.needs_native_review)
+            .map(|x| ("species", x.id.clone())),
+    );
+    v.extend(
+        c.towns
+            .values()
+            .filter(|x| x.needs_native_review)
+            .map(|x| ("town", x.id.clone())),
+    );
     for dlg in c.dialogues.values() {
         for (bi, b) in dlg.branches.iter().enumerate() {
             for (li, l) in b.lines.iter().enumerate() {
