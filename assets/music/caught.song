@@ -1,0 +1,5 @@
+name: caught
+bpm: 150
+loop: no
+lead = square 0.45 : E5:1 G5:1 C6:2 -:1 C6:1 E6:2 G6:4
+bass = triangle 0.7 : C3:4 G3:2 C4:6

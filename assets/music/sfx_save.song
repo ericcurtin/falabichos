@@ -1,0 +1,4 @@
+name: sfx_save
+bpm: 280
+loop: no
+lead = square 0.4 : G5:1 C6:1 G5:1 C6:2

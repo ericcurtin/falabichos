@@ -1,0 +1,4 @@
+name: sfx_wrong
+bpm: 260
+loop: no
+lead = saw 0.4 : G3>C3:3

@@ -1,0 +1,7 @@
+# Title screen theme. Original composition, Apache-2.0.
+name: title
+bpm: 100
+loop: yes
+lead = square 0.4 : G4:2 C5:2 E5:2 G5:2 E5:4 C5:2 D5:2  E5:2 D5:2 C5:2 A4:2 G4:6 -:2
+bass = triangle 0.7 : C3:4 G3:4 C3:4 G3:4 F3:4 C3:4 G3:4 G3:4
+perc = noise 0.25 : x:2 .:2 h:2 .:2

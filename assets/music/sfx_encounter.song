@@ -1,0 +1,5 @@
+name: sfx_encounter
+bpm: 280
+loop: no
+lead = square 0.5 : C4>C6:3 G4>G5:3
+hit = noise 0.3 : x:1 h:1 h:1

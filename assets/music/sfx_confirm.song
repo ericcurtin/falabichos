@@ -1,0 +1,4 @@
+name: sfx_confirm
+bpm: 300
+loop: no
+lead = square 0.5 : E5:1 B5:1

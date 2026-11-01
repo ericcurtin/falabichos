@@ -1,0 +1,4 @@
+name: sfx_select
+bpm: 300
+loop: no
+lead = square 0.4 : C6:1

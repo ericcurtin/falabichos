@@ -1,0 +1,18 @@
+[package]
+name = "falabichos-content"
+description = "Content loading and validation for Falabichos (RON data files)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+falabichos-core.workspace = true
+falabichos-assets = { path = "../falabichos-assets" }
+serde.workspace = true
+ron.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

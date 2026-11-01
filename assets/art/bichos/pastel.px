@@ -1,0 +1,20 @@
+# Bicho: pastel
+size: 16x16
+outline: K
+bob: yes
+................
+................
+....aaaaaaaa....
+..aaAAAAAAAAaa..
+.aAAYYYYYYYYAAa.
+.aAYYoYYYYYoYAa.
+aAYYYKYYYYKYYYAa
+aAYYYKYYYYKYYYAa
+aAYYYYYppYYYYYAa
+aAYYpYYkkYYYpYAa
+.aAYYYYYYYYYYAa.
+.aAAYYYYYYYYAAa.
+..aaAAAAAAAAaa..
+...tt......tt...
+................
+................

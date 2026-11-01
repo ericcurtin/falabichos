@@ -1,0 +1,5 @@
+name: sfx_door
+bpm: 300
+loop: no
+lead = triangle 0.6 : C3>G2:2
+hit = noise 0.4 : x:1 h:1

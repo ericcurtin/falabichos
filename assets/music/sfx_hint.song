@@ -1,0 +1,4 @@
+name: sfx_hint
+bpm: 280
+loop: no
+lead = pulse 0.4 : E6:1 C6:1

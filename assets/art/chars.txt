@@ -1,0 +1,19 @@
+# Recolourable characters. Format:  id: body=<a|b> hair=<L> skin=<L> shirt=<L> pants=<L> shoes=<L> extra=<L>
+# Letters come from palette.txt. `extra` paints the apron/scarf/badge area (set it to the shirt letter to hide it).
+# Template: art/chars/_body_a.px (short hair, trousers) and _body_b.px (long hair, dress).
+player:    body=a hair=t skin=m shirt=R pants=n shoes=K extra=y
+avo:       body=b hair=w skin=m shirt=P pants=P shoes=t extra=W
+amelia:    body=b hair=G skin=M shirt=W pants=b shoes=K extra=b
+padeiro:   body=a hair=t skin=m shirt=W pants=G shoes=K extra=W
+joaquim:   body=a hair=K skin=M shirt=W pants=n shoes=K extra=r
+pescador:  body=a hair=w skin=M shirt=b pants=t shoes=K extra=y
+menina:    body=b hair=y skin=m shirt=p pants=p shoes=R extra=R
+menino:    body=a hair=T skin=m shirt=E pants=t shoes=K extra=E
+dona_rosa: body=b hair=P skin=m shirt=R pants=R shoes=K extra=W
+turista:   body=a hair=y skin=m shirt=o pants=y shoes=K extra=o
+beatriz:   body=b hair=K skin=M shirt=y pants=n shoes=K extra=r
+condutor:  body=a hair=G skin=m shirt=n pants=n shoes=K extra=y
+vendedora: body=b hair=t skin=M shirt=e pants=T shoes=K extra=W
+senhor:    body=a hair=w skin=m shirt=T pants=G shoes=t extra=T
+estudante: body=b hair=P skin=m shirt=v pants=G shoes=W extra=v
+lisboeta:  body=a hair=K skin=m shirt=g pants=K shoes=K extra=g

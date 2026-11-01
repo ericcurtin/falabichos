@@ -1,0 +1,20 @@
+# Bicho: azulejo
+size: 16x16
+outline: K
+bob: yes
+................
+................
+..bbbbbbbbbbbb..
+..bWWWWWWWWWWb..
+..bWbBBWWBBbWb..
+..bWBBBWWBBBWb..
+..bWWWKWWKWWWb..
+..bWWWKWWKWWWb..
+..bWBBBWWBBBWb..
+..bWbBBWWBBbWb..
+..bWWWWppWWWWb..
+..bWWWWWWWWWWb..
+..bbbbbbbbbbbb..
+...TT......TT...
+................
+................

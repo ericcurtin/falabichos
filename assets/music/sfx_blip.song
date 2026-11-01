@@ -1,0 +1,4 @@
+name: sfx_blip
+bpm: 420
+loop: no
+lead = square 0.25 : A6:1

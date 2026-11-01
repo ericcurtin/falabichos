@@ -1,0 +1,7 @@
+# Vila Azul (fishing village) theme.
+name: town
+bpm: 108
+loop: yes
+lead = square 0.35 : E5:2 -:1 D5:1 C5:2 D5:2 E5:2 E5:2 E5:4 D5:2 D5:2 D5:4 E5:2 G5:2 G5:4 E5:2 -:1 D5:1 C5:2 D5:2 E5:2 E5:2 E5:4 D5:2 D5:2 E5:2 D5:2 C5:8
+bass = triangle 0.7 : C3:4 G2:4 A2:4 E3:4 F2:4 C3:4 G2:4 G2:4
+perc = noise 0.15 : h:2 .:2 h:2 .:2

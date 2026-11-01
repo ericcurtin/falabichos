@@ -1,0 +1,5 @@
+name: victory
+bpm: 130
+loop: no
+lead = square 0.45 : C5:2 E5:2 G5:2 C6:6
+bass = triangle 0.7 : C3:4 G3:2 C4:6

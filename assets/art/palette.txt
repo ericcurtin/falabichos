@@ -1,0 +1,35 @@
+# Falabichos master palette (31 opaque colours + transparent). Original, Apache-2.0.
+# Every sprite and tile uses ONLY these letters. Keep it that way: it is what makes the art cohesive.
+# Format: <letter> = #rrggbb  <name>
+. = transparent
+K = #1b1a2e  ink (outlines, deepest shadow)
+k = #3a3555  violet shadow
+W = #fff8e8  cream white
+w = #d9d2c0  pale stone
+g = #8c8aa0  grey
+G = #5a5870  dark grey
+d = #1f4a3a  deep green
+e = #2f7a45  green
+E = #55a84f  leaf green
+l = #9ad46a  lime
+n = #1d2f6f  navy
+b = #2a5db0  azulejo blue
+B = #5b9be0  sky blue
+c = #a8dcf0  pale cyan
+s = #2b8fb0  teal sea
+r = #b8322c  red
+R = #e8553c  coral red
+o = #e8893a  orange
+y = #f2c94c  yellow
+Y = #fbe9a0  pale yellow
+p = #e89aa8  pink
+P = #a8456a  plum
+t = #6b3f2a  brown
+T = #9a6a3f  light brown
+a = #d4a574  sand
+A = #ecd2a0  pale sand
+h = #c47a5a  terracotta
+H = #8a4a3a  dark terracotta
+m = #f0c09a  skin
+M = #c98e66  skin dark
+v = #7a5fb0  violet

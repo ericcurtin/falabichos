@@ -1,0 +1,15 @@
+[package]
+name = "falabichos-media"
+description = "Original pixel art, bitmap font, software canvas and chiptune synth for Falabichos"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+falabichos-assets = { path = "../falabichos-assets" }
+png.workspace = true
+
+[lints]
+workspace = true

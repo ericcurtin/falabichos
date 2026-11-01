@@ -1,0 +1,4 @@
+name: sfx_cancel
+bpm: 300
+loop: no
+lead = square 0.4 : B4:1 E4:1

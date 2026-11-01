@@ -1,0 +1,4 @@
+name: sfx_correct
+bpm: 260
+loop: no
+lead = square 0.5 : C5:1 E5:1 G5:2

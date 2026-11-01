@@ -1,0 +1,6 @@
+# Indoor theme (cosy).
+name: indoor
+bpm: 92
+loop: yes
+lead = triangle 0.5 : G4:2 B4:2 D5:4 B4:2 G4:2 A4:4 F4:2 A4:2 C5:4 A4:2 F4:2 G4:4
+bass = square 0.18 : G2:8 D3:8 F2:8 C3:8

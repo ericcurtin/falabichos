@@ -1,0 +1,4 @@
+name: sfx_levelup
+bpm: 260
+loop: no
+lead = square 0.5 : C5:1 E5:1 G5:1 C6:1 E6:2
