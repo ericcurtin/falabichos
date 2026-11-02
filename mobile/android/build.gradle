@@ -2,5 +2,5 @@
 // Top-level build file. The Rust code is built separately by `cargo xtask android` (cargo-ndk), which
 // drops libfalabichos.so into app/src/main/jniLibs/<abi>/ before Gradle packages the APK / AAB.
 plugins {
-    id 'com.android.application' version '8.5.2' apply false
+    id 'com.android.application' version '9.5.0' apply false
 }
