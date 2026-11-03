@@ -23,12 +23,25 @@ battle.progress = Question {n}/{total}  (need {need} right)
 ## Add a language
 
 1. `cp -r assets/i18n/en assets/i18n/es` and translate the values in `assets/i18n/es/ui.lang`.
-2. Run `cargo run -p falabichos-tools --bin falabichos-lint`: it lists **missing** and **unknown** keys against English, and checks that every
+2. Run `cargo run -p falabichos-tools --bin falabichos-lint`: it lists **missing** and **unknown** keys against English, checks that every
+   `{placeholder}` is kept exactly (a different placeholder is an **error**), warns when a string is too long for where the game draws it
+   (pause-menu items about 11 characters, settings labels about 26, toasts, hints and captions one 38-character line; longer texts wrap), and checks that every
    character you used exists in the bitmap font (`assets/art/font.txt`).
-3. If you need a character the font lacks (for example `ñ` is there, but `¿` or `ß` may not be), add a glyph: 5 columns × 8 rows of `#` and `.`
+3. If you need a character the font lacks (for example `ñ`, `¿` and `¡` are there, but `ß`, `œ` and `ë`/`ï` are not), add a glyph: 5 columns × 8 rows of `#` and `.`
    (see the header of `font.txt`). Accents are composed automatically from the base letter (á à â ã é è ê í ì î ó ò ô õ ú ù û ü ç ñ).
-4. Select the language: set `ui_lang: "es"` in `settings.ron` in the game's data directory. A language picker in the settings menu is a
-   [good first issue](GOOD_FIRST_ISSUES.md).
+4. Give your language a name in its own language: `lang.name = Español`. It is what the **Language** row in Settings shows.
+5. Select the language: *Settings > Language* (from the title screen or the pause menu) cycles through every folder under
+   `assets/i18n/` and the interface changes at once. The choice is saved as `ui_lang` in `settings.ron`.
+
+## Languages today
+
+| Code | Language | Status |
+|------|----------|--------|
+| `en` | English | the source language |
+| `es` | Español | complete, **not reviewed by a native speaker** (written by an AI coding assistant) |
+| `fr` | Français | complete, **not reviewed by a native speaker** (written by an AI coding assistant) |
+
+Please review them, or add another language. A translation does not have to be perfect to be merged.
 
 ## Limits today
 

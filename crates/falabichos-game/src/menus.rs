@@ -912,6 +912,7 @@ pub(crate) struct SettingsState {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum SettingItem {
+    Language,
     TextSize,
     HighContrast,
     ReduceMotion,
@@ -924,7 +925,8 @@ enum SettingItem {
     Back,
 }
 
-const SETTING_ITEMS: [SettingItem; 10] = [
+const SETTING_ITEMS: [SettingItem; 11] = [
+    SettingItem::Language,
     SettingItem::TextSize,
     SettingItem::HighContrast,
     SettingItem::ReduceMotion,
@@ -938,10 +940,37 @@ const SETTING_ITEMS: [SettingItem; 10] = [
 ];
 
 impl Game {
+    /// The interface languages found in `assets/i18n/` (English first, then alphabetical).
+    pub(crate) fn languages(&self) -> Vec<String> {
+        let mut found: std::collections::BTreeSet<String> = self
+            .assets
+            .list("i18n/")
+            .filter_map(|p| p.strip_prefix("i18n/")?.strip_suffix("/ui.lang"))
+            .map(String::from)
+            .collect();
+        found.insert("en".to_string());
+        let mut v: Vec<String> = found.into_iter().collect();
+        if let Some(i) = v.iter().position(|l| l == "en") {
+            let en = v.remove(i);
+            v.insert(0, en);
+        }
+        v
+    }
+
+    /// The language's own name (`lang.name` in its ui.lang), or its code if it has none.
+    pub(crate) fn language_name(&self, code: &str) -> String {
+        self.assets
+            .text(&format!("i18n/{code}/ui.lang"))
+            .map(falabichos_core::i18n::parse_table)
+            .and_then(|t| t.get("lang.name").cloned())
+            .unwrap_or_else(|| code.to_string())
+    }
+
     fn setting_label(&self, it: SettingItem) -> (String, String) {
         let onoff = |b: bool| self.t(if b { "settings.on" } else { "settings.off" });
         let s = &self.settings;
         match it {
+            SettingItem::Language => (self.t("settings.language"), self.language_name(&s.ui_lang)),
             SettingItem::TextSize => (
                 self.t("settings.text_size"),
                 self.t(if s.text_size == TextSize::Large {
@@ -988,9 +1017,15 @@ impl Game {
         };
         if delta != 0 {
             let it = SETTING_ITEMS[s.cursor];
+            let langs = self.languages();
             let st = &mut self.settings;
             let mut changed = true;
             match it {
+                SettingItem::Language => {
+                    let at = langs.iter().position(|l| *l == st.ui_lang).unwrap_or(0) as i32;
+                    let next = (at + delta).rem_euclid(langs.len() as i32) as usize;
+                    st.ui_lang = langs[next].clone();
+                }
                 SettingItem::TextSize => {
                     st.text_size = if st.text_size == TextSize::Normal {
                         TextSize::Large
@@ -1020,6 +1055,10 @@ impl Game {
                 }
             }
             if changed {
+                if it == SettingItem::Language {
+                    // switch the interface text right away
+                    self.strings = Self::load_strings(&self.assets, &self.settings.ui_lang);
+                }
                 self.sfx("sfx_select");
                 self.events.push(GameEvent::SettingsChanged);
             }
@@ -1030,7 +1069,7 @@ impl Game {
     pub(crate) fn draw_settings(&self, c: &mut Canvas, ui: &Ui, s: &SettingsState) {
         c.clear(self.bank.pal(if self.settings.high_contrast { 'K' } else { 'n' }));
         ui.text(c, 8, 6, &self.t("menu.settings"), self.bank.pal('W'));
-        ui.panel(c, 4, 20, 232, 134);
+        ui.panel(c, 4, 20, 232, 138);
         for (i, it) in SETTING_ITEMS.iter().enumerate() {
             let y = 25 + i as i32 * 12;
             let (label, value) = self.setting_label(*it);
@@ -1126,5 +1165,96 @@ mod calendar_tests {
             g.draw(&mut c);
             std::fs::write(format!("{dir}/calendar.png"), c.upscaled(3).to_png()).unwrap();
         }
+    }
+}
+
+#[cfg(test)]
+mod language_tests {
+    use super::*;
+    use crate::sim::SharedStorage;
+    use crate::storage::Storage;
+    use crate::{GameConfig, Input, MemoryStorage, SETTINGS_FILE};
+    use falabichos_assets::Assets;
+    use std::sync::Arc;
+
+    fn tap(g: &mut Game, f: impl Fn(&mut Input)) {
+        let mut i = Input::default();
+        f(&mut i);
+        g.tick(&i);
+        g.tick(&Input::default());
+    }
+
+    #[test]
+    fn languages_are_discovered_and_named() {
+        let g = Game::new(
+            Arc::new(Assets::embedded()),
+            Box::new(MemoryStorage::default()),
+            GameConfig::default(),
+        )
+        .unwrap();
+        let langs = g.languages();
+        assert_eq!(langs[0], "en", "English comes first");
+        for l in ["es", "fr"] {
+            assert!(langs.contains(&l.to_string()), "{langs:?}");
+        }
+        assert_eq!(g.language_name("en"), "English");
+        assert_eq!(g.language_name("es"), "Español");
+        assert_eq!(g.language_name("fr"), "Français");
+        assert_eq!(g.language_name("xx"), "xx");
+    }
+
+    #[test]
+    fn the_language_row_switches_the_interface_and_is_saved() {
+        let storage = SharedStorage::default();
+        let mut g = Game::new(
+            Arc::new(Assets::embedded()),
+            Box::new(storage.clone()),
+            GameConfig::default(),
+        )
+        .unwrap();
+        assert_eq!(g.t("menu.settings"), "Settings");
+        // open Settings from the title screen (it is the second entry when there is no save)
+        g.scene = Scene::Settings(SettingsState {
+            cursor: 0,
+            from_title: true,
+        });
+        assert!(SETTING_ITEMS[0] == SettingItem::Language);
+        tap(&mut g, |i| i.right = true);
+        assert_eq!(g.settings.ui_lang, "es");
+        assert_eq!(g.t("menu.settings"), "Ajustes", "the text changes immediately");
+        assert_eq!(g.t("settings.language"), "Idioma");
+        // every settings screen still draws in each language (no layout panic)
+        for _ in 0..g.languages().len() {
+            let mut c = Canvas::new(crate::LOGICAL_W, crate::LOGICAL_H);
+            g.draw(&mut c);
+            if let Ok(dir) = std::env::var("FALABICHOS_TEST_PNG_DIR") {
+                let l = g.settings.ui_lang.clone();
+                std::fs::write(format!("{dir}/settings_{l}.png"), c.upscaled(3).to_png()).unwrap();
+                // the pause menu in the same language
+                let old = std::mem::replace(&mut g.scene, Scene::Menu(MenuState::new("")));
+                let mut c = Canvas::new(crate::LOGICAL_W, crate::LOGICAL_H);
+                g.draw(&mut c);
+                std::fs::write(format!("{dir}/menu_{l}.png"), c.upscaled(3).to_png()).unwrap();
+                g.scene = old;
+            }
+            tap(&mut g, |i| i.right = true);
+        }
+        assert_eq!(g.settings.ui_lang, "es", "cycled through all languages and back");
+        tap(&mut g, |i| i.left = true);
+        assert_eq!(g.settings.ui_lang, "en", "left goes back");
+        tap(&mut g, |i| i.left = true);
+        assert_eq!(g.settings.ui_lang, "fr", "and wraps around");
+        // leaving saves the choice; a new session starts in that language
+        tap(&mut g, |i| i.b = true);
+        let saved = storage.read(SETTINGS_FILE).expect("settings written");
+        assert!(saved.contains("fr"), "{saved}");
+        let g2 = Game::new(
+            Arc::new(Assets::embedded()),
+            Box::new(storage),
+            GameConfig::default(),
+        )
+        .unwrap();
+        assert_eq!(g2.settings.ui_lang, "fr");
+        assert_eq!(g2.t("menu.save"), "Sauvegarder");
     }
 }

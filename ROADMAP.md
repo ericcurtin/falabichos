@@ -51,7 +51,7 @@ Status key: **done**, **in progress**, **next**, **later**. Want to take somethi
 
 ## Community
 
-- **next** Translations of the UI: Spanish, French, German, Italian, Dutch, Polish, Chinese, ...
+- **in progress** Translations of the UI: Spanish and French are in (and a *Language* row in Settings switches them live), written by an AI assistant and **not native-reviewed**. German, Italian, Dutch, Polish, Chinese, ... are still open (the bitmap font covers Latin scripts only).
 - **next** A contributors' content dashboard (lint output rendered as a web page *outside* the game; the game itself stays native-only).
 - **later** Teacher tools: export a learner's SRS state as a progress report.
 

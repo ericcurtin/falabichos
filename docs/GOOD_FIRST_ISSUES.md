@@ -40,7 +40,7 @@ You never need to understand the whole project. Tags: 🗣 Portuguese · 🎨 ar
 
 ## 🦀 Rust
 
-24. **Language picker in Settings.** Add a "Language" row to `crates/falabichos-game/src/menus.rs` that cycles through the folders under `assets/i18n/` (needs `Assets::list`) and saves `ui_lang`. *Done when:* a test switches language and a string changes.
+24. ~~**Language picker in Settings.**~~ (done: *Settings > Language*, `Game::languages`).
 25. ~~**Review calendar.**~~ (done: `SrsStore::calendar` in `falabichos-core` and the *Review* menu screen).
 26. **Add a `--list-content` flag** to `falabichos-lint` that prints each vocab category with item counts and the percentage with audio.
 27. **Gamepad rumble / haptics hook:** emit a `GameEvent::Haptic` on wrong answers and handle it for gamepads in the Bevy client (behind a setting). Keep Bevy usage thin.
@@ -52,8 +52,8 @@ You never need to understand the whole project. Tags: 🗣 Portuguese · 🎨 ar
 
 ## 🌍 Translation
 
-33. **Translate the UI to a language you speak** (`cp -r assets/i18n/en assets/i18n/<code>`; see [LOCALISATION.md](LOCALISATION.md)). *Done when:* the linter shows no missing keys and no missing glyphs (add glyphs to `font.txt` if needed).
-34. **Add glyphs for ¿ ¡ « » ß œ** to `assets/art/font.txt` (5×8 each) so more European languages work.
+33. **Translate the UI to another language you speak** (Spanish and French exist but need a native review) (`cp -r assets/i18n/en assets/i18n/<code>`; see [LOCALISATION.md](LOCALISATION.md)). *Done when:* the linter shows no missing keys and no missing glyphs (add glyphs to `font.txt` if needed).
+34. **Add glyphs for « » ß œ ë ï** (¿ ¡ are done) to `assets/art/font.txt` (5×8 each) so more European languages work.
 
 ## 📚 Docs
 

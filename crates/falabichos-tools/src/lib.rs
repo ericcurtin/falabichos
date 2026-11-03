@@ -29,6 +29,127 @@ impl LintReport {
     }
 }
 
+fn diag(severity: Severity, location: &str, message: String) -> Diagnostic {
+    Diagnostic {
+        severity,
+        location: location.to_string(),
+        message,
+    }
+}
+
+/// Characters of a UI string that are always on screen: the text without its `{placeholders}`.
+fn visible_len(s: &str) -> usize {
+    let mut n = 0;
+    let mut in_ph = false;
+    for c in s.chars() {
+        match c {
+            '{' => in_ph = true,
+            '}' => in_ph = false,
+            _ if !in_ph => n += 1,
+            _ => {}
+        }
+    }
+    n
+}
+
+/// How many characters of a UI string fit where the game draws it (6 px per character on a 240 px screen):
+/// pause-menu items are narrow, settings rows share a line with their value, toasts, hints, captions and
+/// calendar rows are one clipped 38-column line; everything else wraps over several lines.
+fn display_budget(key: &str) -> usize {
+    match key {
+        "menu.time" | "menu.due" => 8,
+        "settings.on" | "settings.off" | "settings.normal" | "settings.large" => 10,
+        "lang.name" => 12,
+        "calendar.nothing" | "party.empty" => 100,
+        k if k.starts_with("menu.") => 11,
+        k if k.starts_with("settings.") => 26,
+        k if k.starts_with("toast.")
+            || k.starts_with("practice.")
+            || k.starts_with("calendar.")
+            || k.starts_with("battle.q.")
+            || k.starts_with("title.")
+            || k.contains("hint")
+            || matches!(
+                k,
+                "battle.leave_keys" | "battle.listen_prompt" | "battle.dictation_prompt" | "battle.type_here"
+            ) =>
+        {
+            38
+        }
+        _ => 100,
+    }
+}
+
+/// `{name}`-style placeholders of a UI string.
+pub fn placeholders(s: &str) -> BTreeSet<String> {
+    let mut out = BTreeSet::new();
+    let mut rest = s;
+    while let Some(i) = rest.find('{') {
+        rest = &rest[i + 1..];
+        match rest.find('}') {
+            Some(j) => {
+                out.insert(rest[..j].to_string());
+                rest = &rest[j + 1..];
+            }
+            None => break,
+        }
+    }
+    out
+}
+
+/// Check one UI translation against the English table:
+/// * missing keys (warning: the game falls back to English) and unknown keys (warning);
+/// * placeholders that differ from the English string (**error**: the text would show `{x}` or lose a value);
+/// * strings that are much longer than the English one (warning: the 240x160 screen clips them).
+pub fn check_translation(
+    path: &str,
+    en: &std::collections::HashMap<String, String>,
+    tbl: &std::collections::HashMap<String, String>,
+) -> Vec<Diagnostic> {
+    let mut d = vec![];
+    let mut keys: Vec<&String> = en.keys().collect();
+    keys.sort();
+    for k in keys {
+        let Some(v) = tbl.get(k) else {
+            d.push(diag(
+                Severity::Warning,
+                path,
+                format!("missing key `{k}` (falls back to English)"),
+            ));
+            continue;
+        };
+        let (pe, pt) = (placeholders(&en[k]), placeholders(v));
+        if pe != pt {
+            d.push(diag(
+                Severity::Error,
+                path,
+                format!("key `{k}`: placeholders {pt:?} must be exactly the English ones {pe:?}"),
+            ));
+        }
+        let (le, lt) = (visible_len(&en[k]), visible_len(v));
+        let limit = display_budget(k).max(le);
+        if lt > limit {
+            d.push(diag(
+                Severity::Warning,
+                path,
+                format!(
+                    "key `{k}` is {lt} characters but about {limit} fit on screen here: it may be clipped"
+                ),
+            ));
+        }
+    }
+    let mut unknown: Vec<&String> = tbl.keys().filter(|k| !en.contains_key(*k)).collect();
+    unknown.sort();
+    for k in unknown {
+        d.push(diag(
+            Severity::Warning,
+            path,
+            format!("unknown key `{k}` (not in English)"),
+        ));
+    }
+    d
+}
+
 /// Extract the contents of `"..."` literals from RON text, skipping `//` comments.
 pub fn string_literals(text: &str) -> Vec<String> {
     let mut out = vec![];
@@ -86,11 +207,6 @@ pub fn lint(assets: &Assets) -> LintReport {
     let loaded = load(assets);
     rep.diagnostics.extend(loaded.diagnostics.iter().cloned());
     let c: &Content = &loaded.content;
-    let diag = |sev, loc: &str, msg: String| Diagnostic {
-        severity: sev,
-        location: loc.to_string(),
-        message: msg,
-    };
 
     // ---- art
     let bank = match ArtBank::load(assets) {
@@ -289,25 +405,8 @@ pub fn lint(assets: &Assets) -> LintReport {
             ));
             continue;
         };
-        let tbl = parse_table(t);
-        for k in en.keys() {
-            if !tbl.contains_key(k) {
-                rep.diagnostics.push(diag(
-                    Severity::Warning,
-                    &p,
-                    format!("missing key `{k}` (falls back to English)"),
-                ));
-            }
-        }
-        for k in tbl.keys() {
-            if !en.contains_key(k) {
-                rep.diagnostics.push(diag(
-                    Severity::Warning,
-                    &p,
-                    format!("unknown key `{k}` (not in English)"),
-                ));
-            }
-        }
+        rep.diagnostics
+            .extend(check_translation(&p, &en, &parse_table(t)));
     }
 
     // ---- review
@@ -362,6 +461,86 @@ mod tests {
     fn lang_values_skip_comments_and_placeholders() {
         let v = lang_values("# <note>\na = Hello {name}!\nb = Bye");
         assert_eq!(v, vec![" Hello !".to_string(), " Bye".to_string()]);
+    }
+
+    fn table(pairs: &[(&str, &str)]) -> std::collections::HashMap<String, String> {
+        pairs
+            .iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect()
+    }
+
+    #[test]
+    fn placeholders_are_extracted() {
+        let p = placeholders("{a} and {b}, {a} again {unclosed");
+        assert_eq!(
+            p.into_iter().collect::<Vec<_>>(),
+            vec!["a".to_string(), "b".to_string()]
+        );
+        assert!(placeholders("no braces").is_empty());
+    }
+
+    #[test]
+    fn translation_check_reports_missing_unknown_placeholder_and_length_problems() {
+        let en = table(&[
+            ("a", "Hello {name}"),
+            ("b", "Bye"),
+            ("c", "Score {right}/{total}"),
+            ("toast.d", "Short"),
+        ]);
+        let es = table(&[
+            ("a", "Hola"),                                                       // dropped placeholder: error
+            ("c", "Puntos {right}/{total}"),                                     // fine
+            ("toast.d", "A very much longer sentence than the screen can hold"), // too long: warning
+            ("zzz", "extra"),                                                    // unknown key: warning
+        ]);
+        let d = check_translation("i18n/es/ui.lang", &en, &es);
+        let has =
+            |sev: Severity, needle: &str| d.iter().any(|x| x.severity == sev && x.message.contains(needle));
+        assert!(has(Severity::Error, "key `a`"), "{d:?}");
+        assert!(has(Severity::Warning, "missing key `b`"), "{d:?}");
+        assert!(has(Severity::Warning, "key `toast.d` is"), "{d:?}");
+        // pause-menu items are narrow: an 11-character budget (English wins if it is longer)
+        let en = table(&[("menu.save", "Save"), ("settings.music", "Music volume")]);
+        let tr = table(&[
+            ("menu.save", "Sauvegarder les données"),
+            ("settings.music", "Volume de la musique"),
+        ]);
+        let d = check_translation("x", &en, &tr);
+        assert!(d.iter().any(|x| x.message.contains("key `menu.save`")), "{d:?}");
+        assert!(!d.iter().any(|x| x.message.contains("settings.music")), "{d:?}");
+        // placeholders do not count as screen text
+        let en = table(&[("a", "Error {error}")]);
+        let tr = table(&[("a", "Un problème avec le fichier {error}")]);
+        assert!(check_translation("x", &en, &tr).is_empty());
+        assert!(has(Severity::Warning, "unknown key `zzz`"), "{d:?}");
+        assert!(!d.iter().any(|x| x.message.contains("key `c`")), "{d:?}");
+        // an extra placeholder is as bad as a missing one
+        let bad = table(&[("a", "Hola {name} {extra}")]);
+        let d = check_translation("x", &en, &bad);
+        assert!(
+            d.iter()
+                .any(|x| x.severity == Severity::Error && x.message.contains("key `a`"))
+        );
+    }
+
+    #[test]
+    fn shipped_translations_are_complete_and_well_formed() {
+        let assets = Assets::embedded();
+        let en = parse_table(assets.text("i18n/en/ui.lang").unwrap());
+        let langs: Vec<&str> = assets
+            .list("i18n/")
+            .filter_map(|p| p.strip_prefix("i18n/")?.strip_suffix("/ui.lang"))
+            .collect();
+        for needed in ["en", "es", "fr"] {
+            assert!(langs.contains(&needed), "missing language {needed}");
+        }
+        for l in langs {
+            let tbl = parse_table(assets.text(&format!("i18n/{l}/ui.lang")).unwrap());
+            let d = check_translation(l, &en, &tbl);
+            assert!(d.is_empty(), "{l}: {d:?}");
+            assert!(tbl.contains_key("lang.name"), "{l} needs a lang.name");
+        }
     }
 
     #[test]

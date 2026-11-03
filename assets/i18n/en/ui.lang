@@ -118,3 +118,5 @@ lesson.hint_last = A: start the conversation   B: skip
 battle.q.translate = Translate it. Select: word hints
 battle.q.dictation = Type the word you hear.
 battle.dictation_prompt = Listen and type (Menu: replay)
+settings.language = Language
+lang.name = English
