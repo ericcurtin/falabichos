@@ -6,6 +6,7 @@
 //! * [`normalize`]: answer matching (accent-insensitive / typo-tolerant)
 //! * [`srs`]: spaced-repetition scheduler
 //! * [`exercise`]: exercise generation and checking
+//! * [`ladder`]: the adaptive strictness ladder for typed answers
 //! * [`battle`]: conversation-battle state machine (catch / challenge / practice)
 //! * [`progress`]: story flags, party, Bichodex, seals
 //! * [`save`]: versioned saves and settings with migrations
@@ -15,6 +16,7 @@ pub mod battle;
 pub mod content;
 pub mod exercise;
 pub mod i18n;
+pub mod ladder;
 pub mod model;
 pub mod normalize;
 pub mod progress;

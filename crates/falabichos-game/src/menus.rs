@@ -921,11 +921,12 @@ enum SettingItem {
     Gloss,
     Accents,
     Typos,
+    Adaptive,
     Fullscreen,
     Back,
 }
 
-const SETTING_ITEMS: [SettingItem; 11] = [
+const SETTING_ITEMS: [SettingItem; 12] = [
     SettingItem::Language,
     SettingItem::TextSize,
     SettingItem::HighContrast,
@@ -935,6 +936,7 @@ const SETTING_ITEMS: [SettingItem; 11] = [
     SettingItem::Gloss,
     SettingItem::Accents,
     SettingItem::Typos,
+    SettingItem::Adaptive,
     SettingItem::Fullscreen,
     SettingItem::Back,
 ];
@@ -986,6 +988,14 @@ impl Game {
             SettingItem::Gloss => (self.t("settings.gloss"), onoff(s.gloss_default)),
             SettingItem::Accents => (self.t("settings.accents"), onoff(s.accent_insensitive)),
             SettingItem::Typos => (self.t("settings.typos"), onoff(s.typo_tolerance)),
+            SettingItem::Adaptive => (
+                self.t("settings.adaptive"),
+                if s.adaptive {
+                    format!("{} {}/3", self.t("settings.on"), self.save.ladder.rung + 1)
+                } else {
+                    onoff(false)
+                },
+            ),
             SettingItem::Fullscreen => (self.t("settings.fullscreen"), onoff(s.fullscreen)),
             SettingItem::Back => (self.t("settings.back"), String::new()),
         }
@@ -1040,6 +1050,7 @@ impl Game {
                 SettingItem::Gloss => st.gloss_default = !st.gloss_default,
                 SettingItem::Accents => st.accent_insensitive = !st.accent_insensitive,
                 SettingItem::Typos => st.typo_tolerance = !st.typo_tolerance,
+                SettingItem::Adaptive => st.adaptive = !st.adaptive,
                 SettingItem::Fullscreen => {
                     st.fullscreen = !st.fullscreen;
                     let f = st.fullscreen;
@@ -1071,10 +1082,10 @@ impl Game {
         ui.text(c, 8, 6, &self.t("menu.settings"), self.bank.pal('W'));
         ui.panel(c, 4, 20, 232, 138);
         for (i, it) in SETTING_ITEMS.iter().enumerate() {
-            let y = 25 + i as i32 * 12;
+            let y = 24 + i as i32 * 11;
             let (label, value) = self.setting_label(*it);
             if i == s.cursor {
-                c.rect_fill(8, y - 2, 224, 12, ui.col.highlight);
+                c.rect_fill(8, y - 2, 224, 11, ui.col.highlight);
                 ui.glyph_cursor(c, 10, y);
             }
             ui.text(c, 22, y, &label, ui.col.text);

@@ -50,7 +50,7 @@ Bevy Update:              Game::draw(&mut Canvas 240x160) ->  upload RGBA to one
 `Game { scene, world, save: SaveGame, rng, settings, ... }`
 
 - `SaveGame` = player position, `Progress` (flags, seals, Bichodex seen, party), `SrsStore` (all SRS cards by skill id),
-  RNG state, steps, play time, carried confidence. It is serialised as pretty RON with a `version` field.
+  RNG state, steps, play time, carried confidence, the adaptive-strictness ladder. It is serialised as pretty RON with a `version` field.
 - `Scene` is an enum: `Title`, `World` (with an optional dialogue overlay), `Menu`, `Battle`, `Dex`
   (Bichodex and party), `Notebook`, `Seals`, `Calendar` (review calendar), `Lesson` (mini-lesson before a grammar Bicho's first battle), `Settings`. Each tick takes the scene out of `Game`, updates
   it, and puts the next scene back, which keeps the borrow checker happy and transitions explicit.
@@ -80,6 +80,14 @@ accepted with a note ("watch the accents: pão") and small typos are accepted fo
 (1 slip for 5-8 letters, 2 for longer; **never** for short words or for grammar exercises, so `falas` is not accepted for
 `falam`). Both policies are settings. Mastery-wise, a typo or accent slip grades as *Hard*.
 
+### Adaptive strictness (`ladder`)
+
+The accent and typo settings form a three-rung ladder (forgive both, forgive accents only, strict). With *Settings > Adaptive
+strictness* on, a clean run of typed answers (11 of the last 12 exactly right) climbs a rung and a poor run (fewer than 6 of 12
+right under the current rules) slides back; the player is told with a short message. The ladder can only make the rules
+**stricter than the player's own settings**. It is off by default, the rung and the recent answers are saved with the game
+(format version 2), and only typed answers count.
+
 ### Spaced repetition (`srs`)
 
 An SM-2 derivative with Anki-style learning steps:
@@ -106,8 +114,8 @@ awards a Selo. *Practice*: reviews your party's started words with no penalty.
 
 ### Saves (`save`)
 
-RON with a leading `version`. `load` probes the version, migrates old formats (the v0 prototype format is kept in a
-`legacy` module with a test) and rejects *newer* versions rather than guessing. The client writes atomically and keeps
+RON with a leading `version` (currently 2). `load` probes the version and migrates old formats (the v0 prototype and the v1 release
+format are kept in a `legacy` module, each with a test) and rejects *newer* versions rather than guessing. The client writes atomically and keeps
 `save.ron.bak`. Settings are a separate file and tolerate missing fields (`#[serde(default)]`).
 
 ## Content pipeline

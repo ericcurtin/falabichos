@@ -7,6 +7,7 @@ use crate::world::PendingBattle;
 use crate::{Game, GameEvent, Scene};
 use falabichos_core::battle::{Battle, BattleKind, Outcome, SettleEvent, settle};
 use falabichos_core::exercise::{Answer, ExKind, Exercise, Flavor, Hint, Judgement};
+use falabichos_core::ladder::{Change, Outcome as TypedOutcome};
 use falabichos_core::model::Lang;
 use falabichos_core::normalize::Verdict;
 use falabichos_core::progress::bicho_level;
@@ -109,6 +110,24 @@ impl Game {
         })
     }
 
+    /// The answer policy for this learner: their settings, tightened by the adaptive ladder if it is on.
+    pub(crate) fn effective_policy(&self) -> falabichos_core::normalize::AnswerPolicy {
+        self.settings.effective_policy(&self.save.ladder)
+    }
+
+    /// Feed a typed answer to the strictness ladder and tell the player when the rules change.
+    pub(crate) fn record_typed_answer(&mut self, outcome: TypedOutcome) {
+        let msg = match self.save.ladder.record(outcome) {
+            Some(Change::Up(1)) => "ladder.up1",
+            Some(Change::Up(_)) => "ladder.up2",
+            Some(Change::Down(0)) => "ladder.down0",
+            Some(Change::Down(_)) => "ladder.down1",
+            None => return,
+        };
+        let m = self.t(msg);
+        self.toast(m);
+    }
+
     /// Start a battle. A first meeting with a grammar Bicho shows its mini-lessons first.
     pub(crate) fn start_battle(&mut self, pb: PendingBattle) {
         if self.open_lessons_before(&pb) {
@@ -121,7 +140,7 @@ impl Game {
     pub(crate) fn start_battle_now(&mut self, pb: PendingBattle) {
         self.toast = None;
         let now = self.now();
-        let policy = self.settings.policy();
+        let policy = self.effective_policy();
         let content = self.content.clone();
         match pb {
             PendingBattle::Wild(species) => {
@@ -169,7 +188,7 @@ impl Game {
     pub(crate) fn start_practice(&mut self) {
         self.toast = None;
         let now = self.now();
-        let policy = self.settings.policy();
+        let policy = self.effective_policy();
         let content = self.content.clone();
         match Battle::practice(
             &content,
@@ -448,6 +467,12 @@ impl Game {
             let _ = &content;
             if let Some(report) = s.battle.answer(&a, &mut self.save.srs, now) {
                 s.trust_gain = report.trust_gain;
+                if ex.kind == ExKind::Type
+                    && self.settings.adaptive
+                    && let Some(v) = &report.judgement.verdict
+                {
+                    self.record_typed_answer(TypedOutcome::from_verdict(v));
+                }
                 if report.judgement.correct {
                     self.sfx("sfx_correct");
                 } else {
@@ -1240,5 +1265,109 @@ mod translate_tests {
         assert_eq!(plays(&mut g), 1, "Start replays it");
         let mut c = Canvas::new(crate::LOGICAL_W, crate::LOGICAL_H);
         g.draw(&mut c);
+    }
+}
+
+#[cfg(test)]
+mod adaptive_tests {
+    use super::*;
+    use crate::{GameConfig, Input, MemoryStorage};
+    use falabichos_assets::Assets;
+    use falabichos_core::exercise::from_def;
+    use std::sync::Arc;
+
+    fn game() -> Game {
+        let mut g = Game::new(
+            Arc::new(Assets::embedded()),
+            Box::new(MemoryStorage::default()),
+            GameConfig::default(),
+        )
+        .unwrap();
+        g.set_clock(|| 1_000_000);
+        g.debug_teleport("vila_azul");
+        g
+    }
+
+    fn tick(g: &mut Game, f: impl Fn(&mut Input)) {
+        let mut i = Input::default();
+        f(&mut i);
+        g.tick(&i);
+    }
+
+    /// Put a typed question (`th_6`: type "temos") on screen in a wild battle.
+    fn typed_question(g: &mut Game) {
+        g.start_battle_now(PendingBattle::Wild("galo".into()));
+        let def = g.content.grammar_exercise("th_6").unwrap().clone();
+        let ex = from_def(&def, &mut falabichos_core::Rng::new(1));
+        let Scene::Battle(b) = &mut g.scene else {
+            panic!("not in a battle")
+        };
+        b.phase = BPhase::Ask;
+        b.battle.current = Some(ex);
+    }
+
+    fn answer_typed(g: &mut Game, text: &str) {
+        typed_question(g);
+        tick(g, |i| i.typed = text.to_string());
+        tick(g, |i| i.enter = true);
+        g.scene = Scene::World; // leave the battle; the ladder was fed during the answer
+    }
+
+    #[test]
+    fn typed_answers_feed_the_ladder_only_when_adaptive_is_on() {
+        let mut g = game();
+        answer_typed(&mut g, "temos");
+        assert!(
+            g.save.ladder.recent.is_empty(),
+            "off by default: nothing is recorded"
+        );
+        g.settings.adaptive = true;
+        answer_typed(&mut g, "temos");
+        answer_typed(&mut g, "tenho");
+        assert_eq!(
+            g.save.ladder.recent,
+            vec![TypedOutcome::Exact, TypedOutcome::Wrong]
+        );
+    }
+
+    #[test]
+    fn a_clean_run_tightens_the_rules_for_the_next_battle_and_tells_the_player() {
+        let mut g = game();
+        g.settings.adaptive = true;
+        assert!(g.effective_policy().typo_tolerance);
+        for _ in 0..falabichos_core::ladder::WINDOW {
+            g.record_typed_answer(TypedOutcome::Exact);
+        }
+        assert_eq!(g.save.ladder.rung, 1);
+        let toast = g.toast.clone().expect("the player is told").0;
+        assert_eq!(toast, g.t("ladder.up1"));
+        assert!(g.effective_policy().accent_insensitive);
+        assert!(!g.effective_policy().typo_tolerance);
+        // the next battle really uses the stricter policy
+        g.start_battle_now(PendingBattle::Wild("galo".into()));
+        assert!(!battle_policy(&g).typo_tolerance);
+        // a poor run eases it again
+        g.scene = Scene::World;
+        for _ in 0..falabichos_core::ladder::WINDOW {
+            g.record_typed_answer(TypedOutcome::Wrong);
+        }
+        assert_eq!(g.save.ladder.rung, 0);
+        assert_eq!(g.toast.clone().unwrap().0, g.t("ladder.down0"));
+        g.start_battle_now(PendingBattle::Wild("galo".into()));
+        assert!(battle_policy(&g).typo_tolerance);
+    }
+
+    fn battle_policy(g: &Game) -> falabichos_core::normalize::AnswerPolicy {
+        let Scene::Battle(b) = &g.scene else {
+            panic!("not in a battle")
+        };
+        b.battle.policy
+    }
+
+    #[test]
+    fn without_adaptive_the_ladder_never_changes_the_policy() {
+        let mut g = game();
+        g.save.ladder.rung = 2;
+        assert_eq!(g.effective_policy(), g.settings.policy());
     }
 }

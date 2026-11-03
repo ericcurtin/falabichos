@@ -4,13 +4,15 @@
 //! Format: RON text with a leading `version` field. To change the format: bump
 //! [`SAVE_VERSION`], keep the old struct under `legacy`, and add a step to [`load`].
 
+use crate::ladder::Ladder;
 use crate::model::Dir;
 use crate::progress::Progress;
 use crate::srs::SrsStore;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-pub const SAVE_VERSION: u32 = 1;
+/// Version 2 added the adaptive strictness [`Ladder`]; version 1 saves are migrated on load.
+pub const SAVE_VERSION: u32 = 2;
 pub const SETTINGS_VERSION: u32 = 1;
 
 #[derive(Debug, Error)]
@@ -47,6 +49,9 @@ pub struct SaveGame {
     /// Confidence carried between wild battles (`None` = full). Restored by the café or Avó.
     #[serde(default)]
     pub confidence: Option<u8>,
+    /// Adaptive strictness of typed answers (format 2).
+    #[serde(default)]
+    pub ladder: Ladder,
 }
 
 impl SaveGame {
@@ -61,6 +66,7 @@ impl SaveGame {
             rng_state: now as u64 ^ 0xFA1A_B1C0,
             steps: 0,
             confidence: None,
+            ladder: Ladder::default(),
         }
     }
 
@@ -85,6 +91,20 @@ mod legacy {
         #[serde(default)]
         pub flags: Vec<String>,
     }
+
+    /// Version 1: the first release format (everything of version 2 except the strictness ladder).
+    #[derive(Deserialize)]
+    pub struct V1 {
+        pub saved_at: i64,
+        pub play_secs: u64,
+        pub player: super::PlayerState,
+        pub progress: crate::progress::Progress,
+        pub srs: crate::srs::SrsStore,
+        pub rng_state: u64,
+        pub steps: u64,
+        #[serde(default)]
+        pub confidence: Option<u8>,
+    }
 }
 
 #[derive(Deserialize)]
@@ -105,7 +125,26 @@ pub fn load(text: &str) -> Result<SaveGame, SaveError> {
             let old: legacy::V0 = ron::de::from_str(text).map_err(|e| SaveError::Parse(e.to_string()))?;
             Ok(migrate_v0(old))
         }
+        1 => {
+            let old: legacy::V1 = ron::de::from_str(text).map_err(|e| SaveError::Parse(e.to_string()))?;
+            Ok(migrate_v1(old))
+        }
         _ => ron::de::from_str(text).map_err(|e| SaveError::Parse(e.to_string())),
+    }
+}
+
+fn migrate_v1(old: legacy::V1) -> SaveGame {
+    SaveGame {
+        version: SAVE_VERSION,
+        saved_at: old.saved_at,
+        play_secs: old.play_secs,
+        player: old.player,
+        progress: old.progress,
+        srs: old.srs,
+        rng_state: old.rng_state,
+        steps: old.steps,
+        confidence: old.confidence,
+        ladder: Ladder::default(),
     }
 }
 
@@ -150,6 +189,9 @@ pub struct Settings {
     pub fullscreen: bool,
     /// UI language code (folder in `assets/i18n`).
     pub ui_lang: String,
+    /// Adaptive strictness: tighten the accent / typo forgiveness after clean runs, ease it after poor ones
+    /// (see [`crate::ladder`]). Off by default.
+    pub adaptive: bool,
 }
 
 impl Default for Settings {
@@ -166,6 +208,7 @@ impl Default for Settings {
             typo_tolerance: true,
             fullscreen: false,
             ui_lang: "en".to_string(),
+            adaptive: false,
         }
     }
 }
@@ -191,10 +234,20 @@ impl Settings {
         Ok(s)
     }
 
+    /// The answer policy the player chose (before any adaptive tightening).
     pub fn policy(&self) -> crate::normalize::AnswerPolicy {
         crate::normalize::AnswerPolicy {
             accent_insensitive: self.accent_insensitive,
             typo_tolerance: self.typo_tolerance,
+        }
+    }
+
+    /// The policy actually used for a learner: the settings, tightened by the ladder when adaptive.
+    pub fn effective_policy(&self, ladder: &Ladder) -> crate::normalize::AnswerPolicy {
+        if self.adaptive {
+            ladder.apply(self.policy())
+        } else {
+            self.policy()
         }
     }
 }
@@ -244,6 +297,57 @@ mod tests {
         assert_eq!(load(&s.to_ron().unwrap()).unwrap(), s);
     }
 
+    /// The exact shape version 1 saves had on disk (before the strictness ladder existed).
+    #[derive(Serialize)]
+    struct V1Shape {
+        version: u32,
+        saved_at: i64,
+        play_secs: u64,
+        player: PlayerState,
+        progress: Progress,
+        srs: SrsStore,
+        rng_state: u64,
+        steps: u64,
+        confidence: Option<u8>,
+    }
+
+    #[test]
+    fn migrates_v1_saves_and_adds_an_empty_ladder() {
+        let cur = sample();
+        let v1 = V1Shape {
+            version: 1,
+            saved_at: cur.saved_at,
+            play_secs: 777,
+            player: cur.player.clone(),
+            progress: cur.progress.clone(),
+            srs: cur.srs.clone(),
+            rng_state: 55,
+            steps: cur.steps,
+            confidence: Some(3),
+        };
+        let text = ron::ser::to_string_pretty(&v1, ron::ser::PrettyConfig::default()).unwrap();
+        assert!(text.contains("version: 1") && !text.contains("ladder"));
+        let s = load(&text).unwrap();
+        assert_eq!(s.version, SAVE_VERSION);
+        assert_eq!(s.ladder, Ladder::default());
+        assert_eq!((s.play_secs, s.rng_state, s.confidence), (777, 55, Some(3)));
+        assert_eq!(s.progress, cur.progress);
+        assert_eq!(s.srs, cur.srs);
+        assert_eq!(s.player, cur.player);
+        // the migrated save is written as the current format and reads back identically
+        let again = s.to_ron().unwrap();
+        assert!(again.contains("version: 2"));
+        assert_eq!(load(&again).unwrap(), s);
+    }
+
+    #[test]
+    fn the_ladder_survives_a_round_trip() {
+        let mut s = sample();
+        s.ladder.rung = 2;
+        s.ladder.recent = vec![crate::ladder::Outcome::Exact, crate::ladder::Outcome::Wrong];
+        assert_eq!(load(&s.to_ron().unwrap()).unwrap(), s);
+    }
+
     #[test]
     fn rejects_future_versions_and_garbage() {
         assert!(matches!(
@@ -262,5 +366,25 @@ mod tests {
         assert_eq!(rt, s);
         let loud = Settings::load("(music_volume: 99)").unwrap();
         assert_eq!(loud.music_volume, 10);
+    }
+
+    #[test]
+    fn effective_policy_follows_the_ladder_only_when_adaptive() {
+        let mut st = Settings::default();
+        let mut ladder = Ladder {
+            rung: 2,
+            recent: vec![],
+        };
+        assert!(!st.adaptive, "off by default");
+        assert_eq!(st.effective_policy(&ladder), st.policy());
+        st.adaptive = true;
+        let p = st.effective_policy(&ladder);
+        assert!(!p.accent_insensitive && !p.typo_tolerance);
+        // the player's own strictness is never loosened
+        st.accent_insensitive = false;
+        ladder.rung = 0;
+        assert!(!st.effective_policy(&ladder).accent_insensitive);
+        // a settings file from before the option existed still loads (adaptive off)
+        assert!(!Settings::load("(typo_tolerance: false)").unwrap().adaptive);
     }
 }

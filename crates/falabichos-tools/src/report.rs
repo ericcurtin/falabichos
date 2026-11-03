@@ -83,6 +83,8 @@ pub struct Report {
     pub bichos_seen: usize,
     pub bichos_caught: usize,
     pub seals: Vec<String>,
+    /// Adaptive strictness rung (0 = forgiving, 2 = strict); only used when the learner switched it on.
+    pub strictness_rung: u8,
     pub species: Vec<SpeciesRow>,
     pub calendar: ReviewCalendar,
     pub skills: Vec<SkillRow>,
@@ -242,6 +244,7 @@ pub fn build(content: &Content, save: &SaveGame, now: i64) -> Report {
         bichos_seen: seen,
         bichos_caught: caught,
         seals: save.progress.seals.iter().cloned().collect(),
+        strictness_rung: save.ladder.rung,
         species,
         calendar: save.srs.calendar(now),
         skills,
@@ -287,6 +290,11 @@ pub fn to_text(r: &Report) -> String {
         r.mastered(),
         percent(r.accuracy()),
         r.average_mastery() * 100.0
+    );
+    let _ = writeln!(
+        o,
+        "Typed-answer strictness rung (adaptive, 0 forgiving to 2 strict): {}",
+        r.strictness_rung
     );
     let c = &r.calendar;
     let _ = writeln!(
@@ -520,7 +528,7 @@ pub fn to_json(r: &Report) -> String {
         .collect();
     format!(
         "{{\"format\":\"falabichos-progress-report\",\"version\":1,\"generated_at\":{},\
-         \"learner\":{{\"saved_at\":{},\"play_seconds\":{},\"steps\":{},\"bichos_seen\":{},\"bichos_caught\":{},\"seals\":[{}],\"bichos\":[{}]}},\
+         \"learner\":{{\"saved_at\":{},\"play_seconds\":{},\"steps\":{},\"bichos_seen\":{},\"bichos_caught\":{},\"seals\":[{}],\"strictness_rung\":{},\"bichos\":[{}]}},\
          \"srs\":{{\"skills_started\":{},\"skills_mastered\":{},\"mastered_interval_days\":{},\"average_mastery\":{},\"accuracy\":{},\
          \"calendar\":{{\"due_now\":{},\"due_now_learning\":{},\"within_24h\":{},\"within_24_to_48h\":{},\"next_7_days\":[{}],\"later\":{}}}}},\
          \"categories\":[{}],\"concepts\":[{}],\"skills\":[{}]}}\n",
@@ -531,6 +539,7 @@ pub fn to_json(r: &Report) -> String {
         r.bichos_seen,
         r.bichos_caught,
         seals.join(","),
+        r.strictness_rung,
         species.join(","),
         r.started(),
         r.mastered(),
@@ -603,6 +612,7 @@ mod tests {
             NOW - 100,
         );
         s.play_secs = 1830;
+        s.ladder.rung = 1;
         s.steps = 4242;
         s.progress.add_bicho("galo", NOW);
         s.progress.see("sardinha");
@@ -712,6 +722,7 @@ mod tests {
             "mastered (interval >= 21 days): 2",
             "farm",
             "ter_haver",
+            "rung (adaptive, 0 forgiving to 2 strict): 1",
             "Needs attention",
             "galinha",
         ] {
@@ -788,6 +799,7 @@ mod tests {
             "\"format\":\"falabichos-progress-report\"",
             "\"play_seconds\":1830",
             "\"seals\":[\"selo_polvo\"]",
+            "\"strictness_rung\":1",
             "\"skills_started\":5",
             "\"skills_mastered\":2",
             "\"skill\":\"galo\"",

@@ -33,7 +33,7 @@ Status key: **done**, **in progress**, **next**, **later**. Want to take somethi
 - **in progress** Listening dictation: word-level dictation (play the clip, type the word) is implemented, but it is only generated when a native recording exists. There are no recordings yet, so players do not see it and it has only been unit-tested with a synthetic clip name. Sentence-level dictation is not built: the audio model has one clip per vocabulary item, no sentence clips and no speech synthesis.
 - **done** Per-concept "mini-lesson" screens before a grammar Bicho's first wild battle (one page per concept it teaches, the same page as the Notebook; shown once per concept, tracked with `lesson_<concept>` story flags so the save format is unchanged; B skips).
 - **later** Verb conjugation tables as a game mode (pretérito perfeito, imperfeito, futuro).
-- **later** Adaptive difficulty per learner (use accent / typo policy as a ladder).
+- **done** Adaptive difficulty per learner: *Settings > Adaptive strictness* climbs or eases the accent / typo policy as a three-rung ladder from the learner's typed answers (opt-in, off by default; saved in the new save format v2 with a v1 migration). The thresholds (11 of 12 to climb, fewer than 6 to slide back) are a first guess that has not been tuned with real learners.
 
 ## Audio and pronunciation
 

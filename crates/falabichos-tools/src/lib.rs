@@ -66,6 +66,7 @@ fn display_budget(key: &str) -> usize {
         k if k.starts_with("menu.") => 11,
         k if k.starts_with("settings.") => 26,
         k if k.starts_with("toast.")
+            || k.starts_with("ladder.")
             || k.starts_with("practice.")
             || k.starts_with("calendar.")
             || k.starts_with("battle.q.")
