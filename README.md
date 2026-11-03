@@ -108,6 +108,8 @@ cargo run -p falabichos -- --screenshots out/    # replay it and write PNG scree
 cargo run -p falabichos-tools --bin falabichos-lint          # validate all content
 cargo run -p falabichos-tools --bin falabichos-mapcheck -- vila_azul   # annotated map + problems
 cargo run -p falabichos-tools --bin falabichos-preview -- out/         # sprite sheets + WAVs of the music
+cargo run -p falabichos-tools --bin falabichos-dashboard -- -o out/dashboard.html   # lint + coverage as one static HTML page
+cargo run -p falabichos-tools --bin falabichos-report -- --format csv -o progress.csv   # teacher's progress report from save.ron (text, csv or json)
 cargo xtask ci                                    # everything CI runs
 ```
 

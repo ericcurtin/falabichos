@@ -52,7 +52,7 @@ Status key: **done**, **in progress**, **next**, **later**. Want to take somethi
 ## Community
 
 - **in progress** Translations of the UI: Spanish and French are in (and a *Language* row in Settings switches them live), written by an AI assistant and **not native-reviewed**. German, Italian, Dutch, Polish, Chinese, ... are still open (the bitmap font covers Latin scripts only).
-- **next** A contributors' content dashboard (lint output rendered as a web page *outside* the game; the game itself stays native-only).
-- **later** Teacher tools: export a learner's SRS state as a progress report.
+- **done** A contributors' content dashboard: `falabichos-dashboard` renders lint output, coverage tables and the native-review queue as one static HTML page (no scripts; outside the game, which stays native-only). Publishing it (for example from CI) is not set up.
+- **done** Teacher tools: `falabichos-report` exports a learner's save (SRS state, calendar, Bichos, Selos) as a text, CSV or JSON progress report. It is a command-line tool; there is no in-game export button and no classroom/multi-learner view.
 
 See also [docs/GOOD_FIRST_ISSUES.md](docs/GOOD_FIRST_ISSUES.md).

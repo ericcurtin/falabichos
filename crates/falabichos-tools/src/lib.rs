@@ -10,6 +10,8 @@ use falabichos_media::synth::Song;
 use std::collections::BTreeSet;
 use std::fmt::Write as _;
 
+pub mod dashboard;
+pub mod report;
 pub mod scaffold;
 
 #[derive(Default)]

@@ -2079,6 +2079,7 @@ dependencies = [
  "falabichos-assets",
  "falabichos-content",
  "falabichos-core",
+ "falabichos-game",
  "falabichos-media",
 ]
 

@@ -1,6 +1,6 @@
 [package]
 name = "falabichos-tools"
-description = "Contributor tools for Falabichos: content linter, map checker, art/audio preview, scaffolder"
+description = "Contributor tools for Falabichos: content linter, dashboard, teacher progress report, map checker, art/audio preview, scaffolder"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -12,6 +12,7 @@ falabichos-core.workspace = true
 falabichos-assets = { path = "../falabichos-assets" }
 falabichos-content.workspace = true
 falabichos-media.workspace = true
+falabichos-game.workspace = true
 
 [lints]
 workspace = true
@@ -27,6 +28,14 @@ path = "src/bin/falabichos-mapcheck.rs"
 [[bin]]
 name = "falabichos-preview"
 path = "src/bin/falabichos-preview.rs"
+
+[[bin]]
+name = "falabichos-dashboard"
+path = "src/bin/falabichos-dashboard.rs"
+
+[[bin]]
+name = "falabichos-report"
+path = "src/bin/falabichos-report.rs"
 
 [[bin]]
 name = "falabichos-new"

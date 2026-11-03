@@ -89,6 +89,8 @@ cargo xtask ci                          # fmt --check, clippy -D warnings, tests
 - Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). In short: game logic is engine-agnostic
   (`falabichos-core`, `falabichos-game`), rendering is a software canvas, Bevy is a thin shell. Most
   features do not touch Bevy at all and can be tested headlessly.
+- `cargo run -p falabichos-tools --bin falabichos-dashboard -- -o out/dashboard.html` renders the linter's findings, coverage tables
+  (vocabulary, grammar, Bichos, UI languages) and the native-review queue as one static HTML page (no scripts, outside the game).
 - Add tests. `falabichos-core` has property tests (SRS invariants); `falabichos-game/tests/headless.rs`
   drives the whole game with synthetic input; `cargo run -p falabichos -- --headless-sim` plays through the story.
 - `cargo fmt`, `cargo clippy --workspace --all-targets -- -D warnings`, and `cargo test --workspace` must pass.
@@ -109,6 +111,10 @@ You know what makes learners stumble. Help us with:
 - playtesting with real learners and filing issues about confusing exercises.
 
 Open an issue or a pull request; no Rust needed.
+
+Teachers can also export a learner's progress: `cargo run -p falabichos-tools --bin falabichos-report -- [save.ron] --format csv|json|text`
+reads the learner's save file (by default the one in the game's data directory) and writes one row per word and exercise (phase, interval,
+accuracy, lapses, mastery), per-category and per-concept totals, the review calendar and which Bichos were caught. It runs locally and sends nothing anywhere.
 
 ## Pull requests
 
