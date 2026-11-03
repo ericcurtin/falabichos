@@ -6,6 +6,17 @@ use falabichos_core::Content;
 use falabichos_core::model::*;
 use std::collections::{BTreeSet, VecDeque};
 
+/// Longest answer the typing screen accepts for a translation (see `battle_ui`).
+const MAX_TYPED_ANSWER: usize = 60;
+
+/// A word lower-cased with punctuation removed (accents kept: hints must match the spelling).
+fn fold_word(w: &str) -> String {
+    w.chars()
+        .filter(|c| c.is_alphanumeric())
+        .flat_map(char::to_lowercase)
+        .collect()
+}
+
 fn is_snake_id(s: &str) -> bool {
     !s.is_empty()
         && s.chars()
@@ -148,6 +159,58 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
                     }
                 }
                 ExerciseKind::Type => {}
+                ExerciseKind::Translate => {
+                    if e.prompt_lang != Lang::En {
+                        d.push(warn(
+                            eloc.clone(),
+                            "Translate prompts are English sentences: set `prompt_lang: En`".into(),
+                        ));
+                    }
+                    if e.prompt.chars().count() > falabichos_core::exercise::TRANSLATE_PROMPT_CHARS {
+                        d.push(warn(
+                            eloc.clone(),
+                            format!(
+                                "prompt is longer than {} characters and will be clipped on screen",
+                                falabichos_core::exercise::TRANSLATE_PROMPT_CHARS
+                            ),
+                        ));
+                    }
+                    if e.answer.iter().any(|a| a.chars().count() > MAX_TYPED_ANSWER) {
+                        d.push(err(
+                            eloc.clone(),
+                            format!("an answer is longer than the {MAX_TYPED_ANSWER}-character typing limit"),
+                        ));
+                    }
+                    // a hint for a word that is not in any accepted answer is almost surely a typo
+                    let folded: Vec<Vec<String>> = e
+                        .answer
+                        .iter()
+                        .map(|a| a.split_whitespace().map(fold_word).collect())
+                        .collect();
+                    for (en, pt) in &e.word_hints {
+                        if en.trim().is_empty() || pt.trim().is_empty() {
+                            d.push(err(eloc.clone(), "empty word hint".into()));
+                            continue;
+                        }
+                        let in_answer = folded.iter().any(|ws| {
+                            let joined = ws.join(" ");
+                            joined
+                                .contains(&pt.split_whitespace().map(fold_word).collect::<Vec<_>>().join(" "))
+                        });
+                        if !in_answer {
+                            d.push(warn(
+                                eloc.clone(),
+                                format!("word hint `{en}={pt}` does not appear in any accepted answer"),
+                            ));
+                        }
+                    }
+                }
+            }
+            if e.kind != ExerciseKind::Translate && !e.word_hints.is_empty() {
+                d.push(warn(
+                    eloc.clone(),
+                    "`word_hints` are only used by `Translate` exercises".into(),
+                ));
             }
             if e.explanation.is_none() {
                 d.push(diag(Severity::Info, eloc.clone(), "no explanation"));
@@ -517,5 +580,114 @@ fn validate_map(c: &Content, m: &MapDef, d: &mut Vec<Diagnostic>) {
         if !near && !across && n.show_when.is_empty() {
             d.push(w(format!("npc `{}` has no reachable neighbouring tile", n.id)));
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn translate(id: &str, prompt: &str, answer: &str, hints: &[(&str, &str)]) -> ExerciseDef {
+        ExerciseDef {
+            id: id.into(),
+            kind: ExerciseKind::Translate,
+            prompt: prompt.into(),
+            prompt_lang: Lang::En,
+            context: None,
+            options: vec![],
+            answer: vec![answer.into()],
+            hint: None,
+            word_hints: hints
+                .iter()
+                .map(|(a, b)| (a.to_string(), b.to_string()))
+                .collect(),
+            explanation: Some("because".into()),
+            needs_native_review: true,
+        }
+    }
+
+    fn diagnostics_for(exercises: Vec<ExerciseDef>) -> Vec<Diagnostic> {
+        let mut c = Content::default();
+        c.grammar.insert(
+            "g".into(),
+            GrammarConcept {
+                id: "g".into(),
+                title: "t".into(),
+                summary: "s".into(),
+                rules: vec![],
+                examples: vec![],
+                pt_pt_note: None,
+                exercises,
+                needs_native_review: true,
+            },
+        );
+        c.finalize();
+        validate(&c)
+    }
+
+    fn filler(n: usize) -> Vec<ExerciseDef> {
+        (0..n)
+            .map(|i| translate(&format!("f_{i}"), "Hello.", "Olá.", &[]))
+            .collect()
+    }
+
+    #[test]
+    fn a_good_translation_exercise_is_clean() {
+        let mut ex = filler(2);
+        ex.push(translate(
+            "t_ok",
+            "The bridge is high.",
+            "A ponte é alta.",
+            &[("bridge", "ponte"), ("high", "alta")],
+        ));
+        let d = diagnostics_for(ex);
+        // (an empty test Content has no story or maps: only look at the exercises)
+        assert!(
+            d.iter()
+                .filter(|x| x.location.starts_with("exercise:") || x.location.starts_with("grammar:"))
+                .all(|x| x.severity == Severity::Info),
+            "unexpected diagnostics: {d:?}"
+        );
+    }
+
+    #[test]
+    fn translation_lints_catch_typos_and_overlong_text() {
+        let mut ex = filler(2);
+        // hint word missing from the answer (typo `pnte`), prompt too long, wrong prompt language
+        let mut bad = translate(
+            "t_bad",
+            "This English sentence is much too long for the typing screen.",
+            "A ponte é alta.",
+            &[("bridge", "pnte"), ("high", "ALTA")],
+        );
+        bad.prompt_lang = Lang::Pt;
+        ex.push(bad);
+        ex.push(translate("t_long", "Hello.", &"a ".repeat(40), &[]));
+        let d = diagnostics_for(ex);
+        let has = |sev: Severity, loc: &str, needle: &str| {
+            d.iter()
+                .any(|x| x.severity == sev && x.location == loc && x.message.contains(needle))
+        };
+        assert!(has(Severity::Warning, "exercise:t_bad", "pnte"), "{d:?}");
+        assert!(
+            !has(Severity::Warning, "exercise:t_bad", "ALTA"),
+            "case-insensitive: {d:?}"
+        );
+        assert!(has(Severity::Warning, "exercise:t_bad", "prompt_lang"), "{d:?}");
+        assert!(has(Severity::Warning, "exercise:t_bad", "clipped"), "{d:?}");
+        assert!(has(Severity::Error, "exercise:t_long", "typing limit"), "{d:?}");
+    }
+
+    #[test]
+    fn word_hints_on_other_kinds_are_flagged() {
+        let mut ex = filler(2);
+        let mut e = translate("t_kind", "Hello.", "Olá.", &[("hello", "olá")]);
+        e.kind = ExerciseKind::Type;
+        ex.push(e);
+        let d = diagnostics_for(ex);
+        assert!(
+            d.iter()
+                .any(|x| x.location == "exercise:t_kind" && x.message.contains("word_hints"))
+        );
     }
 }

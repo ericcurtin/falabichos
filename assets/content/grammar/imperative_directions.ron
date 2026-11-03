@@ -79,6 +79,14 @@
             answer: ["Desculpe, onde fica a farmácia?"],
             explanation: "'Desculpe' opens a polite question to a stranger.",
         ),
+        (
+            id: "im_9", kind: Translate,
+            prompt: "Cross the bridge, please. (tu)",
+            prompt_lang: En,
+            answer: ["Atravessa a ponte, por favor."],
+            word_hints: [("cross", "atravessa"), ("bridge", "ponte"), ("please", "por favor")],
+            explanation: "tu command = ele/ela form of the present: atravessa. Then 'a ponte' and 'por favor'.",
+        ),
     ],
     needs_native_review: true,
 )

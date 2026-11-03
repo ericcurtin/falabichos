@@ -115,3 +115,6 @@ calendar.hint = A or B: back
 lesson.title = Mini-lesson {n}/{total}
 lesson.hint = A: next   Up/Down: scroll   B: skip
 lesson.hint_last = A: start the conversation   B: skip
+battle.q.translate = Translate it. Select: word hints
+battle.q.dictation = Type the word you hear.
+battle.dictation_prompt = Listen and type (Menu: replay)

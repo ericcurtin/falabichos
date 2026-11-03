@@ -87,6 +87,14 @@
             answer: ["Tenho frio."],
             explanation: "Feelings like cold, hunger and thirst use ter: tenho frio, tenho fome, tenho sede. ('Sou frio' would mean you are a cold person.)",
         ),
+        (
+            id: "th_10", kind: Translate,
+            prompt: "I have a map of the city.",
+            prompt_lang: En,
+            answer: ["Tenho um mapa da cidade.", "Eu tenho um mapa da cidade."],
+            word_hints: [("have", "tenho"), ("map", "mapa"), ("city", "cidade")],
+            explanation: "Tenho um mapa da cidade. The subject 'eu' can be left out: the verb ending already says who.",
+        ),
     ],
     needs_native_review: true,
 )

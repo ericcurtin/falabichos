@@ -87,6 +87,14 @@
             answer: ["Onde fica a farmácia?"],
             explanation: "Onde fica + the place: the everyday way to ask where something is.",
         ),
+        (
+            id: "dp_10", kind: Translate,
+            prompt: "The museum is next to the bank.",
+            prompt_lang: En,
+            answer: ["O museu fica ao lado do banco.", "O museu fica ao pé do banco."],
+            word_hints: [("museum", "museu"), ("next to", "ao lado do"), ("bank", "banco")],
+            explanation: "'ao lado de' or 'ao pé de' + o banco = ao lado do banco / ao pé do banco.",
+        ),
     ],
     needs_native_review: true,
 )

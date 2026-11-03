@@ -107,8 +107,10 @@ Exercise `kind` and how fields are used:
 | `FillBlank` | sentence with `___` | choices for the gap | the right choice | picks one |
 | `Type` | the question | (none) | accepted spellings; first is canonical | types it (accent-tolerant, **no typo tolerance**) |
 | `Order` | the English meaning (`prompt_lang: En`) | (none) | the correct sentence(s); the words become shuffled tiles | orders the tiles |
+| `Translate` | an English sentence (`prompt_lang: En`, at most 36 characters) | (none) | accepted Portuguese sentences (at most 60 characters; case, final punctuation and accents are forgiven per the settings, typos are not) | types the whole sentence; the hint key reveals `word_hints` |
 
 Other fields: `prompt_lang: En` (default `Pt`; colours the prompt), `context` (small line under the prompt), `hint`,
+`word_hints: [("bridge", "ponte"), ...]` (only for `Translate`: English/Portuguese pairs in sentence order; the first pairs that fit on one 31-character line are shown, so put the hardest words first; the linter warns if a Portuguese hint word is not in any accepted answer),
 `explanation` (shown after answering: **always write one**), `needs_native_review`. Exercise ids are global.
 
 ## Bichos: `content/bichos/<id>.ron`

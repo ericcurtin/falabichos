@@ -157,6 +157,9 @@ pub enum ExerciseKind {
     Type,
     /// Put word tiles into the right order.
     Order,
+    /// Translate a whole English sentence into Portuguese by typing it. `word_hints` (English word to
+    /// Portuguese word) can be revealed with the hint key.
+    Translate,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
@@ -187,6 +190,10 @@ pub struct ExerciseDef {
     pub answer: Vec<String>,
     #[serde(default)]
     pub hint: Option<String>,
+    /// For `Translate`: per-word hints as `(English, Portuguese)` pairs, in sentence order. The hint
+    /// key reveals them (as many as fit on one line).
+    #[serde(default)]
+    pub word_hints: Vec<(String, String)>,
     /// Shown after answering (why it is right).
     #[serde(default)]
     pub explanation: Option<String>,

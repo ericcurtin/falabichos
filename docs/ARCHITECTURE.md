@@ -67,7 +67,11 @@ A *skill* is the unit that the SRS schedules: a vocabulary id (`cafe_bica`) or a
   reading ("which word has this pronunciation?"), word ordering from the example sentence, and finally **typed
   answers**. Distractors come from the same category first.
 - **Grammar** skills are hand-written exercises (`Choice`, `FillBlank`, `Type`, `Order`) from `grammar/*.ron`.
-- Listening exercises use a real clip when `audio` exists, otherwise degrade to the IPA reading.
+- Listening exercises use a real clip when `audio` exists, otherwise degrade to the IPA reading. **Dictation** (play the
+  clip, type the word) is only generated when a real clip exists; without one it would just be copying the IPA.
+- **Translation** exercises (type a whole sentence from its English meaning) come from hand-written `Translate`
+  exercises or, at the advanced stage, from vocabulary example sentences. Per-word hints (`english=português`) are
+  derived from the vocabulary (`exercise::word_hints_for`) or written by hand (`word_hints`).
 
 ### Answer checking (`normalize`)
 

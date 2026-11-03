@@ -27,6 +27,10 @@ pub enum Flavor {
     ListenIpa,
     Grammar,
     Sentence,
+    /// Type a whole sentence in Portuguese from its English meaning (with per-word hints).
+    Translate,
+    /// Play the clip, type the word. Only generated when a real recording exists.
+    Dictation,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -45,6 +49,8 @@ pub struct Exercise {
     /// `Type` / `Order`: accepted answers (first is canonical).
     pub accepted: Vec<String>,
     pub hint: Option<String>,
+    /// Per-word hints `(English, Portuguese)` for translation exercises, in sentence order.
+    pub word_hints: Vec<(String, String)>,
     pub explanation: Option<String>,
     pub audio: Option<String>,
     pub ipa: Option<String>,
@@ -133,6 +139,11 @@ impl Exercise {
                 Some(Hint::Eliminate(wrong))
             }
             ExKind::Type => {
+                if self.flavor == Flavor::Translate
+                    && let Some(line) = word_hint_line(&self.word_hints)
+                {
+                    return Some(Hint::Text(line));
+                }
                 if let Some(h) = &self.hint {
                     return Some(Hint::Text(h.clone()));
                 }
@@ -149,6 +160,68 @@ impl Exercise {
             }
         }
     }
+}
+
+/// Longest hint line the battle screen can show next to the "Hint:" label.
+pub const HINT_LINE_CHARS: usize = 31;
+
+/// Per-word hints as one short line: `river=rio blue=azul`. Pairs that do not fit are dropped, but
+/// the first pair is always kept (clipped by the screen if it is very long).
+pub fn word_hint_line(pairs: &[(String, String)]) -> Option<String> {
+    let mut line = String::new();
+    for (en, pt) in pairs {
+        let piece = format!("{en}={pt}");
+        let extra = if line.is_empty() { 0 } else { 1 };
+        if !line.is_empty() && line.chars().count() + extra + piece.chars().count() > HINT_LINE_CHARS {
+            break;
+        }
+        if !line.is_empty() {
+            line.push(' ');
+        }
+        line.push_str(&piece);
+    }
+    if line.is_empty() { None } else { Some(line) }
+}
+
+/// Longest English prompt that fits on one line of the typing screen.
+pub const TRANSLATE_PROMPT_CHARS: usize = 36;
+/// Longest Portuguese sentence a generated translation exercise asks the player to type.
+pub const TRANSLATE_ANSWER_CHARS: usize = 56;
+
+/// Per-word hints for a Portuguese sentence from the vocabulary: `(English, Portuguese)` for every
+/// word or phrase of the sentence that is a vocabulary entry, in sentence order, without repeats.
+pub fn word_hints_for(content: &Content, sentence: &str) -> Vec<(String, String)> {
+    let tokens: Vec<String> = sentence
+        .split_whitespace()
+        .map(|w| w.trim_matches(|c: char| !c.is_alphanumeric()).to_string())
+        .filter(|w| !w.is_empty())
+        .collect();
+    let none = std::collections::BTreeMap::new();
+    let mut out: Vec<(String, String)> = vec![];
+    let mut seen_ids: Vec<String> = vec![];
+    let mut i = 0;
+    while i < tokens.len() {
+        let mut matched = false;
+        for len in (1..=3.min(tokens.len() - i)).rev() {
+            let phrase = tokens[i..i + len].join(" ");
+            if let Some(g) = content.lookup_word(&phrase, &none)
+                && let Some(id) = g.vocab_id
+            {
+                if !seen_ids.contains(&id) {
+                    let en = g.en.split(" / ").next().unwrap_or("").to_string();
+                    out.push((en, g.pt.clone()));
+                    seen_ids.push(id);
+                }
+                i += len;
+                matched = true;
+                break;
+            }
+        }
+        if !matched {
+            i += 1;
+        }
+    }
+    out
 }
 
 fn words_of(s: &str) -> Vec<String> {
@@ -172,6 +245,7 @@ pub fn from_def(def: &ExerciseDef, rng: &mut Rng) -> Exercise {
         correct: vec![],
         accepted: def.answer.clone(),
         hint: def.hint.clone(),
+        word_hints: def.word_hints.clone(),
         explanation: def.explanation.clone(),
         audio: None,
         ipa: None,
@@ -194,6 +268,11 @@ pub fn from_def(def: &ExerciseDef, rng: &mut Rng) -> Exercise {
         }
         ExerciseKind::Type => {
             ex.kind = ExKind::Type;
+        }
+        ExerciseKind::Translate => {
+            ex.kind = ExKind::Type;
+            ex.flavor = Flavor::Translate;
+            ex.accepted = def.answer.iter().map(|a| strip_end_punct(a)).collect();
         }
         ExerciseKind::Order => {
             ex.kind = ExKind::Order;
@@ -274,6 +353,8 @@ pub fn generate_vocab(content: &Content, item: &VocabItem, card: Option<&Card>, 
         Listen,
         TypeEnPt,
         Order,
+        Translate,
+        Dictation,
     }
     let seen = card.map(|c| c.seen).unwrap_or(0);
     let is_review = matches!(card.map(|c| c.phase), Some(Phase::Review));
@@ -284,6 +365,14 @@ pub fn generate_vocab(content: &Content, item: &VocabItem, card: Option<&Card>, 
         .map(|e| (3..=8).contains(&e.pt.split_whitespace().count()))
         .unwrap_or(false);
     let ipa_ok = item.ipa.is_some();
+    // A whole-sentence translation: only for the advanced stage and sentences that fit the screen.
+    let translate_ok = item.example.as_ref().is_some_and(|e| {
+        (3..=8).contains(&e.pt.split_whitespace().count())
+            && e.en.chars().count() <= TRANSLATE_PROMPT_CHARS
+            && strip_end_punct(&e.pt).chars().count() <= TRANSLATE_ANSWER_CHARS
+    });
+    // Dictation needs a real recording: without one it would just be "copy the IPA".
+    let dictation_ok = content.has_clip(&item.audio_slot());
     let mut picks: Vec<Pick> = vec![];
     if seen < 2 && !is_review {
         picks.push(Pick::PtToEn);
@@ -300,6 +389,9 @@ pub fn generate_vocab(content: &Content, item: &VocabItem, card: Option<&Card>, 
         if order_ok {
             picks.push(Pick::Order);
         }
+        if dictation_ok {
+            picks.push(Pick::Dictation);
+        }
     } else {
         picks.push(Pick::TypeEnPt);
         picks.push(Pick::EnToPt);
@@ -309,8 +401,14 @@ pub fn generate_vocab(content: &Content, item: &VocabItem, card: Option<&Card>, 
         if order_ok {
             picks.push(Pick::Order);
         }
+        if translate_ok {
+            picks.push(Pick::Translate);
+        }
         if ipa_ok {
             picks.push(Pick::Listen);
+        }
+        if dictation_ok {
+            picks.push(Pick::Dictation);
         }
     }
     let pick = *rng.pick(&picks).unwrap_or(&Pick::PtToEn);
@@ -326,6 +424,7 @@ pub fn generate_vocab(content: &Content, item: &VocabItem, card: Option<&Card>, 
         correct: vec![],
         accepted: vec![],
         hint: item.note.clone().filter(|_| false),
+        word_hints: vec![],
         explanation: None,
         audio: None,
         ipa: item.ipa.clone(),
@@ -416,6 +515,27 @@ pub fn generate_vocab(content: &Content, item: &VocabItem, card: Option<&Card>, 
             }
             base.hint = None;
         }
+        Pick::Translate => {
+            let ex = item.example.clone().unwrap_or_default();
+            base.kind = ExKind::Type;
+            base.flavor = Flavor::Translate;
+            base.prompt = ex.en.clone();
+            base.prompt_lang = Lang::En;
+            base.accepted = vec![strip_end_punct(&ex.pt)];
+            base.word_hints = word_hints_for(content, &ex.pt);
+            base.typo_ok = false;
+        }
+        Pick::Dictation => {
+            let slot = item.audio_slot();
+            base.kind = ExKind::Type;
+            base.flavor = Flavor::Dictation;
+            base.audio = Some(slot);
+            base.prompt = String::new();
+            base.prompt_lang = Lang::Pt;
+            base.accepted = vec![item.pt.clone()];
+            base.typo_ok = item.pt.chars().count() >= 5;
+            base.hint = None;
+        }
         Pick::Order => {
             let ex = item.example.clone().unwrap_or_default();
             base.kind = ExKind::Order;
@@ -480,6 +600,7 @@ mod tests {
                         options: vec!["sou".into(), "estou".into(), "são".into()],
                         answer: vec!["sou".into()],
                         hint: None,
+                        word_hints: vec![],
                         explanation: Some("ser for identity".into()),
                         needs_native_review: false,
                     },
@@ -492,6 +613,7 @@ mod tests {
                         options: vec![],
                         answer: vec!["Estou a comer.".into()],
                         hint: None,
+                        word_hints: vec![],
                         explanation: None,
                         needs_native_review: false,
                     },
@@ -616,7 +738,7 @@ mod tests {
         let mut found = false;
         for _ in 0..200 {
             let ex = generate_vocab(&c, &c.vocab["casa"], Some(&card), &mut rng);
-            if ex.kind == ExKind::Type {
+            if ex.kind == ExKind::Type && ex.flavor == Flavor::EnToPt {
                 found = true;
                 assert!(
                     ex.check(&Answer::Text("pao".into()), AnswerPolicy::default())
@@ -668,6 +790,146 @@ mod tests {
                 .iter()
                 .all(|(f, a)| *f == Flavor::Listen && a.as_deref() == Some("stuff/casa"))
         );
+    }
+
+    fn advanced_card() -> Card {
+        Card {
+            seen: 20,
+            phase: Phase::Review,
+            ..Card::default()
+        }
+    }
+
+    fn flavour_seen(c: &Content, id: &str, flavor: Flavor) -> Option<Exercise> {
+        let card = advanced_card();
+        (0..400u64).find_map(|seed| {
+            let mut rng = Rng::new(seed);
+            let ex = generate_vocab(c, &c.vocab[id], Some(&card), &mut rng);
+            (ex.flavor == flavor).then_some(ex)
+        })
+    }
+
+    #[test]
+    fn translation_is_generated_for_advanced_cards_and_checks_the_whole_sentence() {
+        let c = sample_content();
+        let ex = flavour_seen(&c, "casa", Flavor::Translate).expect("a translation exercise appears");
+        assert_eq!(ex.kind, ExKind::Type);
+        assert_eq!(ex.prompt_lang, Lang::En);
+        assert_eq!(ex.prompt, "I want house now.");
+        let p = AnswerPolicy::default();
+        // case, final punctuation and a missing accent are tolerated, like for single words
+        for ok in [
+            "Eu quero casa agora.",
+            "eu quero casa agora",
+            "EU QUERO CASA AGORA!",
+        ] {
+            assert!(ex.check(&Answer::Text(ok.into()), p).correct, "{ok}");
+        }
+        // wrong words, wrong order and a partial sentence are not, and there is no typo tolerance
+        for bad in [
+            "Eu quero casa",
+            "Quero eu casa agora",
+            "Eu quero caza agora",
+            "Eu quero casas agora",
+        ] {
+            assert!(!ex.check(&Answer::Text(bad.into()), p).correct, "{bad}");
+        }
+        // beginners never get one
+        for seed in 0..200u64 {
+            let mut rng = Rng::new(seed);
+            let card = Card {
+                seen: 0,
+                ..Card::default()
+            };
+            let ex = generate_vocab(&c, &c.vocab["casa"], Some(&card), &mut rng);
+            assert_ne!(ex.flavor, Flavor::Translate);
+        }
+    }
+
+    #[test]
+    fn word_hints_come_from_the_vocabulary_in_sentence_order() {
+        let c = sample_content();
+        let h = word_hints_for(&c, "Eu quero a mesa, a casa e a mesa outra vez.");
+        assert_eq!(
+            h,
+            vec![
+                ("table".to_string(), "mesa".to_string()),
+                ("house".to_string(), "casa".to_string())
+            ],
+            "function words are skipped and repeats removed"
+        );
+        assert!(word_hints_for(&c, "Nada conhecido aqui.").is_empty());
+    }
+
+    #[test]
+    fn word_hint_line_always_fits_the_screen() {
+        let pairs: Vec<(String, String)> = ["alpha", "bravo", "charlie", "delta", "echo"]
+            .iter()
+            .map(|w| (format!("{w}-en"), format!("{w}-pt")))
+            .collect();
+        for n in 0..=pairs.len() {
+            let line = word_hint_line(&pairs[..n]);
+            assert_eq!(line.is_none(), n == 0);
+            if let Some(l) = line {
+                assert!(l.chars().count() <= HINT_LINE_CHARS, "{l}");
+                assert!(l.starts_with("alpha-en=alpha-pt"));
+            }
+        }
+        let long = [(
+            "a very long english phrase".to_string(),
+            "uma frase portuguesa muito longa".to_string(),
+        )];
+        assert!(word_hint_line(&long).is_some(), "the first pair is always kept");
+    }
+
+    #[test]
+    fn hand_written_translation_uses_word_hints_for_its_hint() {
+        let def = ExerciseDef {
+            id: "tr_1".into(),
+            kind: ExerciseKind::Translate,
+            prompt: "The bridge is high.".into(),
+            prompt_lang: Lang::En,
+            context: None,
+            options: vec![],
+            answer: vec!["A ponte é alta.".into(), "A ponte está alta.".into()],
+            hint: None,
+            word_hints: vec![("bridge".into(), "ponte".into()), ("high".into(), "alta".into())],
+            explanation: None,
+            needs_native_review: true,
+        };
+        let mut rng = Rng::new(3);
+        let ex = from_def(&def, &mut rng);
+        assert_eq!((ex.kind, ex.flavor), (ExKind::Type, Flavor::Translate));
+        assert!(!ex.typo_ok);
+        let p = AnswerPolicy::default();
+        assert!(ex.check(&Answer::Text("a ponte e alta".into()), p).correct);
+        assert!(ex.check(&Answer::Text("A ponte está alta.".into()), p).correct);
+        assert!(!ex.check(&Answer::Text("A ponte é baixa.".into()), p).correct);
+        assert_eq!(
+            ex.hint(&mut rng),
+            Some(Hint::Text("bridge=ponte high=alta".into()))
+        );
+        // without word hints it falls back to the usual first-letter hint
+        let mut plain = ex.clone();
+        plain.word_hints.clear();
+        assert_eq!(plain.hint(&mut rng), Some(Hint::Text("A…".into())));
+    }
+
+    #[test]
+    fn dictation_needs_a_real_recording() {
+        let mut c = sample_content();
+        assert!(
+            flavour_seen(&c, "casa", Flavor::Dictation).is_none(),
+            "without a clip dictation would only be copying the IPA"
+        );
+        c.audio_clips.insert("stuff/casa".to_string());
+        let ex = flavour_seen(&c, "casa", Flavor::Dictation).expect("with a clip it appears");
+        assert_eq!(ex.kind, ExKind::Type);
+        assert_eq!(ex.audio.as_deref(), Some("stuff/casa"));
+        assert!(ex.prompt.is_empty(), "the answer is not printed");
+        let p = AnswerPolicy::default();
+        assert!(ex.check(&Answer::Text("casa".into()), p).correct);
+        assert!(!ex.check(&Answer::Text("mesa".into()), p).correct);
     }
 
     #[test]

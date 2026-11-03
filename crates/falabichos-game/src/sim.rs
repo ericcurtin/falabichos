@@ -947,7 +947,11 @@ impl Driver {
             }
             self.settle()?;
             let have = |k: &str| styles.iter().any(|t| t.starts_with(k));
-            if have("Type") && have("Order") && have("Choice") && styles.iter().any(|t| t.contains("Article"))
+            if have("Type")
+                && have("Order")
+                && have("Choice")
+                && styles.iter().any(|t| t.contains("Article"))
+                && styles.iter().any(|t| t.contains("Translate"))
             {
                 break;
             }
@@ -958,6 +962,9 @@ impl Driver {
             if !styles.iter().any(|t| t.starts_with(n)) {
                 return Err(format!("never met a {n} exercise (saw {styles:?})"));
             }
+        }
+        if !styles.iter().any(|t| t.contains("Translate")) {
+            return Err(format!("never met a sentence translation (saw {styles:?})"));
         }
         styles.sort();
         Ok(styles.join(", "))

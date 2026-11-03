@@ -45,6 +45,18 @@ pub(crate) struct BattleScene {
 const KB_ROWS: [&str; 3] = ["abcdefghijklm", "nopqrstuvwxyz", "áàâãéêíóôõúçü"];
 const KB_BUTTONS: [&str; 4] = ["SPACE", "-", "DEL", "OK"];
 const MAX_INPUT: usize = 28;
+/// Whole-sentence translations need a longer input line (the field scrolls to show the end).
+const MAX_INPUT_SENTENCE: usize = 60;
+/// Characters of the typed text visible in the input field (including the cursor).
+const INPUT_VISIBLE: usize = 33;
+
+fn max_input(ex: &Exercise) -> usize {
+    if ex.flavor == Flavor::Translate {
+        MAX_INPUT_SENTENCE
+    } else {
+        MAX_INPUT
+    }
+}
 
 impl BattleScene {
     fn reset_question(&mut self) {
@@ -258,7 +270,7 @@ impl Game {
             self.begin_outro(s);
             return;
         };
-        if ex.flavor == Flavor::Listen && !s.listened {
+        if matches!(ex.flavor, Flavor::Listen | Flavor::Dictation) && !s.listened {
             s.listened = true;
             if let Some(a) = &ex.audio {
                 self.emit(GameEvent::Clip(a.clone()));
@@ -324,8 +336,15 @@ impl Game {
                 }
             }
             ExKind::Type => {
+                let max_input = max_input(&ex);
+                if pad.start && ex.flavor == Flavor::Dictation {
+                    // replay the clip
+                    if let Some(a) = &ex.audio {
+                        self.emit(GameEvent::Clip(a.clone()));
+                    }
+                }
                 for ch in pad.typed.chars() {
-                    if s.input.chars().count() < MAX_INPUT
+                    if s.input.chars().count() < max_input
                         && (ch.is_alphabetic() || ch == ' ' || ch == '-')
                         && self.bank.font.covers(ch)
                     {
@@ -370,7 +389,7 @@ impl Game {
                 }
                 if pad.a {
                     if s.kb.0 < 3 {
-                        if s.input.chars().count() < MAX_INPUT
+                        if s.input.chars().count() < max_input
                             && let Some(ch) = KB_ROWS[s.kb.0].chars().nth(s.kb.1)
                         {
                             s.input.push(ch);
@@ -793,6 +812,8 @@ impl Game {
             Flavor::Listen => "battle.q.listen",
             Flavor::ListenIpa => "battle.q.listen_ipa",
             Flavor::Sentence => "battle.q.order",
+            Flavor::Translate => "battle.q.translate",
+            Flavor::Dictation => "battle.q.dictation",
             Flavor::Grammar => match ex.kind {
                 ExKind::Order => "battle.q.order",
                 ExKind::Type => "battle.q.type",
@@ -805,7 +826,11 @@ impl Game {
         let Some(ex) = &s.battle.current else { return };
         ui.text(c, 8, 67, &clip(&self.flavor_caption(ex), 38), ui.col.dim);
         let mut prompt = if ex.prompt.is_empty() {
-            self.t("battle.listen_prompt")
+            self.t(if ex.flavor == Flavor::Dictation {
+                "battle.dictation_prompt"
+            } else {
+                "battle.listen_prompt"
+            })
         } else {
             ex.prompt.clone()
         };
@@ -883,7 +908,14 @@ impl Game {
                 ui.col.dim,
             );
         } else {
-            ui.text(c, 14, 101, &format!("{}{}", s.input, cursor), ui.col.text);
+            // long sentences scroll: show the end of what was typed
+            let n = s.input.chars().count();
+            let tail: String = s
+                .input
+                .chars()
+                .skip(n.saturating_sub(INPUT_VISIBLE - 1))
+                .collect();
+            ui.text(c, 14, 101, &format!("{tail}{cursor}"), ui.col.text);
         }
         let (x0, y0) = (16, 114);
         for (r, row) in KB_ROWS.iter().enumerate() {
@@ -1081,5 +1113,132 @@ impl Game {
             }
             _ => false,
         }
+    }
+}
+
+#[cfg(test)]
+mod translate_tests {
+    use super::*;
+    use crate::{GameConfig, Input, MemoryStorage};
+    use falabichos_assets::Assets;
+    use falabichos_core::exercise::from_def;
+    use std::sync::Arc;
+
+    /// A wild battle whose current question is the hand-written translation `dp_10`.
+    fn translation_battle() -> Game {
+        let mut g = Game::new(
+            Arc::new(Assets::embedded()),
+            Box::new(MemoryStorage::default()),
+            GameConfig::default(),
+        )
+        .unwrap();
+        g.set_clock(|| 1_000_000);
+        g.debug_teleport("vila_azul");
+        g.start_battle_now(PendingBattle::Wild("galo".into()));
+        let def = g.content.grammar_exercise("dp_10").unwrap().clone();
+        let mut rng = falabichos_core::Rng::new(1);
+        let ex = from_def(&def, &mut rng);
+        let Scene::Battle(b) = &mut g.scene else {
+            panic!("not in a battle")
+        };
+        b.phase = BPhase::Ask;
+        b.battle.current = Some(ex);
+        b.battle.hints_left = 2;
+        g
+    }
+
+    fn tick(g: &mut Game, f: impl Fn(&mut Input)) {
+        let mut i = Input::default();
+        f(&mut i);
+        g.tick(&i);
+    }
+
+    fn battle(g: &Game) -> &BattleScene {
+        let Scene::Battle(b) = &g.scene else {
+            panic!("not in a battle")
+        };
+        b
+    }
+
+    #[test]
+    fn long_sentences_can_be_typed_scroll_and_are_checked() {
+        let mut g = translation_battle();
+        let text = "o museu fica ao lado do banco";
+        assert!(
+            text.chars().count() > MAX_INPUT,
+            "longer than a single word's limit"
+        );
+        tick(&mut g, |i| i.typed = text.to_string());
+        assert_eq!(battle(&g).input, text);
+        // drawing with a long input must not panic and shows the end of the text
+        let mut c = Canvas::new(crate::LOGICAL_W, crate::LOGICAL_H);
+        g.draw(&mut c);
+        if let Ok(dir) = std::env::var("FALABICHOS_TEST_PNG_DIR") {
+            std::fs::write(format!("{dir}/translate.png"), c.upscaled(3).to_png()).unwrap();
+        }
+        // the input is capped
+        tick(&mut g, |i| i.typed = "x".repeat(100));
+        assert_eq!(battle(&g).input.chars().count(), MAX_INPUT_SENTENCE);
+        // wrong answer is judged wrong, right answer right
+        let ex = battle(&g).battle.current.clone().unwrap();
+        let policy = falabichos_core::normalize::AnswerPolicy::default();
+        assert!(!ex.check(&Answer::Text(battle(&g).input.clone()), policy).correct);
+        assert!(ex.check(&Answer::Text(text.to_string()), policy).correct);
+    }
+
+    #[test]
+    fn the_hint_key_reveals_the_per_word_hints_on_one_line() {
+        let mut g = translation_battle();
+        tick(&mut g, |i| i.select = true);
+        let hint = battle(&g).hint.clone().expect("a hint was revealed");
+        assert_eq!(hint, "museum=museu next to=ao lado do");
+        assert!(hint.chars().count() <= falabichos_core::exercise::HINT_LINE_CHARS);
+        let mut c = Canvas::new(crate::LOGICAL_W, crate::LOGICAL_H);
+        g.draw(&mut c);
+        if let Ok(dir) = std::env::var("FALABICHOS_TEST_PNG_DIR") {
+            std::fs::write(format!("{dir}/translate_hint.png"), c.upscaled(3).to_png()).unwrap();
+        }
+    }
+
+    #[test]
+    fn dictation_plays_its_clip_and_replays_on_start() {
+        let mut g = translation_battle();
+        // replace the question with a dictation exercise (as if a recording existed)
+        let ex = Exercise {
+            skill: "ponte".into(),
+            kind: ExKind::Type,
+            flavor: Flavor::Dictation,
+            prompt: String::new(),
+            prompt_lang: Lang::Pt,
+            context: None,
+            options: vec![],
+            correct: vec![],
+            accepted: vec!["ponte".into()],
+            hint: None,
+            word_hints: vec![],
+            explanation: None,
+            audio: Some("city/ponte".into()),
+            ipa: None,
+            typo_ok: true,
+            needs_native_review: true,
+            pron_tags: vec![],
+        };
+        let Scene::Battle(b) = &mut g.scene else { panic!() };
+        b.battle.current = Some(ex);
+        g.take_events();
+        tick(&mut g, |_| {});
+        let plays = |g: &mut Game| {
+            g.take_events()
+                .into_iter()
+                .filter(|e| matches!(e, GameEvent::Clip(c) if c == "city/ponte"))
+                .count()
+        };
+        assert_eq!(plays(&mut g), 1, "the clip plays automatically once");
+        tick(&mut g, |_| {});
+        assert_eq!(plays(&mut g), 0);
+        tick(&mut g, |i| i.start = true);
+        assert_eq!(plays(&mut g), 1, "Start replays it");
+        let mut c = Canvas::new(crate::LOGICAL_W, crate::LOGICAL_H);
+        g.draw(&mut c);
     }
 }

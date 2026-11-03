@@ -34,7 +34,7 @@ The scaffolder refuses to overwrite existing files. Field-by-field reference: [C
 
 1. `falabichos-new grammar por_para`.
 2. Write the **rules** (short bullets), 2-4 **examples**, a **pt_pt_note**, and at least **5 exercises** with clear **explanations**.
-   Mix kinds: `FillBlank`/`Choice` for recognition, `Type` for production, `Order` for word order. Use `hint` sparingly.
+   Mix kinds: `FillBlank`/`Choice` for recognition, `Type` for production, `Order` for word order, `Translate` for a whole sentence typed from English (with `word_hints`). Use `hint` sparingly.
 3. Attach it to a grammar Bicho (`grammar: ["por_para"]`) so players meet it in battles, and optionally to a Mestre's `pool`.
    Every concept automatically appears in the in-game **Notebook**, and it is shown as a **mini-lesson** page the first time the player meets that Bicho in the wild, so write the `summary`, `rules` and `examples` for a first-time reader.
 
