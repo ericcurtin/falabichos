@@ -1,0 +1,42 @@
+// Irregular verbs: conjugation tables for the pretérito perfeito, the pretérito imperfeito and the futuro.
+// Forms are in the order of PERSONS: eu, tu, ele/ela, nós, eles/elas.
+[
+    (
+        id: "ser", inf: "ser", en: "to be (identity, traits)", group: "irregular",
+        perfeito: ["fui", "foste", "foi", "fomos", "foram"],
+        imperfeito: ["era", "eras", "era", "éramos", "eram"],
+        futuro: ["serei", "serás", "será", "seremos", "serão"],
+        note: "Past of ser = past of ir: fui, foste, foi.",
+        needs_native_review: true,
+    ),
+    (
+        id: "estar", inf: "estar", en: "to be (place, state)", group: "irregular",
+        perfeito: ["estive", "estiveste", "esteve", "estivemos", "estiveram"],
+        imperfeito: ["estava", "estavas", "estava", "estávamos", "estavam"],
+        futuro: ["estarei", "estarás", "estará", "estaremos", "estarão"],
+        needs_native_review: true,
+    ),
+    (
+        id: "ir", inf: "ir", en: "to go", group: "irregular",
+        perfeito: ["fui", "foste", "foi", "fomos", "foram"],
+        imperfeito: ["ia", "ias", "ia", "íamos", "iam"],
+        futuro: ["irei", "irás", "irá", "iremos", "irão"],
+        note: "Past of ir = past of ser. Vou à praia (a + a).",
+        needs_native_review: true,
+    ),
+    (
+        id: "ter", inf: "ter", en: "to have", group: "irregular",
+        perfeito: ["tive", "tiveste", "teve", "tivemos", "tiveram"],
+        imperfeito: ["tinha", "tinhas", "tinha", "tínhamos", "tinham"],
+        futuro: ["terei", "terás", "terá", "teremos", "terão"],
+        needs_native_review: true,
+    ),
+    (
+        id: "fazer", inf: "fazer", en: "to do, to make", group: "irregular",
+        perfeito: ["fiz", "fizeste", "fez", "fizemos", "fizeram"],
+        imperfeito: ["fazia", "fazias", "fazia", "fazíamos", "faziam"],
+        futuro: ["farei", "farás", "fará", "faremos", "farão"],
+        note: "Futuro: farei, not fazerei.",
+        needs_native_review: true,
+    ),
+]

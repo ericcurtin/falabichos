@@ -19,6 +19,7 @@ pub mod sim;
 pub mod storage;
 pub mod touch_art;
 pub mod ui;
+mod verbs;
 mod world;
 
 pub use input::{Input, Pad};
@@ -35,6 +36,7 @@ use input::PadTracker;
 use lesson::LessonState;
 use menus::{CalendarState, DexState, MenuState, NotebookState, SealsState, SettingsState, TitleState};
 use std::sync::Arc;
+use verbs::VerbsState;
 use world::World;
 
 /// Logical resolution.
@@ -92,6 +94,7 @@ pub(crate) enum Scene {
     Seals(SealsState),
     Calendar(CalendarState),
     Lesson(Box<LessonState>),
+    Verbs(VerbsState),
     Settings(SettingsState),
 }
 
@@ -359,6 +362,7 @@ impl Game {
             Scene::Seals(s) => self.tick_seals(s, &pad),
             Scene::Calendar(s) => self.tick_calendar(s, &pad),
             Scene::Lesson(s) => self.tick_lesson(s, &pad),
+            Scene::Verbs(s) => self.tick_verbs(s, &pad),
             Scene::Settings(s) => self.tick_settings(s, &pad),
         }
     }
@@ -379,6 +383,7 @@ impl Game {
             Scene::Seals(s) => self.draw_seals(c, &ui, s),
             Scene::Calendar(s) => self.draw_calendar(c, &ui, s),
             Scene::Lesson(s) => self.draw_lesson(c, &ui, s),
+            Scene::Verbs(s) => self.draw_verbs(c, &ui, s),
             Scene::Settings(s) => self.draw_settings(c, &ui, s),
         }
         if let Some((text, t)) = &self.toast {
@@ -403,6 +408,7 @@ impl Game {
             Scene::Seals(_) => "seals",
             Scene::Calendar(_) => "calendar",
             Scene::Lesson(_) => "lesson",
+            Scene::Verbs(_) => "verbs",
             Scene::Settings(_) => "settings",
         }
     }
@@ -477,6 +483,7 @@ mod tests {
             include_str!("dialogue.rs"),
             include_str!("menus.rs"),
             include_str!("lesson.rs"),
+            include_str!("verbs.rs"),
             include_str!("battle_ui.rs"),
         ];
         let mut missing = vec![];

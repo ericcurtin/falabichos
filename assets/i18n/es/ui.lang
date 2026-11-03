@@ -122,3 +122,7 @@ ladder.up1 = ¡Bien escrito! Las erratas cuentan.
 ladder.up2 = ¡Genial! Los acentos cuentan ya.
 ladder.down1 = Acentos perdonados otra vez.
 ladder.down0 = Erratas perdonadas otra vez.
+menu.verbs = Verbos
+verbs.title = Tablas de verbos
+verbs.hint = A: practicar  Select: todos  B: volver
+battle.conjugation_intro = ¡Práctica de verbos! Escribe cada forma.

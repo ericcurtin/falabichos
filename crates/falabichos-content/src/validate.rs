@@ -218,6 +218,70 @@ pub fn validate(c: &Content) -> Vec<Diagnostic> {
         }
     }
 
+    // ---- verbs (conjugation tables)
+    for v in c.verbs.values() {
+        let loc = format!("verb:{}", v.id);
+        if !is_snake_id(&v.id) {
+            d.push(err(loc.clone(), "id must be lowercase snake_case ASCII".into()));
+        }
+        if v.inf.trim().is_empty() || v.en.trim().is_empty() {
+            d.push(err(loc.clone(), "needs `inf` and `en`".into()));
+        }
+        if !matches!(v.group.as_str(), "ar" | "er" | "ir" | "irregular") {
+            d.push(err(
+                loc.clone(),
+                format!("`group` must be ar, er, ir or irregular, not `{}`", v.group),
+            ));
+        }
+        for t in Tense::ALL {
+            let forms = v.forms(t);
+            if forms.len() != PERSONS.len() {
+                d.push(err(
+                    loc.clone(),
+                    format!(
+                        "{} needs {} forms ({}), found {}",
+                        t.pt(),
+                        PERSONS.len(),
+                        PERSONS.join(", "),
+                        forms.len()
+                    ),
+                ));
+                continue;
+            }
+            if forms
+                .iter()
+                .any(|f| f.trim().is_empty() || f.contains(char::is_whitespace))
+            {
+                d.push(err(loc.clone(), format!("{}: every form is one word", t.pt())));
+            }
+            let mut uniq: Vec<&String> = forms.iter().collect();
+            uniq.sort();
+            uniq.dedup();
+            if uniq.len() < 3 {
+                d.push(warn(
+                    loc.clone(),
+                    format!("{}: suspiciously few distinct forms", t.pt()),
+                ));
+            }
+            // regular verbs must follow their group's pattern
+            if v.group != "irregular" && t == Tense::Perfeito {
+                let stem = v.inf.trim_end_matches(&v.group);
+                if forms.iter().any(|f| !f.starts_with(stem)) {
+                    d.push(warn(
+                        loc.clone(),
+                        "a regular form does not start with the verb stem".into(),
+                    ));
+                }
+            }
+        }
+        if v.id != falabichos_core::normalize::fold(&v.inf) {
+            d.push(warn(
+                loc.clone(),
+                "id should be the infinitive without accents".into(),
+            ));
+        }
+    }
+
     // ---- species
     let mut dex = BTreeSet::new();
     for s in c.species.values() {

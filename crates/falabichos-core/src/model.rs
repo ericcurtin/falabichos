@@ -623,3 +623,85 @@ pub struct Story {
     pub finale_flag: String,
     pub finale_dialogue: String,
 }
+
+/// The three tenses of the conjugation tables.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum Tense {
+    /// Pretérito perfeito (simple past): falei, falaste, falou, falámos, falaram.
+    Perfeito,
+    /// Pretérito imperfeito (past habit or description): falava, falavas, ...
+    Imperfeito,
+    /// Futuro (simple future): falarei, falarás, ...
+    Futuro,
+}
+
+impl Tense {
+    pub const ALL: [Tense; 3] = [Tense::Perfeito, Tense::Imperfeito, Tense::Futuro];
+
+    /// Short code used in skill ids (`conj_falar_pp_2`).
+    pub fn code(self) -> &'static str {
+        match self {
+            Tense::Perfeito => "pp",
+            Tense::Imperfeito => "im",
+            Tense::Futuro => "fu",
+        }
+    }
+
+    pub fn from_code(c: &str) -> Option<Tense> {
+        Tense::ALL.into_iter().find(|t| t.code() == c)
+    }
+
+    /// Portuguese name.
+    pub fn pt(self) -> &'static str {
+        match self {
+            Tense::Perfeito => "pretérito perfeito",
+            Tense::Imperfeito => "pretérito imperfeito",
+            Tense::Futuro => "futuro",
+        }
+    }
+
+    /// English name.
+    pub fn en(self) -> &'static str {
+        match self {
+            Tense::Perfeito => "simple past",
+            Tense::Imperfeito => "past habit / description",
+            Tense::Futuro => "future",
+        }
+    }
+}
+
+/// The persons of a conjugation table (the second person plural *vós* is left out: it is not used
+/// in everyday European Portuguese).
+pub const PERSONS: [&str; 5] = ["eu", "tu", "ele/ela", "nós", "eles/elas"];
+
+/// A verb with its conjugation tables. Each tense lists the forms for [`PERSONS`], in that order.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Verb {
+    /// Stable snake_case id; used in SRS skill ids (`conj_<id>_pp_0`). Never rename.
+    pub id: String,
+    /// The infinitive.
+    pub inf: String,
+    /// English meaning ("to speak").
+    pub en: String,
+    /// `ar`, `er`, `ir` for regular verbs, `irregular` otherwise.
+    pub group: String,
+    pub perfeito: Vec<String>,
+    pub imperfeito: Vec<String>,
+    pub futuro: Vec<String>,
+    /// Learning note (pt-PT traps).
+    #[serde(default)]
+    pub note: Option<String>,
+    #[serde(default)]
+    pub needs_native_review: bool,
+}
+
+impl Verb {
+    pub fn forms(&self, t: Tense) -> &[String] {
+        match t {
+            Tense::Perfeito => &self.perfeito,
+            Tense::Imperfeito => &self.imperfeito,
+            Tense::Futuro => &self.futuro,
+        }
+    }
+}

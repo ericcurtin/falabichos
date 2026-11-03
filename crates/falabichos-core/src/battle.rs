@@ -206,6 +206,31 @@ impl Battle {
         Ok(b)
     }
 
+    /// A conjugation drill (no penalty, like Practice): typed forms of the verb tables. `only` limits it to one
+    /// verb. Brand-new forms are mixed in with the ones that are due.
+    pub fn conjugation(
+        content: &Content,
+        srs: &SrsStore,
+        policy: AnswerPolicy,
+        only: Option<&str>,
+        questions: u8,
+        rng: &mut Rng,
+        now: i64,
+    ) -> Result<Battle, BattleError> {
+        let pool = content.conjugation_skills(only);
+        if pool.is_empty() {
+            return Err(BattleError::EmptyPool);
+        }
+        let mut b = Battle::base(BattleKind::Practice, "Conjugation".to_string(), pool);
+        b.confidence = 99;
+        b.max_confidence = 99;
+        b.total = Some(questions.max(1));
+        b.hints_left = 99;
+        b.policy = policy;
+        b.next_question(content, srs, rng, now);
+        Ok(b)
+    }
+
     pub fn is_over(&self) -> bool {
         self.outcome.is_some()
     }

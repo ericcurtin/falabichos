@@ -339,6 +339,9 @@ pub fn generate(content: &Content, skill: &str, card: Option<&Card>, rng: &mut R
     if let Some(def) = content.grammar_exercise(skill) {
         return Some(from_def(def, rng));
     }
+    if let Some(def) = content.conjugation_exercise(skill) {
+        return Some(from_def(&def, rng));
+    }
     let item = content.vocab.get(skill)?;
     Some(generate_vocab(content, item, card, rng))
 }

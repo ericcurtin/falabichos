@@ -125,3 +125,7 @@ ladder.up1 = Great spelling! Typos count now.
 ladder.up2 = Excellent! Accents count now too.
 ladder.down1 = Accents are forgiven again.
 ladder.down0 = Small typos are forgiven again.
+menu.verbs = Verbs
+verbs.title = Verb tables
+verbs.hint = A: drill  Select: all  B: back
+battle.conjugation_intro = Verb drill! Type each form.

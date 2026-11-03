@@ -13,7 +13,7 @@ Status key: **done**, **in progress**, **next**, **later**. Want to take somethi
 ## Part 2 progress (branch `roadmap-progress`)
 
 - Town 3, **Ribeira Dourada**, is in (see the table below). Totals now: 3 towns, 15 maps, 13 Bichos,
-  124 vocabulary items, 15 grammar concepts (89 exercises), 3 Mestres and Selos, 10 trainers.
+  124 vocabulary items, 15 grammar concepts (92 exercises), 10 verbs with conjugation tables, 3 Mestres and Selos, 10 trainers.
 
 ## Part 2: the rest of the journey
 
@@ -32,7 +32,7 @@ Status key: **done**, **in progress**, **next**, **later**. Want to take somethi
 - **done** Sentence translation with per-word hints: players type a whole Portuguese sentence from its English meaning; the hint key reveals `english=português` word pairs. Hand-written (`kind: Translate`, `word_hints`) and generated from vocabulary examples at the advanced stage.
 - **in progress** Listening dictation: word-level dictation (play the clip, type the word) is implemented, but it is only generated when a native recording exists. There are no recordings yet, so players do not see it and it has only been unit-tested with a synthetic clip name. Sentence-level dictation is not built: the audio model has one clip per vocabulary item, no sentence clips and no speech synthesis.
 - **done** Per-concept "mini-lesson" screens before a grammar Bicho's first wild battle (one page per concept it teaches, the same page as the Notebook; shown once per concept, tracked with `lesson_<concept>` story flags so the save format is unchanged; B skips).
-- **later** Verb conjugation tables as a game mode (pretérito perfeito, imperfeito, futuro).
+- **in progress** Verb conjugation tables as a game mode: a *Verbs* screen (tables for pretérito perfeito, imperfeito and futuro, per-verb mastery) and a typed conjugation drill that feeds the spaced-repetition scheduler. 10 verbs (5 regular, 5 irregular) so far, all flagged for native review; more verbs and the other tenses (presente, condicional, conjuntivo) are still to do.
 - **done** Adaptive difficulty per learner: *Settings > Adaptive strictness* climbs or eases the accent / typo policy as a three-rung ladder from the learner's typed answers (opt-in, off by default; saved in the new save format v2 with a v1 migration). The thresholds (11 of 12 to climb, fewer than 6 to slide back) are a first guess that has not been tuned with real learners.
 
 ## Audio and pronunciation

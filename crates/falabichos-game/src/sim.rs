@@ -770,10 +770,31 @@ pub fn playthrough(assets: Arc<Assets>, shots: Option<PathBuf>) -> R<Vec<String>
     check(d.game.scene_name() == "calendar", "the review calendar opens")?;
     d.capture("calendar");
     d.settle()?;
-    d.open_menu_item(7);
+    d.open_menu_item(6);
+    check(d.game.scene_name() == "verbs", "the verb tables open")?;
+    d.capture("verbs");
+    // drill the first verb through the real UI: typed forms until the drill ends
+    d.tap_a();
+    check(
+        d.game.scene_name() == "battle",
+        "A on a verb starts a conjugation drill",
+    )?;
+    let first_skill = d
+        .game
+        .battle_exercise()
+        .map(|e| e.skill.clone())
+        .unwrap_or_default();
+    check(
+        first_skill.starts_with("conj_"),
+        "the drill asks conjugation forms",
+    )?;
+    d.settle()?;
+    check(d.game.scene_name() == "world", "the drill ends back in the world")?;
+    d.settle()?;
+    d.open_menu_item(8);
     d.capture("settings");
     d.settle()?;
-    log.push("Bichodex / Notebook / Seals / Review calendar / Settings screens open and close OK".into());
+    log.push("Bichodex / Notebook / Seals / Review calendar / Verb tables (+ a typed conjugation drill) / Settings screens open and close OK".into());
 
     // ---- practice session
     d.open_menu_item(2);
@@ -785,7 +806,7 @@ pub fn playthrough(assets: Arc<Assets>, shots: Option<PathBuf>) -> R<Vec<String>
     log.push("practice session (SRS review) completed".into());
 
     // ---- save, quit, resume
-    d.open_menu_item(6);
+    d.open_menu_item(7);
     d.idle(5);
     check(storage.read("save.ron").is_some(), "Save writes save.ron")?;
     let (map, x, y) = d.pos();

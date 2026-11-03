@@ -169,6 +169,7 @@ pub(crate) enum MenuItem {
     Notebook,
     Seals,
     Calendar,
+    Verbs,
     Save,
     Settings,
     Title,
@@ -190,6 +191,7 @@ impl MenuState {
                 MenuItem::Notebook,
                 MenuItem::Seals,
                 MenuItem::Calendar,
+                MenuItem::Verbs,
                 MenuItem::Save,
                 MenuItem::Settings,
                 MenuItem::Title,
@@ -209,6 +211,7 @@ impl Game {
             MenuItem::Notebook => "menu.notebook",
             MenuItem::Seals => "menu.seals",
             MenuItem::Calendar => "menu.calendar",
+            MenuItem::Verbs => "menu.verbs",
             MenuItem::Save => "menu.save",
             MenuItem::Settings => "menu.settings",
             MenuItem::Title => "menu.title_screen",
@@ -248,6 +251,9 @@ impl Game {
                 }
                 MenuItem::Seals => self.scene = Scene::Seals(SealsState { cursor: 0 }),
                 MenuItem::Calendar => self.scene = Scene::Calendar(CalendarState),
+                MenuItem::Verbs => {
+                    self.scene = Scene::Verbs(crate::verbs::VerbsState { cursor: 0, tense: 0 })
+                }
                 MenuItem::Save => {
                     let ok = self.save_game();
                     let m = self.t(if ok { "toast.saved" } else { "toast.save_failed" });

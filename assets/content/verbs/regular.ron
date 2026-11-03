@@ -1,0 +1,44 @@
+// Regular verbs: conjugation tables for the pretérito perfeito, the pretérito imperfeito and the futuro.
+// Forms are in the order of PERSONS: eu, tu, ele/ela, nós, eles/elas ("vós" is left out).
+// Field reference: docs/CONTENT_FORMAT.md
+[
+    (
+        id: "falar", inf: "falar", en: "to speak, to talk", group: "ar",
+        perfeito: ["falei", "falaste", "falou", "falámos", "falaram"],
+        imperfeito: ["falava", "falavas", "falava", "falávamos", "falavam"],
+        futuro: ["falarei", "falarás", "falará", "falaremos", "falarão"],
+        note: "falámos (past, accent) vs falamos (present).",
+        needs_native_review: true,
+    ),
+    (
+        id: "morar", inf: "morar", en: "to live (somewhere)", group: "ar",
+        perfeito: ["morei", "moraste", "morou", "morámos", "moraram"],
+        imperfeito: ["morava", "moravas", "morava", "morávamos", "moravam"],
+        futuro: ["morarei", "morarás", "morará", "moraremos", "morarão"],
+        note: "morámos (past) vs moramos (present).",
+        needs_native_review: true,
+    ),
+    (
+        id: "comer", inf: "comer", en: "to eat", group: "er",
+        perfeito: ["comi", "comeste", "comeu", "comemos", "comeram"],
+        imperfeito: ["comia", "comias", "comia", "comíamos", "comiam"],
+        futuro: ["comerei", "comerás", "comerá", "comeremos", "comerão"],
+        note: "-er: comemos is past and present.",
+        needs_native_review: true,
+    ),
+    (
+        id: "viver", inf: "viver", en: "to live, to be alive", group: "er",
+        perfeito: ["vivi", "viveste", "viveu", "vivemos", "viveram"],
+        imperfeito: ["vivia", "vivias", "vivia", "vivíamos", "viviam"],
+        futuro: ["viverei", "viverás", "viverá", "viveremos", "viverão"],
+        needs_native_review: true,
+    ),
+    (
+        id: "partir", inf: "partir", en: "to leave, to break", group: "ir",
+        perfeito: ["parti", "partiste", "partiu", "partimos", "partiram"],
+        imperfeito: ["partia", "partias", "partia", "partíamos", "partiam"],
+        futuro: ["partirei", "partirás", "partirá", "partiremos", "partirão"],
+        note: "-er/-ir imperfeito: -ia, -ias, -ia, -íamos, -iam.",
+        needs_native_review: true,
+    ),
+]

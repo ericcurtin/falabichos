@@ -52,7 +52,7 @@ Bevy Update:              Game::draw(&mut Canvas 240x160) ->  upload RGBA to one
 - `SaveGame` = player position, `Progress` (flags, seals, Bichodex seen, party), `SrsStore` (all SRS cards by skill id),
   RNG state, steps, play time, carried confidence, the adaptive-strictness ladder. It is serialised as pretty RON with a `version` field.
 - `Scene` is an enum: `Title`, `World` (with an optional dialogue overlay), `Menu`, `Battle`, `Dex`
-  (Bichodex and party), `Notebook`, `Seals`, `Calendar` (review calendar), `Lesson` (mini-lesson before a grammar Bicho's first battle), `Settings`. Each tick takes the scene out of `Game`, updates
+  (Bichodex and party), `Notebook`, `Seals`, `Calendar` (review calendar), `Lesson` (mini-lesson before a grammar Bicho's first battle), `Verbs` (conjugation tables and drill), `Settings`. Each tick takes the scene out of `Game`, updates
   it, and puts the next scene back, which keeps the borrow checker happy and transitions explicit.
 
 ## Learning engine (`falabichos-core`)
@@ -66,6 +66,8 @@ A *skill* is the unit that the SRS schedules: a vocabulary id (`cafe_bica`) or a
   not): new cards get multiple choice (pt→en, en→pt); known cards get the article/gender question, an IPA
   reading ("which word has this pronunciation?"), word ordering from the example sentence, and finally **typed
   answers**. Distractors come from the same category first.
+- **Conjugation** skills (`conj_<verb>_<tense>_<person>`) are generated from the verb tables in `content/verbs/` (`Content::conjugation_exercise`)
+  as typed exercises; `Battle::conjugation` runs a drill over them.
 - **Grammar** skills are hand-written exercises (`Choice`, `FillBlank`, `Type`, `Order`) from `grammar/*.ron`.
 - Listening exercises use a real clip when `audio` exists, otherwise degrade to the IPA reading. **Dictation** (play the
   clip, type the word) is only generated when a real clip exists; without one it would just be copying the IPA.

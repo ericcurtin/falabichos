@@ -19,6 +19,7 @@ pub struct Content {
     pub tiles: Vec<TileDef>,
     pub vocab: BTreeMap<String, VocabItem>,
     pub grammar: BTreeMap<String, GrammarConcept>,
+    pub verbs: BTreeMap<String, Verb>,
     pub species: BTreeMap<String, Species>,
     pub towns: BTreeMap<String, Town>,
     pub maps: BTreeMap<String, MapDef>,
@@ -130,6 +131,62 @@ impl Content {
     pub fn grammar_exercise(&self, skill: &str) -> Option<&ExerciseDef> {
         let g = self.grammar.get(self.exercise_index.get(skill)?)?;
         g.exercises.iter().find(|e| e.id == skill)
+    }
+
+    /// Skill id of one conjugation form: `conj_<verb>_<pp|im|fu>_<person index 0..5>`.
+    pub fn conjugation_skill(verb: &str, tense: Tense, person: usize) -> String {
+        format!("conj_{verb}_{}_{person}", tense.code())
+    }
+
+    /// Split a conjugation skill id back into (verb id, tense, person index). The verb must exist.
+    pub fn parse_conjugation_skill(&self, skill: &str) -> Option<(&Verb, Tense, usize)> {
+        let rest = skill.strip_prefix("conj_")?;
+        let (rest, person) = rest.rsplit_once('_')?;
+        let (verb, tense) = rest.rsplit_once('_')?;
+        let person: usize = person.parse().ok()?;
+        let verb = self.verbs.get(verb)?;
+        let tense = Tense::from_code(tense)?;
+        (person < PERSONS.len() && verb.forms(tense).len() == PERSONS.len()).then_some((verb, tense, person))
+    }
+
+    /// Every conjugation skill (verbs x 3 tenses x 5 persons), optionally only some verbs.
+    pub fn conjugation_skills(&self, only: Option<&str>) -> Vec<String> {
+        let mut out = vec![];
+        for v in self.verbs.values().filter(|v| only.is_none_or(|o| o == v.id)) {
+            for t in Tense::ALL {
+                for p in 0..PERSONS.len() {
+                    out.push(Self::conjugation_skill(&v.id, t, p));
+                }
+            }
+        }
+        out
+    }
+
+    /// The exercise for a conjugation skill: type the form. Both `falaste` and `tu falaste` are accepted.
+    pub fn conjugation_exercise(&self, skill: &str) -> Option<ExerciseDef> {
+        let (v, t, p) = self.parse_conjugation_skill(skill)?;
+        let form = v.forms(t)[p].clone();
+        let pronouns: &[&str] = match p {
+            2 => &["ele", "ela"],
+            4 => &["eles", "elas"],
+            _ => &[PERSONS[p]],
+        };
+        let mut answer = vec![form.clone()];
+        answer.extend(pronouns.iter().map(|pr| format!("{pr} {form}")));
+        let row: Vec<String> = v.forms(t).to_vec();
+        Some(ExerciseDef {
+            id: skill.to_string(),
+            kind: ExerciseKind::Type,
+            prompt: format!("{} ({}): {} ___", v.inf, t.pt(), PERSONS[p]),
+            prompt_lang: Lang::Pt,
+            context: Some(format!("{}: {}", v.en, t.en())),
+            options: vec![],
+            answer,
+            hint: None,
+            word_hints: vec![],
+            explanation: Some(format!("{}, {}: {}", v.inf, t.pt(), row.join(", "))),
+            needs_native_review: v.needs_native_review,
+        })
     }
 
     pub fn is_grammar_skill(&self, skill: &str) -> bool {

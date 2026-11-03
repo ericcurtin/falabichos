@@ -61,7 +61,7 @@ It plays like a classic top-down 16x16 monster-collecting adventure, but the "ba
 ## Vertical slice (what you can play today)
 
 3 towns (**Vila Azul**, a fishing village, **Setecolinas**, a hilly tram city, and **Ribeira Dourada**, a riverside
-city), 15 maps, 13 Bichos, 124 vocabulary items, 15 grammar concepts (89 exercises), 3 Mestres with Selos,
+city), 15 maps, 13 Bichos, 124 vocabulary items, 15 grammar concepts (92 exercises), 10 verbs with conjugation tables, 3 Mestres with Selos,
 10 trainers, a full story arc from the first conversation to the end of Part 1, plus the first town of Part 2.
 See [ROADMAP.md](ROADMAP.md) for the other towns (Alentejo, Algarve, Azores, Madeira).
 

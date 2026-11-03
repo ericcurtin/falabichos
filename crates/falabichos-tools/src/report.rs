@@ -19,7 +19,7 @@ pub const MASTERED_DAYS: f32 = 21.0;
 #[derive(Debug, Clone, PartialEq)]
 pub struct SkillRow {
     pub skill: String,
-    /// `vocab`, `grammar` or `unknown` (a card whose content was removed).
+    /// `vocab`, `grammar`, `conjugation` or `unknown` (a card whose content was removed).
     pub kind: &'static str,
     /// Vocabulary category or grammar concept id.
     pub group: String,
@@ -90,6 +90,8 @@ pub struct Report {
     pub skills: Vec<SkillRow>,
     pub categories: Vec<GroupRow>,
     pub concepts: Vec<GroupRow>,
+    /// Conjugation forms grouped by verb.
+    pub verbs: Vec<GroupRow>,
 }
 
 impl Report {
@@ -195,6 +197,22 @@ pub fn build(content: &Content, save: &SaveGame, now: i64) -> Report {
             ));
         }
     }
+    for skill in content.conjugation_skills(None) {
+        if let (Some(def), Some((v, _, _))) = (
+            content.conjugation_exercise(&skill),
+            content.parse_conjugation_skill(&skill),
+        ) {
+            skills.push(row(
+                &skill,
+                save.srs.card(&skill),
+                "conjugation",
+                &v.id,
+                &def.prompt,
+                def.context.as_deref().unwrap_or(""),
+                vec![],
+            ));
+        }
+    }
     // cards whose content no longer exists (kept so the teacher sees the whole history)
     let known: std::collections::BTreeSet<String> = skills.iter().map(|s| s.skill.clone()).collect();
     for (id, card) in &save.srs.cards {
@@ -222,7 +240,7 @@ pub fn build(content: &Content, save: &SaveGame, now: i64) -> Report {
         }
         m.into_values().collect()
     };
-    let (categories, concepts) = (group("vocab"), group("grammar"));
+    let (categories, concepts, verbs) = (group("vocab"), group("grammar"), group("conjugation"));
 
     let mut species: Vec<SpeciesRow> = content
         .species
@@ -250,6 +268,7 @@ pub fn build(content: &Content, save: &SaveGame, now: i64) -> Report {
         skills,
         categories,
         concepts,
+        verbs,
     }
 }
 
@@ -325,6 +344,18 @@ pub fn to_text(r: &Report) -> String {
         let _ = writeln!(
             o,
             "  {:<22} {:>3} / {:<3}  mastered {:>3}  accuracy {}",
+            g.name,
+            g.started,
+            g.total,
+            g.mastered,
+            percent(g.accuracy())
+        );
+    }
+    let _ = writeln!(o, "\nVerb tables (forms started / total, mastered, accuracy)");
+    for g in &r.verbs {
+        let _ = writeln!(
+            o,
+            "  {:<18} {:>3} / {:<3}  mastered {:>3}  accuracy {}",
             g.name,
             g.started,
             g.total,
@@ -497,6 +528,7 @@ pub fn to_json(r: &Report) -> String {
         .collect();
     let cats: Vec<String> = r.categories.iter().map(json_group).collect();
     let concepts: Vec<String> = r.concepts.iter().map(json_group).collect();
+    let verbs: Vec<String> = r.verbs.iter().map(json_group).collect();
     let skills: Vec<String> = r
         .skills
         .iter()
@@ -531,7 +563,7 @@ pub fn to_json(r: &Report) -> String {
          \"learner\":{{\"saved_at\":{},\"play_seconds\":{},\"steps\":{},\"bichos_seen\":{},\"bichos_caught\":{},\"seals\":[{}],\"strictness_rung\":{},\"bichos\":[{}]}},\
          \"srs\":{{\"skills_started\":{},\"skills_mastered\":{},\"mastered_interval_days\":{},\"average_mastery\":{},\"accuracy\":{},\
          \"calendar\":{{\"due_now\":{},\"due_now_learning\":{},\"within_24h\":{},\"within_24_to_48h\":{},\"next_7_days\":[{}],\"later\":{}}}}},\
-         \"categories\":[{}],\"concepts\":[{}],\"skills\":[{}]}}\n",
+         \"categories\":[{}],\"concepts\":[{}],\"verbs\":[{}],\"skills\":[{}]}}\n",
         r.generated_at,
         r.saved_at,
         r.play_secs,
@@ -554,6 +586,7 @@ pub fn to_json(r: &Report) -> String {
         c.later,
         cats.join(","),
         concepts.join(","),
+        verbs.join(","),
         skills.join(",")
     )
 }
@@ -644,6 +677,11 @@ mod tests {
         s.srs
             .cards
             .insert(ex, mk(Phase::Review, 25.0, NOW + 10 * DAY, 3, 3, 0));
+        // and one conjugation form
+        s.srs.cards.insert(
+            "conj_falar_pp_3".into(),
+            mk(Phase::Review, 2.0, NOW + 2 * DAY, 2, 2, 0),
+        );
         s
     }
 
@@ -653,7 +691,7 @@ mod tests {
         let r = build(&c, &save_with_progress(&c), NOW);
         assert_eq!((r.bichos_caught, r.bichos_seen), (1, 2));
         assert_eq!(r.seals, vec!["selo_polvo".to_string()]);
-        assert_eq!(r.started(), 5);
+        assert_eq!(r.started(), 6);
         assert_eq!(
             r.mastered(),
             2,
@@ -674,6 +712,11 @@ mod tests {
             farm.total,
             c.vocab.values().filter(|v| v.category == "farm").count()
         );
+        let falar = r.verbs.iter().find(|g| g.name == "falar").unwrap();
+        assert_eq!((falar.total, falar.started, falar.seen), (15, 1, 2));
+        let form = r.skills.iter().find(|s| s.skill == "conj_falar_pp_3").unwrap();
+        assert_eq!((form.kind, form.group.as_str()), ("conjugation", "falar"));
+        assert!(form.label_pt.contains("falar (pretérito perfeito): nós"));
         let th = r.concepts.iter().find(|g| g.name == "ter_haver").unwrap();
         assert_eq!((th.started, th.mastered, th.seen, th.correct), (1, 1, 3, 3));
         assert_eq!(
@@ -681,7 +724,9 @@ mod tests {
             "only galinha is due (the removed skill is due in 5 s)"
         );
         // every vocabulary item and exercise is listed once, started or not
-        let total: usize = c.vocab.len() + c.grammar.values().map(|g| g.exercises.len()).sum::<usize>();
+        let total: usize = c.vocab.len()
+            + c.grammar.values().map(|g| g.exercises.len()).sum::<usize>()
+            + c.conjugation_skills(None).len();
         assert_eq!(r.skills.len(), total + 1);
         assert_eq!(r.species.len(), c.species.len());
         assert!(r.species[0].caught || r.species.iter().any(|s| s.id == "galo" && s.caught));
@@ -800,7 +845,7 @@ mod tests {
             "\"play_seconds\":1830",
             "\"seals\":[\"selo_polvo\"]",
             "\"strictness_rung\":1",
-            "\"skills_started\":5",
+            "\"skills_started\":6",
             "\"skills_mastered\":2",
             "\"skill\":\"galo\"",
             "\"phase\":\"learning\"",

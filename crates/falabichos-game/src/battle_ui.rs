@@ -218,6 +218,32 @@ impl Game {
         }
     }
 
+    /// Start a conjugation drill (typed verb forms, no penalty). `only` limits it to one verb.
+    pub(crate) fn start_conjugation(&mut self, only: Option<&str>, questions: u8) {
+        self.toast = None;
+        let now = self.now();
+        let policy = self.effective_policy();
+        let content = self.content.clone();
+        match Battle::conjugation(
+            &content,
+            &self.save.srs,
+            policy,
+            only,
+            questions,
+            &mut self.rng,
+            now,
+        ) {
+            Ok(b) => {
+                self.scene = Scene::Battle(self.new_battle_scene(b, "camaleao".to_string(), false));
+                self.set_music(Some("battle"));
+            }
+            Err(e) => {
+                self.toast(e.to_string());
+                self.scene = Scene::World;
+            }
+        }
+    }
+
     /// The exercise currently shown in battle (for tests and the simulator).
     pub fn battle_exercise(&self) -> Option<&Exercise> {
         match &self.scene {
@@ -702,6 +728,9 @@ impl Game {
                             self.tf("battle.challenge_intro", &[("name", &s.battle.name)]),
                             theme
                         )
+                    }
+                    BattleKind::Practice if s.battle.name == "Conjugation" => {
+                        self.t("battle.conjugation_intro")
                     }
                     BattleKind::Practice => self.t("battle.practice_intro"),
                 };

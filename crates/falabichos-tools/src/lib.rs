@@ -434,6 +434,12 @@ pub fn lint(assets: &Assets) -> LintReport {
         c.grammar.len(),
         exercises
     );
+    let _ = writeln!(
+        s,
+        "  verbs              {} ({} drill forms)",
+        c.verbs.len(),
+        c.conjugation_skills(None).len()
+    );
     let _ = writeln!(s, "  bichos             {}", c.species.len());
     let _ = writeln!(s, "  towns / maps       {} / {}", c.towns.len(), c.maps.len());
     let _ = writeln!(s, "  dialogues / lines  {} / {}", c.dialogues.len(), lines);

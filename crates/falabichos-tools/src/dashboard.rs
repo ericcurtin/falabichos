@@ -128,6 +128,14 @@ pub fn render_report(assets: &Assets, rep: &LintReport, c: &Content) -> String {
             format!("{} / {}", c.towns.len(), c.maps.len()),
         ],
         vec!["Bichos".into(), c.species.len().to_string()],
+        vec![
+            "Verbs with conjugation tables".into(),
+            format!(
+                "{} ({} drill forms)",
+                c.verbs.len(),
+                c.conjugation_skills(None).len()
+            ),
+        ],
         vec!["Vocabulary items".into(), c.vocab.len().to_string()],
         vec![
             "Grammar concepts / exercises".into(),
@@ -286,6 +294,28 @@ pub fn render_report(assets: &Assets, rep: &LintReport, c: &Content) -> String {
             "Taught by",
             "Needs review",
         ],
+        &rows,
+    );
+
+    // ---- verbs
+    o.push_str("<h2>Verb tables</h2>\n");
+    let mut rows = vec![];
+    for v in c.verbs.values() {
+        rows.push(vec![
+            format!("<code>{}</code>", esc(&v.id)),
+            esc(&v.en),
+            esc(&v.group),
+            esc(&v.perfeito.join(" ")),
+            if v.needs_native_review {
+                "yes".into()
+            } else {
+                "no".into()
+            },
+        ]);
+    }
+    table(
+        &mut o,
+        &["Verb", "Meaning", "Group", "Pretérito perfeito", "Needs review"],
         &rows,
     );
 
@@ -473,6 +503,8 @@ mod tests {
             "<code>directions</code>",
             "ter_haver",
             "Rabelo",
+            "Verb tables",
+            "falámos",
             "Interface languages",
             "Français",
             "Waiting for a native speaker",

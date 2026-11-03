@@ -11,6 +11,7 @@
 //! | `seals.ron` | list of `Seal` |
 //! | `vocab/*.ron` | list of `VocabItem` |
 //! | `grammar/*.ron` | one `GrammarConcept` per file |
+//! | `verbs/*.ron` | list of `Verb` (conjugation tables) |
 //! | `bichos/*.ron` | one `Species` per file |
 //! | `towns/<town>/town.ron` | one `Town` |
 //! | `towns/<town>/maps/*.ron` | one `MapDef` per file |
@@ -164,6 +165,11 @@ pub fn load(assets: &Assets) -> Loaded {
                     insert_unique(&mut content.grammar, g.id.clone(), g, "grammar", path, &mut d);
                 }
             }
+            ["verbs", _] => {
+                for v in parse::<Vec<Verb>>(path, text, &mut d).unwrap_or_default() {
+                    insert_unique(&mut content.verbs, v.id.clone(), v, "verb", path, &mut d);
+                }
+            }
             ["bichos", _] => {
                 if let Some(s) = parse::<Species>(path, text, &mut d) {
                     insert_unique(&mut content.species, s.id.clone(), s, "species", path, &mut d);
@@ -254,6 +260,12 @@ pub fn review_items(c: &Content) -> Vec<(&'static str, String)> {
         );
     }
     v.extend(
+        c.verbs
+            .values()
+            .filter(|x| x.needs_native_review)
+            .map(|x| ("verb", x.id.clone())),
+    );
+    v.extend(
         c.species
             .values()
             .filter(|x| x.needs_native_review)
@@ -292,6 +304,7 @@ pub fn embedded_content() -> Content {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use falabichos_core::Rng;
     use std::collections::BTreeSet;
 
     fn shipped() -> Content {
@@ -349,6 +362,110 @@ mod tests {
         for s in c.seals.keys() {
             assert!(awarded.contains(s), "seal `{s}` is never awarded");
         }
+    }
+
+    /// The conjugation tables are right for European Portuguese (spot checks) and drive a working drill.
+    #[test]
+    fn conjugation_tables_and_drill_work() {
+        use falabichos_core::battle::{Battle, BattleKind};
+        use falabichos_core::exercise::{Answer, ExKind, generate};
+        use falabichos_core::normalize::AnswerPolicy;
+        use falabichos_core::srs::SrsStore;
+        let c = shipped();
+        assert!(c.verbs.len() >= 10);
+        let forms = |v: &str, t: Tense| c.verbs[v].forms(t).join(" ");
+        // pt-PT: the nós form of the pretérito perfeito of -ar verbs has an accent
+        assert_eq!(
+            forms("falar", Tense::Perfeito),
+            "falei falaste falou falámos falaram"
+        );
+        assert_eq!(
+            forms("comer", Tense::Perfeito),
+            "comi comeste comeu comemos comeram"
+        );
+        assert_eq!(forms("ser", Tense::Perfeito), forms("ir", Tense::Perfeito));
+        assert_eq!(forms("ser", Tense::Imperfeito), "era eras era éramos eram");
+        assert_eq!(forms("ir", Tense::Imperfeito), "ia ias ia íamos iam");
+        assert_eq!(
+            forms("ter", Tense::Imperfeito),
+            "tinha tinhas tinha tínhamos tinham"
+        );
+        assert_eq!(forms("fazer", Tense::Futuro), "farei farás fará faremos farão");
+        assert_eq!(
+            forms("partir", Tense::Futuro),
+            "partirei partirás partirá partiremos partirão"
+        );
+        // regular verbs follow their group's endings
+        let endings: [(&str, Tense, [&str; 5]); 6] = [
+            ("ar", Tense::Perfeito, ["ei", "aste", "ou", "ámos", "aram"]),
+            ("er", Tense::Perfeito, ["i", "este", "eu", "emos", "eram"]),
+            ("ir", Tense::Perfeito, ["i", "iste", "iu", "imos", "iram"]),
+            ("ar", Tense::Imperfeito, ["ava", "avas", "ava", "ávamos", "avam"]),
+            ("er", Tense::Imperfeito, ["ia", "ias", "ia", "íamos", "iam"]),
+            ("ar", Tense::Futuro, ["arei", "arás", "ará", "aremos", "arão"]),
+        ];
+        for v in c.verbs.values().filter(|v| v.group != "irregular") {
+            for (g, t, ends) in &endings {
+                if v.group == *g {
+                    let stem = v.inf.trim_end_matches(g);
+                    for (form, end) in v.forms(*t).iter().zip(ends) {
+                        assert!(form.ends_with(end), "{}: {form} should end in -{end}", v.id);
+                        if *t != Tense::Futuro {
+                            assert!(form.starts_with(stem), "{}: {form}", v.id);
+                        }
+                    }
+                }
+            }
+        }
+        // skill ids round trip and every one generates a typed exercise whose answer checks out
+        let skills = c.conjugation_skills(None);
+        assert_eq!(skills.len(), c.verbs.len() * 15);
+        let mut rng = Rng::new(7);
+        for s in &skills {
+            let (v, t, p) = c.parse_conjugation_skill(s).expect("parses");
+            assert_eq!(&Content::conjugation_skill(&v.id, t, p), s);
+            let ex = generate(&c, s, None, &mut rng).expect("generates");
+            assert_eq!(ex.kind, ExKind::Type);
+            let form = &v.forms(t)[p];
+            for ok in [
+                form.clone(),
+                format!("{} {form}", PERSONS[p].split('/').next().unwrap()),
+            ] {
+                assert!(
+                    ex.check(&Answer::Text(ok), AnswerPolicy::default()).correct,
+                    "{s}"
+                );
+            }
+            assert!(
+                !ex.check(&Answer::Text("zzz".into()), AnswerPolicy::default())
+                    .correct
+            );
+            assert!(ex.explanation.as_deref().unwrap().contains(form));
+        }
+        assert!(c.parse_conjugation_skill("conj_nope_pp_0").is_none());
+        assert!(c.parse_conjugation_skill("conj_falar_xx_0").is_none());
+        assert!(c.parse_conjugation_skill("conj_falar_pp_9").is_none());
+        // a whole drill can be played to the end by answering correctly
+        let srs = SrsStore::default();
+        let mut b =
+            Battle::conjugation(&c, &srs, AnswerPolicy::default(), Some("falar"), 6, &mut rng, 0).unwrap();
+        assert!(matches!(b.kind, BattleKind::Practice));
+        let mut store = SrsStore::default();
+        let mut asked = 0;
+        while !b.is_over() && asked < 20 {
+            let ex = b.current.clone().expect("a question");
+            assert!(
+                ex.skill.starts_with("conj_falar_"),
+                "limited to one verb: {}",
+                ex.skill
+            );
+            let right = ex.accepted[0].clone();
+            b.answer(&Answer::Text(right), &mut store, 100 + asked).unwrap();
+            b.advance(&c, &store, &mut rng, 100 + asked);
+            asked += 1;
+        }
+        assert!(b.is_over());
+        assert_eq!(store.cards.len(), 6, "each answered form gets an SRS card");
     }
 
     /// Part 2, town 3 (Ribeira Dourada): the content promised by the roadmap is really there.

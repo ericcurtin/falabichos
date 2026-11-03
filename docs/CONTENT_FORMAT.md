@@ -28,6 +28,7 @@ It must report **0 errors**. Warnings are worth reading (missing IPA, nouns with
 | `content/seals.ron` | the Selos (badges) |
 | `content/vocab/<category>.ron` | list of vocabulary items |
 | `content/grammar/<concept>.ron` | one grammar concept with its exercises |
+| `content/verbs/*.ron` | lists of verbs with conjugation tables |
 | `content/bichos/<id>.ron` | one Bicho species |
 | `content/towns/<town>/town.ron` | town metadata |
 | `content/towns/<town>/maps/<map>.ron` | one map each |
@@ -112,6 +113,25 @@ Exercise `kind` and how fields are used:
 Other fields: `prompt_lang: En` (default `Pt`; colours the prompt), `context` (small line under the prompt), `hint`,
 `word_hints: [("bridge", "ponte"), ...]` (only for `Translate`: English/Portuguese pairs in sentence order; the first pairs that fit on one 31-character line are shown, so put the hardest words first; the linter warns if a Portuguese hint word is not in any accepted answer),
 `explanation` (shown after answering: **always write one**), `needs_native_review`. Exercise ids are global.
+
+## Verbs: `content/verbs/*.ron`
+
+Conjugation tables for the *Verbs* screen and the typed conjugation drill. A file is a list of verbs:
+
+```ron
+(
+    id: "falar", inf: "falar", en: "to speak, to talk", group: "ar",   // ar | er | ir | irregular
+    perfeito:   ["falei", "falaste", "falou", "falámos", "falaram"],    // pretérito perfeito
+    imperfeito: ["falava", "falavas", "falava", "falávamos", "falavam"],
+    futuro:     ["falarei", "falarás", "falará", "falaremos", "falarão"],
+    note: "falámos (past, accent) vs falamos (present).",              // optional, at most about 66 characters
+    needs_native_review: true,
+)
+```
+
+Each tense lists five single-word forms in the order **eu, tu, ele/ela, nós, eles/elas** (*vós* is not taught). The game turns
+every form into a typed exercise (`conj_<id>_<pp|im|fu>_<0-4>`, so 15 skills per verb) that the spaced-repetition scheduler tracks;
+`falaste` and `tu falaste` are both accepted. The linter checks the counts and that regular verbs start with their stem.
 
 ## Bichos: `content/bichos/<id>.ron`
 
