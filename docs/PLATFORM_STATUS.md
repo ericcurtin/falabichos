@@ -57,3 +57,15 @@ a physical GPU; Wayland sessions (X11 only, via Xvfb); gamepads (code path is st
 - **DPI**: the frame uses physical-pixel integer scaling (`scale_factor` aware) and the touch layout scales with the window's DPI factor; verified only by unit tests and on a 1× virtual display.
 - **Pause/resume**: `AppLifecycle::WillSuspend/Suspended` → `Game::on_suspend()` autosaves (when not mid-dialogue). Tested in logic only; the lifecycle events themselves can only fire on a device.
 - **Quit on mobile** is hidden from the title menu (`GameConfig::can_quit`).
+
+## Update: branch `roadmap-progress` (engine-free crates only)
+
+The later work (town 3, review calendar, mini-lessons, translation exercises, adaptive strictness and save format v2, Spanish and French UI,
+verb tables, dashboard and report tools) was verified on a Linux x86_64 host **without** the Bevy system libraries and without a container:
+
+- Verified: `cargo fmt`, `cargo clippy -D warnings` and `cargo test` for `falabichos-core`, `-content`, `-game`, `-media` and `-tools` (and `cargo test -p xtask`),
+  `falabichos-lint --strict` (0 errors, 0 warnings), and the headless playthrough through `cargo run -p falabichos-game --example sim_report`
+  (the same `sim::run_all` that `falabichos --headless-sim` calls).
+- **Not** verified: building or running the Bevy client (`cargo check -p falabichos` stops in `wayland-sys`'s build script: no `pkg-config` entry for
+  the Wayland development libraries), the Xvfb/lavapipe run, any other platform, and audio. The client code was not changed apart from what it re-uses
+  from `falabichos-game`/`-core`, which still compile, but nobody has run it since.

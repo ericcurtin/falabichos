@@ -33,14 +33,18 @@ Read this first if you are resuming work (human or AI). Then `git log --oneline`
 - [x] 8. Community docs, 36 good first issues, platform status
 - [x] 9. Final verification, `docs/FINAL_REPORT.md`
 - [x] 10. Part 2, town 3 (Ribeira Dourada): 5 maps, 4 Bichos, 28 words, 3 grammar concepts, Mestre Duarte, 5 trainers, wired into progression and the headless sim
+- [x] 11. Learning features on branch `roadmap-progress`: review calendar, mini-lessons, sentence translation with per-word hints, word dictation (only with recordings), adaptive strictness ladder (save format v2), verb tables + conjugation drill (10 verbs)
+- [x] 12. Community on branch `roadmap-progress`: Spanish and French UI + a Language row in Settings + placeholder/length lint, `falabichos-dashboard` (static HTML), `falabichos-report` (teacher progress report: text/CSV/JSON)
 
 ## What is NOT done (honest list)
 
 - macOS, Windows, Android, iOS were **not built or run** (no hardware/SDKs). See [PLATFORM_STATUS.md](PLATFORM_STATUS.md).
+- The work on branch `roadmap-progress` was verified only on the engine-free crates (the Bevy client could not be built on that host: no Wayland dev libraries), so the client was not rebuilt or run after those changes.
 - No native-speaker review of any Portuguese (132 items flagged `needs_native_review`).
 - No recorded audio clips; audio output was never *heard* (no sound device in the container).
 - Real safe-area insets (winit 0.31) are not available in Bevy 0.19.
 - Towns 4-8 and the rest of the story (see ROADMAP.md). Town 3 exists but, like everything else, is flagged for native review.
+- The new Spanish and French UI strings, the 10 verb tables and the new vocabulary/grammar are AI-written and unreviewed by native speakers.
 
 ## Bugs the tests/screenshots caught during development (kept as lessons)
 

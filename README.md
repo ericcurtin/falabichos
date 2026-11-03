@@ -43,6 +43,9 @@ It plays like a classic top-down 16x16 monster-collecting adventure, but the "ba
   mastery** of its words, and *Practice* reviews what is due.
 - **Mestres and Selos**: each town has a language master with a themed test (ordering food, transport and
   polite register, ...). Beat them to earn a *Selo* (badge).
+- **Learning tools**: a *Review* calendar (what is due now, within 24 h and in 24 to 48 h), a mini-lesson page before the
+  first conversation with a grammar Bicho, whole-sentence translation exercises with per-word hints, *Verb tables* with a typed
+  conjugation drill (pretérito perfeito, imperfeito, futuro), and an optional adaptive strictness ladder for accents and typos.
 - **Bichodex = notebook**: every Bicho lists its words with IPA, pronunciation tips and your mastery; the
   **Notebook** holds 15 grammar concepts with rules, examples and a note on pt-PT vs pt-BR.
 - **Pronunciation first**: IPA for every word, a tip system for nasal vowels, `ão/ões/ães`, reduced vowels,
@@ -56,7 +59,8 @@ It plays like a classic top-down 16x16 monster-collecting adventure, but the "ba
   and touch.
 - **Five platforms, one codebase**: Linux, macOS, Windows, Android, iOS. Native only (no web build).
 - **Translatable UI**: the interface strings are in [`assets/i18n/en/ui.lang`](assets/i18n/en/ui.lang);
-  add a folder to translate the game for speakers of other languages.
+  add a folder to translate the game for speakers of other languages. English, Spanish and French exist (Settings > Language;
+  the Spanish and French were written by an AI assistant and are not native-reviewed).
 
 ## Vertical slice (what you can play today)
 

@@ -114,3 +114,18 @@ Every hit is either a policy statement (GOVERNANCE, AGENTS, CONTRIBUTING, BUILDI
 ```
 
 The single hit is the English word "s**pok**en" in a dialogue gloss ("Have you **spoken** to Professor Amélia yet?"), a false positive. Re-running the grep also matches the lines of this report that quote the command. `Cargo.lock` has no match. The game's own vocabulary is Bicho / Bichodex / Selo / Mestre; all art, music and names are original; the README states the independence disclaimer. During development a franchise keyword accidentally appeared twice (a desktop-entry keyword and one sentence in CONTRIBUTING.md); both were caught by this grep and removed before the final commit.
+
+## 7. Update: the `roadmap-progress` branch
+
+Later work, committed on the local branch `roadmap-progress` (one commit per roadmap item; see `git log`). Details and the exact commands are in
+`FINAL_REPORT.md` kept next to the checkout by the person who ran it, and the honest status per item is in [ROADMAP.md](../ROADMAP.md).
+
+| Area | What was added |
+|------|----------------|
+| Part 2, town 3 | Ribeira Dourada: 5 maps, Mestre Duarte + Selo da Ponte, 5 trainers, 4 Bichos with art, 28 words, 3 grammar concepts, wired into the story and the headless playthrough |
+| Learning | review calendar, mini-lessons, sentence translation with per-word hints, word dictation (needs recordings), adaptive strictness (save format v2), verb tables and conjugation drill |
+| Community | Spanish and French UI, Language row in Settings, placeholder and length lint, `falabichos-dashboard`, `falabichos-report` |
+
+Verification on that branch covered only the engine-free crates (see [PLATFORM_STATUS.md](PLATFORM_STATUS.md)): 137 tests pass across the five
+engine-free crates (73 before), lint reports 0 errors and 0 warnings, and the headless playthrough passes. The Bevy client was not rebuilt.
+All new Portuguese, Spanish and French text is flagged or documented as not native-reviewed.
