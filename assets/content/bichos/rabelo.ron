@@ -1,0 +1,15 @@
+// Bicho #10: Rabelo
+(
+    id: "rabelo",
+    name: "Rabelo",
+    dex_no: 10,
+    kind: Vocab,
+    theme: "the river and the city: bridge, quay, wine cellar, tower, map",
+    flavor_pt: "O Rabelo desce o rio devagar, com a vela cheia de vento e o porão cheio de vinho.",
+    flavor_en: "The Rabelo sails down the river slowly, its sail full of wind and its hold full of wine.",
+    vocab: ["rio", "ponte", "cais", "adega", "vinho", "cidade", "bairro", "torre", "mapa"],
+    art: "rabelo",
+    trust_needed: 5,
+    cry_hz: 300,
+    needs_native_review: true,
+)

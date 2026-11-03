@@ -1,0 +1,8 @@
+(
+    id: "ribeira_dourada",
+    name: "Ribeira Dourada",
+    blurb: "A riverside city of azulejo churches, steep lanes and port-wine cellars.",
+    inspired_by: "Porto and the Douro river",
+    start_map: "ribeira_dourada",
+    needs_native_review: true,
+)

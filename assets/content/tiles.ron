@@ -28,6 +28,9 @@
     (ch: 'B', name: "boat",        art: ["boat"], kind: Solid),
     (ch: 'L', name: "lamp",        art: ["lamp"], kind: Solid),
     (ch: 'b', name: "bench",       art: ["bench"], kind: Solid),
+    (ch: 'j', name: "bridge",      art: ["bridge"]),
+    (ch: 'Q', name: "quay_wall",   art: ["quay_wall"], kind: Solid),
+    (ch: 'V', name: "vines",       art: ["vines"], kind: Solid),
     // ---- indoors
     (ch: 'F', name: "floor_wood",     art: ["floor_wood"]),
     (ch: 'K', name: "floor_tile",     art: ["floor_tile"]),
@@ -43,4 +46,5 @@
     (ch: 'J', name: "bed",            art: ["bed"], kind: Solid),
     (ch: 'P', name: "plant",          art: ["plant"], kind: Solid),
     (ch: 'I', name: "stove",          art: ["stove"], kind: Solid),
+    (ch: 'u', name: "barrel",         art: ["barrel"], kind: Solid),
 ]

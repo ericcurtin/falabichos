@@ -1,0 +1,25 @@
+// The tourist office: Mestre Duarte tests directions and the city.
+(
+    id: "posto_turismo",
+    name: "Posto de Turismo",
+    town: "ribeira_dourada",
+    music: "indoor",
+    indoor: true,
+    rows: [
+        "NNNNNNNNNN",
+        "NNNNNNNNNN",
+        "NGGGFFHHHN",
+        "NFFFFFFFFN",
+        "NFXXXXXXFN",
+        "NFMFFFFMFN",
+        "NPFFFFFFFN",
+        "NNNNEENNNN",
+    ],
+    warps: [
+        (x: 4, y: 7, map: "ribeira_dourada", to_x: 6, to_y: 7, facing: Down),
+        (x: 5, y: 7, map: "ribeira_dourada", to_x: 6, to_y: 7, facing: Down),
+    ],
+    npcs: [
+        (id: "duarte", x: 4, y: 3, art: "duarte", facing: Down, dialogue: "duarte"),
+    ],
+)

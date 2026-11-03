@@ -1,0 +1,44 @@
+// The road between Setecolinas and Ribeira Dourada.
+(
+    id: "rota_ribeira",
+    name: "Caminho da Ribeira",
+    town: "ribeira_dourada",
+    music: "town",
+    rows: [
+        "TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+        "TT.TT.TT.TT.TT.TT.TT.TT.TT.T",
+        "T..\"\"\"\"\"\"..,.,.....\"\"\"\"\"...T",
+        "T..\"\"\"\"\"\"......O...\"\"\"\"\"...T",
+        "T..\"\"\"\"\"\".,.,......\"\"\"\"\"...T",
+        "T.S.............,.,......S.T",
+        "::::::::::::::::::::::::::::",
+        "::::::::::::::::::::::::::::",
+        "T..,.......,.........,....,T",
+        "T...\"\"\"\"\"..\"\"\"\"\"\"\".......,.T",
+        "T...\"\"\"\"\"..\"\"\"O\"\"\".........T",
+        "T...\"\"\"\"\"..\"\"\"\"\"\"\".........T",
+        "TTT.TT.TT.TT.TT.TT.TT.TT.TTT",
+        "TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    ],
+    warps: [
+        (x: 0, y: 6, map: "setecolinas", to_x: 30, to_y: 8, facing: Left),
+        (x: 0, y: 7, map: "setecolinas", to_x: 30, to_y: 8, facing: Left),
+        (x: 27, y: 6, map: "ribeira_dourada", to_x: 1, to_y: 8, facing: Right),
+        (x: 27, y: 7, map: "ribeira_dourada", to_x: 1, to_y: 9, facing: Right),
+    ],
+    npcs: [
+        (id: "hugo", x: 18, y: 4, art: "ciclista", facing: Down, dialogue: "hugo", trainer: (sight: 3, challenge: "treino_hugo", spot_dialogue: "hugo_spot")),
+    ],
+    signs: [
+        (x: 2, y: 5, dialogue: "sign_rota_oeste"),
+        (x: 25, y: 5, dialogue: "sign_rota_leste"),
+    ],
+    encounters: [
+        (species: "bussola", weight: 30),
+        (species: "pombo", weight: 25),
+        (species: "cegonha", weight: 15),
+        (species: "galo", weight: 15),
+        (species: "camaleao", weight: 15),
+    ],
+    encounter_rate: 14,
+)

@@ -1,0 +1,51 @@
+// Trainers and the Mestre of Ribeira Dourada.
+[
+    (
+        id: "mestre_duarte", name: "Mestre Duarte", kind: Mestre,
+        theme: "Directions and the city",
+        pool: (categories: ["directions", "city"], grammar: ["directions_prep", "ter_haver", "imperative_directions"]),
+        questions: 8, pass_correct: 6, confidence: 3,
+        art: "duarte", reward_flag: "beat_duarte", seal: "selo_ponte",
+        win_dialogue: "duarte_win", lose_dialogue: "duarte_lose",
+    ),
+    (
+        id: "treino_guia", name: "Guia Marta", kind: Trainer,
+        theme: "Ter and há",
+        pool: (grammar: ["ter_haver"]),
+        questions: 3, pass_correct: 2, confidence: 2,
+        art: "guia", reward_flag: "beat_guia",
+        win_dialogue: "guia_win", lose_dialogue: "guia_lose",
+    ),
+    (
+        id: "treino_barqueiro", name: "Barqueiro Zé", kind: Trainer,
+        theme: "Directions",
+        pool: (categories: ["directions"]),
+        questions: 4, pass_correct: 3, confidence: 2,
+        art: "barqueiro", reward_flag: "beat_barqueiro",
+        win_dialogue: "barqueiro_win", lose_dialogue: "barqueiro_lose",
+    ),
+    (
+        id: "treino_rita", name: "Rita", kind: Trainer,
+        theme: "The city",
+        pool: (categories: ["city"]),
+        questions: 3, pass_correct: 2, confidence: 2,
+        art: "menina", reward_flag: "beat_rita",
+        win_dialogue: "rita_win", lose_dialogue: "rita_lose",
+    ),
+    (
+        id: "treino_provador", name: "Abílio", kind: Trainer,
+        theme: "Commands for giving directions",
+        pool: (grammar: ["imperative_directions"]),
+        questions: 3, pass_correct: 2, confidence: 2,
+        art: "provador", reward_flag: "beat_abilio",
+        win_dialogue: "provador_win", lose_dialogue: "provador_lose",
+    ),
+    (
+        id: "treino_hugo", name: "Ciclista Hugo", kind: Trainer,
+        theme: "Transport and directions",
+        pool: (categories: ["transport", "directions"]),
+        questions: 3, pass_correct: 2, confidence: 2,
+        art: "ciclista", reward_flag: "beat_hugo",
+        win_dialogue: "hugo_win", lose_dialogue: "hugo_lose",
+    ),
+]

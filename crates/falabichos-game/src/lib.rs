@@ -433,7 +433,13 @@ impl Game {
                 }
             }
         }
-        self.world = World::new(&content, map, spot.0, spot.1, Dir::Down);
+        self.debug_teleport_at(map, spot.0, spot.1);
+    }
+
+    /// Put the player at an exact tile of `map` (for tools, screenshots and tests).
+    pub fn debug_teleport_at(&mut self, map: &str, x: i32, y: i32) {
+        let content = self.content.clone();
+        self.world = World::new(&content, map, x, y, Dir::Down);
         self.scene = Scene::World;
         self.enter_current_map(true);
     }

@@ -288,3 +288,124 @@ pub fn embedded_content() -> Content {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::BTreeSet;
+
+    fn shipped() -> Content {
+        embedded_content()
+    }
+
+    /// Every species can actually be met: it appears in some map's encounter table or is gifted.
+    #[test]
+    fn every_species_can_be_met_in_the_world() {
+        let c = shipped();
+        let mut met: BTreeSet<String> = BTreeSet::new();
+        for m in c.maps.values() {
+            met.extend(m.encounters.iter().map(|e| e.species.clone()));
+        }
+        for d in c.dialogues.values() {
+            for b in &d.branches {
+                for a in &b.then {
+                    if let Action::GiveBicho(s) = a {
+                        met.insert(s.clone());
+                    }
+                }
+            }
+        }
+        for s in c.species.keys() {
+            assert!(met.contains(s), "species `{s}` is never encountered or gifted");
+        }
+    }
+
+    /// Every grammar concept is attached to a grammar Bicho, so players meet it in battles.
+    #[test]
+    fn every_grammar_concept_belongs_to_a_bicho() {
+        let c = shipped();
+        let used: BTreeSet<&String> = c.species.values().flat_map(|s| s.grammar.iter()).collect();
+        for g in c.grammar.keys() {
+            assert!(
+                used.contains(g),
+                "grammar concept `{g}` is not taught by any Bicho"
+            );
+        }
+    }
+
+    /// Every Mestre awards a Selo that exists, and every Selo is awarded by exactly one Mestre.
+    #[test]
+    fn mestres_and_seals_match() {
+        let c = shipped();
+        let mut awarded = BTreeSet::new();
+        for ch in c.challenges.values().filter(|c| c.kind == ChallengeKind::Mestre) {
+            let seal = ch
+                .seal
+                .as_ref()
+                .unwrap_or_else(|| panic!("{} has no seal", ch.id));
+            assert!(c.seals.contains_key(seal), "{} awards unknown seal {seal}", ch.id);
+            assert!(awarded.insert(seal.clone()), "seal {seal} is awarded twice");
+        }
+        for s in c.seals.keys() {
+            assert!(awarded.contains(s), "seal `{s}` is never awarded");
+        }
+    }
+
+    /// Part 2, town 3 (Ribeira Dourada): the content promised by the roadmap is really there.
+    #[test]
+    fn ribeira_dourada_is_complete() {
+        let c = shipped();
+        assert!(c.towns.contains_key("ribeira_dourada"));
+        let maps: Vec<&MapDef> = c
+            .maps
+            .values()
+            .filter(|m| m.town.as_deref() == Some("ribeira_dourada"))
+            .collect();
+        assert!(
+            maps.len() >= 5,
+            "town 3 needs an outdoor map, a route and interiors"
+        );
+        let mestre = &c.challenges["mestre_duarte"];
+        assert_eq!(mestre.kind, ChallengeKind::Mestre);
+        assert_eq!(mestre.seal.as_deref(), Some("selo_ponte"));
+        let trainers = c
+            .challenges
+            .values()
+            .filter(|ch| ch.kind == ChallengeKind::Trainer && ch.id != "treino_hugo")
+            .filter(|ch| {
+                maps.iter()
+                    .flat_map(|m| m.npcs.iter())
+                    .any(|n| n.trainer.as_ref().is_some_and(|t| t.challenge == ch.id))
+            })
+            .count();
+        assert!(
+            trainers >= 3,
+            "town 3 needs at least three trainers, found {trainers}"
+        );
+        // New Bichos, with unique Bichodex numbers.
+        for (id, dex) in [("rabelo", 10), ("bussola", 11), ("pombo", 12), ("coruja", 13)] {
+            assert_eq!(c.species[id].dex_no, dex);
+        }
+        // Vocabulary: directions and the city, each word fully annotated.
+        for cat in ["directions", "city"] {
+            let items: Vec<&VocabItem> = c.vocab.values().filter(|v| v.category == cat).collect();
+            assert!(items.len() >= 12, "category {cat} has only {} words", items.len());
+            for v in items {
+                assert!(v.ipa.is_some(), "{} lacks ipa", v.id);
+                assert!(v.example.is_some(), "{} lacks an example", v.id);
+                assert!(
+                    v.needs_native_review,
+                    "{} must stay flagged for native review",
+                    v.id
+                );
+            }
+        }
+        // Grammar: ter/haver and the directions concepts, with real exercise sets.
+        for g in ["ter_haver", "directions_prep", "imperative_directions"] {
+            let concept = &c.grammar[g];
+            assert!(concept.exercises.len() >= 8, "{g} needs 8+ exercises");
+            assert!(concept.exercises.iter().all(|e| e.explanation.is_some()));
+            assert!(concept.needs_native_review);
+        }
+    }
+}

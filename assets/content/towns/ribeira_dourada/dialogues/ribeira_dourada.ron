@@ -1,0 +1,143 @@
+// Dialogues of Ribeira Dourada and the road to it. The first branch whose `when` conditions hold is played.
+[
+    (
+        id: "duarte",
+        branches: [
+            (when: [Flag("beat_duarte")], lines: [
+                (who: "Mestre Duarte", pt: "O Selo da Ponte é teu. Já sabes encontrar o caminho!", en: "The Bridge Seal is yours. Now you can find your way!", words: {"encontrar": "to find", "caminho": "way, path"}),
+                (who: "Mestre Duarte", pt: "A viagem continua para sul, mas isso é outra história.", en: "The journey continues south, but that is another story.", words: {"sul": "south", "outra": "another", "história": "story"}, needs_native_review: true),
+            ]),
+            (lines: [
+                (who: "Mestre Duarte", pt: "Boa tarde! Eu sou o Mestre Duarte, do Posto de Turismo.", en: "Good afternoon! I am Master Duarte, from the Tourist Office.", words: {"posto de turismo": "tourist office"}),
+                (who: "Mestre Duarte", pt: "Todos os dias me perguntam: 'Desculpe, onde fica a estação?'", en: "Every day people ask me: 'Excuse me, where is the station?'", words: {"perguntam": "they ask", "todos os dias": "every day"}, register: "formal", needs_native_review: true),
+                (who: "Mestre Duarte", pt: "O teu teste: dar indicações na cidade. Vamos a isso!", en: "Your test: giving directions in the city. Let's go!", words: {"indicações": "directions (instructions)"}),
+            ], then: [Challenge("mestre_duarte")]),
+        ],
+    ),
+    (
+        id: "duarte_win",
+        branches: [(lines: [
+            (who: "Mestre Duarte", pt: "Excelente! Já sabes dar indicações como um guia a sério.", en: "Excellent! You can give directions like a real guide.", words: {"a sério": "real, serious", "guia": "guide"}),
+            (pt: "Recebeste o Selo da Ponte!", en: "You received the Bridge Seal!"),
+        ])],
+    ),
+    (
+        id: "duarte_lose",
+        branches: [(lines: [
+            (who: "Mestre Duarte", pt: "Não faz mal. Estuda o mapa e volta cá!", en: "Never mind. Study the map and come back!", words: {"estuda": "study (tu command)", "volta": "come back (tu command)", "cá": "here"}, needs_native_review: true),
+        ])],
+    ),
+    (
+        id: "guia_spot",
+        branches: [(lines: [(who: "Guia Marta", pt: "Olá! Tens um mapa? Eu tenho uma pergunta para ti!", en: "Hello! Do you have a map? I have a question for you!", words: {"tens": "you have", "pergunta": "question"}, register: "tu")])],
+    ),
+    (
+        id: "guia",
+        branches: [
+            (when: [Flag("beat_guia")], lines: [(who: "Guia Marta", pt: "Há muito para ver na Ribeira: a ponte, a igreja e as adegas.", en: "There is a lot to see in Ribeira: the bridge, the church and the cellars.", words: {"há": "there is / there are", "muito para ver": "a lot to see"})]),
+            (lines: [(who: "Guia Marta", pt: "Hoje há muitos turistas! Tu tens um mapa?", en: "There are lots of tourists today! Do you have a map?", words: {"turistas": "tourists", "muitos": "many"})], then: [Challenge("treino_guia")]),
+        ],
+    ),
+    (id: "guia_win", branches: [(lines: [(who: "Guia Marta", pt: "Muito bem! Já sabes usar 'ter' e 'há'.", en: "Well done! You can already use 'ter' and 'há'.")])]),
+    (id: "guia_lose", branches: [(lines: [(who: "Guia Marta", pt: "Não faz mal. Há sempre outra oportunidade.", en: "Never mind. There is always another chance.", words: {"oportunidade": "opportunity, chance"}, needs_native_review: true)])]),
+    (
+        id: "barqueiro_spot",
+        branches: [(lines: [(who: "Barqueiro Zé", pt: "Ei! Sabes onde fica o cais? Vamos ver!", en: "Hey! Do you know where the quay is? Let's see!", words: {"sabes": "you know", "onde fica": "where is (it located)"})])],
+    ),
+    (
+        id: "barqueiro",
+        branches: [
+            (when: [Flag("beat_barqueiro")], lines: [(who: "Barqueiro Zé", pt: "O meu barco está ali, ao pé da ponte.", en: "My boat is over there, next to the bridge.", words: {"ali": "over there", "ao pé de": "next to"})]),
+            (lines: [(who: "Barqueiro Zé", pt: "Bom dia! Sabes dar indicações? Responde a isto!", en: "Good morning! Can you give directions? Answer this!", words: {"responde": "answer (tu command)"}, register: "tu")], then: [Challenge("treino_barqueiro")]),
+        ],
+    ),
+    (id: "barqueiro_win", branches: [(lines: [(who: "Barqueiro Zé", pt: "Muito bem! Tens bom sentido de orientação.", en: "Well done! You have a good sense of direction.", words: {"sentido de orientação": "sense of direction"})])]),
+    (id: "barqueiro_lose", branches: [(lines: [(who: "Barqueiro Zé", pt: "Não faz mal. Olha para o mapa e tenta outra vez.", en: "Never mind. Look at the map and try again.", words: {"olha": "look (tu command)", "tenta": "try (tu command)"})])]),
+    (
+        id: "rita_spot",
+        branches: [(lines: [(who: "Rita", pt: "Olá! Gostas da cidade? Vamos treinar!", en: "Hi! Do you like the city? Let's practise!", words: {"gostas": "you like"})])],
+    ),
+    (
+        id: "rita",
+        branches: [
+            (when: [Flag("beat_rita")], lines: [(who: "Rita", pt: "Adoro viver ao pé do rio.", en: "I love living next to the river.", words: {"adoro": "I love", "viver": "to live"})]),
+            (lines: [(who: "Rita", pt: "Eu moro neste bairro. Conheces a cidade?", en: "I live in this neighbourhood. Do you know the city?", words: {"moro": "I live", "conheces": "you know (a place)"})], then: [Challenge("treino_rita")]),
+        ],
+    ),
+    (id: "rita_win", branches: [(lines: [(who: "Rita", pt: "Que bem! Conheces mesmo a cidade.", en: "Great! You really know the city.", words: {"mesmo": "really"})])]),
+    (id: "rita_lose", branches: [(lines: [(who: "Rita", pt: "Quase! Tenta outra vez.", en: "Almost! Try again.")])]),
+    (
+        id: "provador_spot",
+        branches: [(lines: [(who: "Abílio", pt: "Anda cá! Antes de visitares a adega, um teste rápido.", en: "Come here! Before you visit the cellar, a quick test.", words: {"anda cá": "come here", "rápido": "quick", "visitares": "(for you) to visit"}, needs_native_review: true)])],
+    ),
+    (
+        id: "provador",
+        branches: [
+            (when: [Flag("beat_abilio")], lines: [(who: "Abílio", pt: "As uvas desta região dão um vinho muito bom.", en: "The grapes of this region make a very good wine.", words: {"uvas": "grapes", "região": "region", "dão": "they give"})]),
+            (lines: [(who: "Abílio", pt: "Sabes dar indicações? Diz-me como se vai à ponte!", en: "Can you give directions? Tell me how to get to the bridge!", words: {"diz-me": "tell me", "como se vai": "how does one go"}, needs_native_review: true)], then: [Challenge("treino_provador")]),
+        ],
+    ),
+    (id: "provador_win", branches: [(lines: [(who: "Abílio", pt: "Excelente! Falas como um guia a sério.", en: "Excellent! You speak like a real guide.")])]),
+    (id: "provador_lose", branches: [(lines: [(who: "Abílio", pt: "Quase! Lembra-te: vira, segue, atravessa.", en: "Almost! Remember: turn, follow, cross.", words: {"lembra-te": "remember (tu command)", "atravessa": "cross (tu command)"}, needs_native_review: true)])]),
+    (
+        id: "hugo_spot",
+        branches: [(lines: [(who: "Ciclista Hugo", pt: "Ei! Vais para a Ribeira? Primeiro, um teste!", en: "Hey! Are you going to Ribeira? First, a test!", words: {"vais": "you are going", "primeiro": "first"})])],
+    ),
+    (
+        id: "hugo",
+        branches: [
+            (when: [Flag("beat_hugo")], lines: [(who: "Ciclista Hugo", pt: "A Ribeira Dourada fica ao fundo desta estrada.", en: "Ribeira Dourada is at the end of this road.", words: {"ao fundo de": "at the end of", "estrada": "road"})]),
+            (lines: [(who: "Ciclista Hugo", pt: "Estou a treinar para uma corrida de bicicleta. E tu?", en: "I am training for a bicycle race. And you?", words: {"estou a treinar": "I am training", "corrida": "race"})], then: [Challenge("treino_hugo")]),
+        ],
+    ),
+    (id: "hugo_win", branches: [(lines: [(who: "Ciclista Hugo", pt: "Muito bem! Boa viagem!", en: "Well done! Have a good trip!")])]),
+    (id: "hugo_lose", branches: [(lines: [(who: "Ciclista Hugo", pt: "Não faz mal. A estrada é longa.", en: "Never mind. The road is long.", words: {"longa": "long (f.)"})])]),
+    (
+        id: "portuense",
+        branches: [(lines: [
+            (who: "Morador", pt: "Bom dia! Estás perdido? Posso ajudar-te?", en: "Good morning! Are you lost? Can I help you?", words: {"perdido": "lost", "posso": "I can", "ajudar-te": "to help you"}, register: "tu"),
+            (who: "Morador", pt: "O Posto de Turismo fica à esquerda da igreja. O café fica à direita.", en: "The Tourist Office is to the left of the church. The café is on the right.", words: {"à esquerda de": "to the left of", "à direita": "on the right"}),
+            (who: "Morador", pt: "A adega fica do outro lado do rio. Atravessa a ponte!", en: "The cellar is on the other side of the river. Cross the bridge!", words: {"do outro lado": "on the other side", "atravessa": "cross (tu command)"}),
+        ])],
+    ),
+    (
+        id: "velho_banco",
+        branches: [(lines: [
+            (who: "Senhor", pt: "Boa tarde, jovem. Há sempre muita gente na ponte ao fim da tarde.", en: "Good afternoon, young one. There are always lots of people on the bridge in the late afternoon.", words: {"gente": "people", "ao fim da tarde": "in the late afternoon"}),
+            (who: "Senhor", pt: "Aqui ao pé do rio o ar é fresco. Tenho setenta anos e nunca me cansei desta vista.", en: "Here by the river the air is fresh. I am seventy years old and I have never got tired of this view.", words: {"fresco": "fresh, cool", "setenta": "seventy", "vista": "view", "nunca": "never"}, needs_native_review: true),
+        ])],
+    ),
+    (
+        id: "adegueira",
+        branches: [(lines: [
+            (who: "Adegueira", pt: "Bom dia! Bem-vindo à Adega Torre Velha.", en: "Good morning! Welcome to Torre Velha Cellar.", register: "formal", words: {"bem-vindo": "welcome"}),
+            (who: "Adegueira", pt: "Aqui há barris muito antigos. Alguns têm cem anos!", en: "Here there are very old barrels. Some are a hundred years old!", words: {"antigos": "old, ancient", "alguns": "some", "têm": "they have", "cem": "a hundred"}),
+            (who: "Adegueira", pt: "Temos vinho do Porto e sumo de uva para os mais novos.", en: "We have port wine and grape juice for the youngsters.", words: {"temos": "we have", "uva": "grape", "os mais novos": "the youngest"}, needs_native_review: true),
+        ])],
+    ),
+    (
+        id: "dona_lurdes",
+        branches: [
+            (when: [Flag("beat_duarte")], lines: [
+                (who: "Dona Lurdes", pt: "O Mestre Duarte telefonou! O cimbalino é por conta da casa.", en: "Master Duarte phoned! The espresso is on the house.", words: {"telefonou": "phoned", "cimbalino": "espresso (Porto word)", "por conta da casa": "on the house"}),
+            ], then: [Heal]),
+            (lines: [
+                (who: "Dona Lurdes", pt: "Boa tarde! Estás cansado? Senta-te e bebe um cimbalino.", en: "Good afternoon! Are you tired? Sit down and have an espresso.", words: {"senta-te": "sit down (tu)", "bebe": "drink (tu command)"}, register: "tu"),
+                (who: "Dona Lurdes", pt: "Aqui na Ribeira, a bica chama-se cimbalino.", en: "Here in Ribeira, a 'bica' is called a 'cimbalino'.", words: {"chama-se": "is called"}, needs_native_review: true),
+            ], then: [Heal]),
+        ],
+    ),
+    (
+        id: "estudante_cafe",
+        branches: [(lines: [
+            (who: "Estudante", pt: "Para ir ao museu, segue em frente e vira à direita na esquina.", en: "To get to the museum, go straight ahead and turn right at the corner.", words: {"para ir": "to go", "segue": "go on (tu command)", "vira": "turn (tu command)", "esquina": "corner"}),
+            (who: "Estudante", pt: "É fácil! O museu fica ao lado do banco.", en: "It's easy! The museum is next to the bank.", words: {"fácil": "easy"}),
+        ])],
+    ),
+    (id: "sign_posto", branches: [(lines: [(pt: "Posto de Turismo. Mapas grátis e informações.", en: "Tourist Office. Free maps and information.", words: {"grátis": "free", "informações": "information"})])]),
+    (id: "sign_igreja", branches: [(lines: [(pt: "Igreja dos Azulejos. Encerrada para obras. Volte em breve.", en: "Church of the Tiles. Closed for works. Please come back soon.", words: {"encerrada": "closed", "obras": "building works", "volte": "come back (polite command)", "em breve": "soon"}, register: "formal", needs_native_review: true)])]),
+    (id: "sign_cimbalino", branches: [(lines: [(pt: "Café Cimbalino. O melhor café da Ribeira.", en: "Café Cimbalino. The best café in Ribeira.", words: {"melhor": "best"})])]),
+    (id: "sign_adega", branches: [(lines: [(pt: "Adega Torre Velha. Visitas guiadas.", en: "Torre Velha Cellar. Guided tours.", words: {"visitas guiadas": "guided tours"})])]),
+    (id: "sign_rota_oeste", branches: [(lines: [(pt: "Setecolinas: 8 quilómetros.", en: "Setecolinas: 8 kilometres.")])]),
+    (id: "sign_rota_leste", branches: [(lines: [(pt: "Ribeira Dourada: 2 quilómetros. Cuidado com a erva alta!", en: "Ribeira Dourada: 2 kilometres. Careful with the tall grass!", words: {"cuidado com": "careful with", "erva alta": "tall grass"})])]),
+]

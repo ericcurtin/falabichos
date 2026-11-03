@@ -44,7 +44,7 @@ It plays like a classic top-down 16x16 monster-collecting adventure, but the "ba
 - **Mestres and Selos**: each town has a language master with a themed test (ordering food, transport and
   polite register, ...). Beat them to earn a *Selo* (badge).
 - **Bichodex = notebook**: every Bicho lists its words with IPA, pronunciation tips and your mastery; the
-  **Notebook** holds 12 grammar concepts with rules, examples and a note on pt-PT vs pt-BR.
+  **Notebook** holds 15 grammar concepts with rules, examples and a note on pt-PT vs pt-BR.
 - **Pronunciation first**: IPA for every word, a tip system for nasal vowels, `ão/ões/ães`, reduced vowels,
   `lh/nh/ch`, the two r sounds, and a slot system for native-speaker recordings
   ([docs/AUDIO_GUIDE.md](docs/AUDIO_GUIDE.md)). No clip yet? The game degrades gracefully.
@@ -60,10 +60,10 @@ It plays like a classic top-down 16x16 monster-collecting adventure, but the "ba
 
 ## Vertical slice (what you can play today)
 
-2 towns (**Vila Azul**, a fishing village, and **Setecolinas**, a hilly tram city), 10 maps, 9 Bichos,
-96 vocabulary items, 12 grammar concepts (63 exercises), 2 Mestres with Selos, 5 trainers, a full story
-arc from the first conversation to the end of Part 1. See [ROADMAP.md](ROADMAP.md) for the other towns
-(Porto riverside, Alentejo, Algarve, Azores, Madeira).
+3 towns (**Vila Azul**, a fishing village, **Setecolinas**, a hilly tram city, and **Ribeira Dourada**, a riverside
+city), 15 maps, 13 Bichos, 124 vocabulary items, 15 grammar concepts (89 exercises), 3 Mestres with Selos,
+10 trainers, a full story arc from the first conversation to the end of Part 1, plus the first town of Part 2.
+See [ROADMAP.md](ROADMAP.md) for the other towns (Alentejo, Algarve, Azores, Madeira).
 
 ## Platform support
 
@@ -188,7 +188,7 @@ single most valuable contribution you can make.
 
 ## Roadmap
 
-Towns 3 to 8 (Porto, Alentejo, Algarve, Azores, Madeira, the final Grande Mestre), native-speaker audio,
+Towns 4 to 8 (Alentejo, Algarve, Azores, Madeira, the final Grande Mestre), native-speaker audio,
 more grammar (pretérito perfeito, por/para, subjunctive), community UI translations. See [ROADMAP.md](ROADMAP.md).
 
 ## Licence

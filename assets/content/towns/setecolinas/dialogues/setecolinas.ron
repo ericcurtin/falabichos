@@ -30,8 +30,8 @@
         id: "finale",
         branches: [(lines: [
             (pt: "Parabéns! Ganhaste dois Selos e conheceste muitos Bichos.", en: "Congratulations! You won two Seals and met many Bichos.", words: {"conheceste": "you met"}),
-            (pt: "A aventura vai continuar: o Porto, o Alentejo, o Algarve e as ilhas esperam por ti!", en: "The adventure will continue: Porto, the Alentejo, the Algarve and the islands are waiting for you!", words: {"esperam": "they wait"}),
-            (pt: "Obrigado por jogares a Parte 1 do Falabichos. Continua a treinar!", en: "Thank you for playing Part 1 of Falabichos. Keep practising!", needs_native_review: true),
+            (pt: "A estrada para a Ribeira Dourada está aberta! Depois virão o Alentejo, o Algarve e as ilhas.", en: "The road to Ribeira Dourada is open! The Alentejo, the Algarve and the islands will follow.", words: {"estrada": "road", "aberta": "open (f.)", "virão": "they will come"}, needs_native_review: true),
+            (pt: "Obrigado por jogares o Falabichos. Continua a treinar!", en: "Thank you for playing Falabichos. Keep practising!", needs_native_review: true),
         ])],
     ),
     (
@@ -108,5 +108,12 @@
     (id: "sign_estacao", branches: [(lines: [(pt: "Estação do Elétrico. Bilhetes à venda.", en: "Tram Station. Tickets on sale.", words: {"à venda": "on sale"})])]),
     (id: "sign_mercearia", branches: [(lines: [(pt: "Mercearia Dois Irmãos. Fruta fresca todos os dias.", en: "Two Brothers Grocery. Fresh fruit every day.")])]),
     (id: "sign_jardim", branches: [(lines: [(pt: "Jardim das Colinas. Não pises a erva alta... a não ser que queiras conhecer um Bicho!", en: "Hill Garden. Don't step on the tall grass... unless you want to meet a Bicho!", words: {"pises": "you step (don't)", "a não ser que": "unless"}, needs_native_review: true)])]),
+    (
+        id: "guarda_ribeira",
+        branches: [(lines: [
+            (who: "Senhor", pt: "Vais para a Ribeira Dourada? Ainda não!", en: "Are you going to Ribeira Dourada? Not yet!", register: "tu"),
+            (who: "Senhor", pt: "Primeiro, tens de ganhar o Selo do Elétrico. Fala com a Mestra Beatriz.", en: "First, you have to win the Tram Seal. Talk to Master Beatriz.", words: {"ganhar": "to win", "tens de": "you have to"}),
+        ])],
+    ),
     (id: "sign_paragem", branches: [(lines: [(pt: "Paragem do Elétrico 28. Próximo elétrico em 5 minutos.", en: "Tram stop, line 28. Next tram in 5 minutes.")])]),
 ]

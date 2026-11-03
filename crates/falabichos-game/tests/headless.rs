@@ -26,6 +26,10 @@ fn full_playthrough_reaches_the_finale() {
         log.iter().any(|l| l.contains("save -> quit -> resume OK")),
         "{log:?}"
     );
+    assert!(
+        log.iter().any(|l| l.contains("Mestre Duarte beaten")),
+        "Part 2 town 3 must be reachable and beatable: {log:?}"
+    );
 }
 
 #[test]

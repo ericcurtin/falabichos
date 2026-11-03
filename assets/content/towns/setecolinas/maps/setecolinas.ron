@@ -32,6 +32,7 @@
         (x: 6, y: 5, map: "estacao_eletrico", to_x: 5, to_y: 7, facing: Up),
         (x: 25, y: 5, map: "mercearia", to_x: 4, to_y: 6, facing: Up),
         (x: 0, y: 8, map: "rota_colinas", to_x: 26, to_y: 7, facing: Left),
+        (x: 31, y: 8, map: "rota_ribeira", to_x: 1, to_y: 6, facing: Right),
     ],
     npcs: [
         (id: "lisboeta", x: 13, y: 8, art: "lisboeta", facing: Down, dialogue: "lisboeta", wander: true),
@@ -39,6 +40,7 @@
         (id: "turista_colina", x: 8, y: 11, art: "turista", facing: Right, dialogue: "turista_colina"),
         (id: "rui", x: 22, y: 8, art: "condutor", facing: Left, dialogue: "rui", trainer: (sight: 4, challenge: "treino_rui", spot_dialogue: "rui_spot")),
         (id: "ines", x: 24, y: 17, art: "estudante", facing: Left, dialogue: "ines", trainer: (sight: 4, challenge: "treino_ines", spot_dialogue: "ines_spot")),
+        (id: "guarda_ribeira", x: 30, y: 8, art: "senhor", facing: Right, dialogue: "guarda_ribeira", show_when: [NotFlag("beat_beatriz")]),
     ],
     signs: [
         (x: 2, y: 7, dialogue: "sign_setecolinas"),

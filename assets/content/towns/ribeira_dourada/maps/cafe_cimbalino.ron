@@ -1,0 +1,26 @@
+// Café with a cimbalino (Porto's word for an espresso): restores your confidence.
+(
+    id: "cafe_cimbalino",
+    name: "Café Cimbalino",
+    town: "ribeira_dourada",
+    music: "indoor",
+    indoor: true,
+    rows: [
+        "NNNNNNNNNNNN",
+        "NNNNNNNNNNNN",
+        "NHHKUKKHHKFN",
+        "NXXAAXXXUXFN",
+        "NFFFFFFFFFFN",
+        "NFFFFCCFFFFN",
+        "NFMFFFFFFMPN",
+        "NNNNNEENNNNN",
+    ],
+    warps: [
+        (x: 5, y: 7, map: "ribeira_dourada", to_x: 24, to_y: 7, facing: Down),
+        (x: 6, y: 7, map: "ribeira_dourada", to_x: 24, to_y: 7, facing: Down),
+    ],
+    npcs: [
+        (id: "dona_lurdes", x: 5, y: 2, art: "dona_rosa", facing: Down, dialogue: "dona_lurdes"),
+        (id: "estudante_cafe", x: 8, y: 5, art: "estudante", facing: Left, dialogue: "estudante_cafe"),
+    ],
+)

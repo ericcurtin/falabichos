@@ -19,10 +19,10 @@ You never need to understand the whole project. Tags: 🗣 Portuguese · 🎨 ar
 ## 🎓 Teaching and curriculum
 
 11. **Write a new grammar concept: *por* vs *para*** (`falabichos-new grammar por_para`): 4 rules, 3 examples, 6 exercises with explanations.
-12. **Write a new concept: *ter* and *haver*** (has / there is), including the pt-PT form *há* and common mistakes.
+12. ~~**Write a new concept: *ter* and *haver***~~ (done: `grammar/ter_haver.ron`; a native-speaker review of it is still very welcome).
 13. **Write a new concept: *pretérito perfeito* of regular verbs** (*falei, falaste, falou, falámos, falaram*: note the accent in *falámos*, which is pt-PT).
 14. **Audit the difficulty ladder.** Play a few battles and list in an issue any exercises that are confusing, ambiguous, or have two right answers.
-15. **Design a Mestre test for the next town** (Porto-inspired, "directions"): write the `challenge` RON with a pool of vocabulary categories and grammar concepts and a theme line.
+15. **Design a Mestre test for the next town** (Alentejo-inspired: food, farming, numbers and prices): write the `challenge` RON with a pool of vocabulary categories and grammar concepts and a theme line. (The Porto-inspired "directions" Mestre is done: `towns/ribeira_dourada/challenges`.)
 
 ## 🎨 Art
 

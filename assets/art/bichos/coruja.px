@@ -1,0 +1,20 @@
+# Bicho: coruja (a wise owl that knows who has and who is there)
+size: 16x16
+outline: K
+bob: yes
+................
+...t........t...
+..tTt......tTt..
+..tTTTTTTTTTTt..
+.tTTTTTTTTTTTTt.
+.tTWWWTTTTWWWTt.
+.tTWKKWTTWKKWTt.
+.tTWKKWyyWKKWTt.
+.tTTWWTTyTWWTTt.
+.tTTTTTTTTTTTTt.
+..tAAATAATAAAt..
+..tAATAAAATAAt..
+...tAAAAAAAAt...
+....tTTTTTTt....
+....oo....oo....
+................

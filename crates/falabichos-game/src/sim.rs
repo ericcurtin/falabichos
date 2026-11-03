@@ -811,6 +811,10 @@ pub fn playthrough(assets: Arc<Assets>, shots: Option<PathBuf>) -> R<Vec<String>
     d.enter("rota_colinas")?;
     d.enter("setecolinas")?;
     d.talk_and_finish("lisboeta").ok();
+    check(
+        d.path_to((31, 8)).is_none(),
+        "the guard blocks the road to Ribeira Dourada until the second Selo",
+    )?;
     d.enter("estacao_eletrico")?;
     d.talk_to("beatriz")?;
     d.settle()?;
@@ -822,6 +826,36 @@ pub fn playthrough(assets: Arc<Assets>, shots: Option<PathBuf>) -> R<Vec<String>
     d.settle()?;
     check(d.game.progress().has_flag("finale_seen"), "the finale played")?;
     log.push("road -> Setecolinas -> Mestra Beatriz beaten: Selo do Eletrico, finale reached".into());
+
+    // ---- Part 2, town 3: Ribeira Dourada
+    d.enter("setecolinas")?;
+    check(
+        d.path_to((31, 8)).is_some(),
+        "the guard is gone after the second Selo",
+    )?;
+    d.enter("rota_ribeira")?;
+    d.enter("ribeira_dourada")?;
+    d.talk_and_finish("portuense").ok();
+    // a wild encounter in the park of the new town
+    d.hunt_wild((4, 10))?;
+    d.settle()?;
+    check(
+        d.game.scene_name() == "world",
+        "back in the world after the wild encounter in Ribeira Dourada",
+    )?;
+    d.enter("posto_turismo")?;
+    d.talk_to("duarte")?;
+    d.settle()?;
+    check(
+        d.game.progress().has_flag("beat_duarte"),
+        "Mestre Duarte defeated",
+    )?;
+    check(
+        d.game.progress().seals.contains("selo_ponte"),
+        "Selo da Ponte awarded",
+    )?;
+    check(d.game.progress().seals.len() == 3, "three Seals")?;
+    log.push("Part 2: road -> Ribeira Dourada -> Mestre Duarte beaten: Selo da Ponte".into());
     let (seen, caught) = d.game.progress().dex_counts();
     log.push(format!(
         "final state: {caught} Bichos caught, {seen} seen, {} SRS cards, {} steps",

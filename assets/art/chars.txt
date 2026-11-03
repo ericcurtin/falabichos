@@ -17,3 +17,10 @@ vendedora: body=b hair=t skin=M shirt=e pants=T shoes=K extra=W
 senhor:    body=a hair=w skin=m shirt=T pants=G shoes=t extra=T
 estudante: body=b hair=P skin=m shirt=v pants=G shoes=W extra=v
 lisboeta:  body=a hair=K skin=m shirt=g pants=K shoes=K extra=g
+duarte:    body=a hair=w skin=m shirt=b pants=n shoes=K extra=W
+barqueiro: body=a hair=t skin=M shirt=W pants=b shoes=t extra=r
+guia:      body=b hair=T skin=m shirt=B pants=n shoes=K extra=y
+adegueira: body=b hair=w skin=m shirt=P pants=G shoes=K extra=W
+portuense: body=a hair=G skin=m shirt=h pants=t shoes=K extra=h
+provador:  body=a hair=K skin=m shirt=P pants=G shoes=K extra=W
+ciclista:  body=a hair=T skin=M shirt=y pants=K shoes=W extra=r

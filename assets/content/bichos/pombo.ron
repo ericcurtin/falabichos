@@ -1,0 +1,15 @@
+// Bicho #12: Pombo
+(
+    id: "pombo",
+    name: "Pombo",
+    dex_no: 12,
+    kind: Vocab,
+    theme: "city places and finding your way: museum, hotel, bank, turn, follow",
+    flavor_pt: "O Pombo conhece todas as esquinas da cidade e mostra o caminho.",
+    flavor_en: "The Pombo knows every corner of the city and shows the way.",
+    vocab: ["museu", "hotel", "banco", "farmacia", "jardim", "esquina", "virar", "seguir", "ficar"],
+    art: "pombo",
+    trust_needed: 5,
+    cry_hz: 400,
+    needs_native_review: true,
+)

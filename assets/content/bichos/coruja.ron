@@ -1,0 +1,15 @@
+// Bicho #13: Coruja
+(
+    id: "coruja",
+    name: "Coruja",
+    dex_no: 13,
+    kind: Grammar,
+    theme: "ter and há, place phrases (ao pé de, à esquerda de), commands for directions",
+    flavor_pt: "A Coruja vê tudo de noite: quem tem, o que há e onde fica.",
+    flavor_en: "The Coruja sees everything at night: who has, what there is, and where it is.",
+    grammar: ["ter_haver", "directions_prep", "imperative_directions"],
+    art: "coruja",
+    trust_needed: 6,
+    cry_hz: 280,
+    needs_native_review: true,
+)

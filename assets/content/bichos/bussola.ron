@@ -1,0 +1,15 @@
+// Bicho #11: Bússola
+(
+    id: "bussola",
+    name: "Bússola",
+    dex_no: 11,
+    kind: Vocab,
+    theme: "directions and position: left, right, straight ahead, near, far, behind",
+    flavor_pt: "A Bússola nunca se perde: sabe sempre o que fica à esquerda e o que fica à direita.",
+    flavor_en: "The Bússola never gets lost: it always knows what is on the left and what is on the right.",
+    vocab: ["esquerda", "direita", "em_frente", "perto", "longe", "ao_pe_de", "ao_lado_de", "atras_de", "entre", "ali"],
+    art: "bussola",
+    trust_needed: 5,
+    cry_hz: 640,
+    needs_native_review: true,
+)

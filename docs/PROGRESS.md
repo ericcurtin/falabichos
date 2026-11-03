@@ -32,6 +32,7 @@ Read this first if you are resuming work (human or AI). Then `git log --oneline`
 - [x] 7. `xtask`, Android (Gradle + GameActivity) and iOS (Xcode) glue, CI + release workflows, Dependabot
 - [x] 8. Community docs, 36 good first issues, platform status
 - [x] 9. Final verification, `docs/FINAL_REPORT.md`
+- [x] 10. Part 2, town 3 (Ribeira Dourada): 5 maps, 4 Bichos, 28 words, 3 grammar concepts, Mestre Duarte, 5 trainers, wired into progression and the headless sim
 
 ## What is NOT done (honest list)
 
@@ -39,7 +40,7 @@ Read this first if you are resuming work (human or AI). Then `git log --oneline`
 - No native-speaker review of any Portuguese (132 items flagged `needs_native_review`).
 - No recorded audio clips; audio output was never *heard* (no sound device in the container).
 - Real safe-area insets (winit 0.31) are not available in Bevy 0.19.
-- Towns 3-8 and the rest of the story (see ROADMAP.md).
+- Towns 4-8 and the rest of the story (see ROADMAP.md). Town 3 exists but, like everything else, is flagged for native review.
 
 ## Bugs the tests/screenshots caught during development (kept as lessons)
 

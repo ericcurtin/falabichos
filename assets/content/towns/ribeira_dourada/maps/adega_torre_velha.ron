@@ -1,0 +1,26 @@
+// A port-wine cellar on the south bank.
+(
+    id: "adega_torre_velha",
+    name: "Adega Torre Velha",
+    town: "ribeira_dourada",
+    music: "indoor",
+    indoor: true,
+    rows: [
+        "NNNNNNNNNNNN",
+        "NuuHHHHHHuuN",
+        "NuFFFFFFFFuN",
+        "NFFFFFFFFFFN",
+        "NFFXXXXXXFFN",
+        "NFFFFFFFFFFN",
+        "NuFFFFFFFFuN",
+        "NNNNNEENNNNN",
+    ],
+    warps: [
+        (x: 5, y: 7, map: "ribeira_dourada", to_x: 6, to_y: 22, facing: Down),
+        (x: 6, y: 7, map: "ribeira_dourada", to_x: 6, to_y: 22, facing: Down),
+    ],
+    npcs: [
+        (id: "adegueira", x: 5, y: 3, art: "adegueira", facing: Down, dialogue: "adegueira"),
+        (id: "provador", x: 8, y: 5, art: "provador", facing: Left, dialogue: "provador", trainer: (sight: 3, challenge: "treino_provador", spot_dialogue: "provador_spot")),
+    ],
+)
