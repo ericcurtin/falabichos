@@ -97,7 +97,16 @@ impl Game {
         })
     }
 
+    /// Start a battle. A first meeting with a grammar Bicho shows its mini-lessons first.
     pub(crate) fn start_battle(&mut self, pb: PendingBattle) {
+        if self.open_lessons_before(&pb) {
+            return;
+        }
+        self.start_battle_now(pb);
+    }
+
+    /// Start a battle without any lessons in between.
+    pub(crate) fn start_battle_now(&mut self, pb: PendingBattle) {
         self.toast = None;
         let now = self.now();
         let policy = self.settings.policy();

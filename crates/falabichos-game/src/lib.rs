@@ -13,6 +13,7 @@
 mod battle_ui;
 mod dialogue;
 pub mod input;
+mod lesson;
 mod menus;
 pub mod sim;
 pub mod storage;
@@ -31,6 +32,7 @@ use falabichos_core::save::{PlayerState, SaveGame, Settings, load as load_save_t
 use falabichos_core::{Content, Rng};
 use falabichos_media::{ArtBank, Canvas};
 use input::PadTracker;
+use lesson::LessonState;
 use menus::{CalendarState, DexState, MenuState, NotebookState, SealsState, SettingsState, TitleState};
 use std::sync::Arc;
 use world::World;
@@ -89,6 +91,7 @@ pub(crate) enum Scene {
     Notebook(NotebookState),
     Seals(SealsState),
     Calendar(CalendarState),
+    Lesson(Box<LessonState>),
     Settings(SettingsState),
 }
 
@@ -355,6 +358,7 @@ impl Game {
             Scene::Notebook(s) => self.tick_notebook(s, &pad),
             Scene::Seals(s) => self.tick_seals(s, &pad),
             Scene::Calendar(s) => self.tick_calendar(s, &pad),
+            Scene::Lesson(s) => self.tick_lesson(s, &pad),
             Scene::Settings(s) => self.tick_settings(s, &pad),
         }
     }
@@ -374,6 +378,7 @@ impl Game {
             Scene::Notebook(s) => self.draw_notebook(c, &ui, s),
             Scene::Seals(s) => self.draw_seals(c, &ui, s),
             Scene::Calendar(s) => self.draw_calendar(c, &ui, s),
+            Scene::Lesson(s) => self.draw_lesson(c, &ui, s),
             Scene::Settings(s) => self.draw_settings(c, &ui, s),
         }
         if let Some((text, t)) = &self.toast {
@@ -397,6 +402,7 @@ impl Game {
             Scene::Notebook(_) => "notebook",
             Scene::Seals(_) => "seals",
             Scene::Calendar(_) => "calendar",
+            Scene::Lesson(_) => "lesson",
             Scene::Settings(_) => "settings",
         }
     }
@@ -470,6 +476,7 @@ mod tests {
             include_str!("world.rs"),
             include_str!("dialogue.rs"),
             include_str!("menus.rs"),
+            include_str!("lesson.rs"),
             include_str!("battle_ui.rs"),
         ];
         let mut missing = vec![];

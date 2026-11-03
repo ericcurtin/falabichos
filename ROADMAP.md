@@ -30,7 +30,7 @@ Status key: **done**, **in progress**, **next**, **later**. Want to take somethi
 
 - **done** Review calendar: a *Review* screen in the pause menu shows what is due now, within 24 h and in 24 to 48 h, plus a 7-day histogram (`SrsStore::calendar` in core, rolling 24 h windows because the engine has no time-zone data).
 - **next** More exercise types: listening dictation, sentence translation with hints per word.
-- **next** Per-concept "mini-lesson" screens before a grammar Bicho's first battle.
+- **done** Per-concept "mini-lesson" screens before a grammar Bicho's first wild battle (one page per concept it teaches, the same page as the Notebook; shown once per concept, tracked with `lesson_<concept>` story flags so the save format is unchanged; B skips).
 - **later** Verb conjugation tables as a game mode (pretérito perfeito, imperfeito, futuro).
 - **later** Adaptive difficulty per learner (use accent / typo policy as a ladder).
 

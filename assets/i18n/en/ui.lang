@@ -112,3 +112,6 @@ calendar.nothing = Nothing started yet. Catch a Bicho and practise its words!
 calendar.clear = All caught up. Nothing is due right now.
 calendar.later = Later: {n}
 calendar.hint = A or B: back
+lesson.title = Mini-lesson {n}/{total}
+lesson.hint = A: next   Up/Down: scroll   B: skip
+lesson.hint_last = A: start the conversation   B: skip

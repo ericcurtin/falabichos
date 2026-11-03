@@ -52,7 +52,7 @@ Bevy Update:              Game::draw(&mut Canvas 240x160) ->  upload RGBA to one
 - `SaveGame` = player position, `Progress` (flags, seals, Bichodex seen, party), `SrsStore` (all SRS cards by skill id),
   RNG state, steps, play time, carried confidence. It is serialised as pretty RON with a `version` field.
 - `Scene` is an enum: `Title`, `World` (with an optional dialogue overlay), `Menu`, `Battle`, `Dex`
-  (Bichodex and party), `Notebook`, `Seals`, `Calendar` (review calendar), `Settings`. Each tick takes the scene out of `Game`, updates
+  (Bichodex and party), `Notebook`, `Seals`, `Calendar` (review calendar), `Lesson` (mini-lesson before a grammar Bicho's first battle), `Settings`. Each tick takes the scene out of `Game`, updates
   it, and puts the next scene back, which keeps the borrow checker happy and transitions explicit.
 
 ## Learning engine (`falabichos-core`)

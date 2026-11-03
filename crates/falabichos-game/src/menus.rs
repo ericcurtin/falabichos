@@ -626,8 +626,12 @@ impl Game {
     }
 
     fn notebook_lines(&self, idx: usize) -> Vec<(String, u8)> {
-        // (text, style) style: 0 normal, 1 heading, 2 dim, 3 accent
-        let g = self.concepts()[idx];
+        self.concept_lines(self.concepts()[idx])
+    }
+
+    /// The wrapped lines of a grammar concept page: `(text, style)` with style 0 normal, 1 heading,
+    /// 2 dim, 3 accent. Shared by the Notebook and the mini-lessons.
+    pub(crate) fn concept_lines(&self, g: &falabichos_core::model::GrammarConcept) -> Vec<(String, u8)> {
         let f = &self.bank.font;
         let mut out: Vec<(String, u8)> = vec![];
         for l in f.wrap(&g.summary, 37) {

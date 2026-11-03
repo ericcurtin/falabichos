@@ -207,6 +207,9 @@ pub struct Driver {
     pub ticks: u64,
     wrong_next: bool,
     large_shot: bool,
+    lesson_shot: bool,
+    /// Mini-lesson pages the driver has read.
+    lessons_seen: usize,
     seen_kinds: Vec<(ExKind, bool)>,
 }
 
@@ -235,6 +238,8 @@ impl Driver {
             ticks: 0,
             wrong_next: false,
             large_shot: false,
+            lesson_shot: false,
+            lessons_seen: 0,
             seen_kinds: vec![],
         })
     }
@@ -295,6 +300,7 @@ impl Driver {
             || w.flash.is_some()
             || w.trainer.is_some()
             || w.walk.is_some()
+            || self.game.scene_name() == "lesson"
     }
 
     /// Resolve whatever is on screen (dialogue, battle, fade) until we are back in the free world.
@@ -307,6 +313,15 @@ impl Driver {
                     self.tap_a();
                 }
                 "battle" => self.battle_step()?,
+                "lesson" => {
+                    // read the mini-lesson page by page, like a player would
+                    if !self.lesson_shot {
+                        self.lesson_shot = true;
+                        self.capture("mini-lesson");
+                    }
+                    self.lessons_seen += 1;
+                    self.tap_a();
+                }
                 _ => self.tap(|i| i.b = true),
             }
         }
@@ -724,6 +739,14 @@ pub fn playthrough(assets: Arc<Assets>, shots: Option<PathBuf>) -> R<Vec<String>
     // ---- every exercise flavour through the real UI (typing, ordering, articles, IPA)
     let kinds = d.exercise_tour()?;
     log.push(format!("exercise tour covered {kinds}"));
+    check(
+        d.lessons_seen >= 1 && d.game.progress().has_flag("lesson_ser_estar"),
+        "the first grammar Bicho showed its mini-lessons",
+    )?;
+    let lessons_before = d.lessons_seen;
+    log.push(format!(
+        "mini-lessons read before the first grammar battle: {lessons_before} page(s)"
+    ));
 
     // ---- Bichodex, notebook, seals, settings screens
     d.open_menu_item(0);
@@ -900,6 +923,15 @@ impl Driver {
             };
             self.game
                 .start_battle(crate::world::PendingBattle::Wild(species.to_string()));
+            // a first meeting with a grammar Bicho opens its mini-lessons: read them page by page
+            while self.game.scene_name() == "lesson" {
+                if !self.lesson_shot {
+                    self.lesson_shot = true;
+                    self.capture("mini-lesson");
+                }
+                self.lessons_seen += 1;
+                self.tap_a();
+            }
             // answer everything through the UI; remember which kinds we met
             for _ in 0..4000 {
                 if let Some(ex) = self.game.battle_exercise() {
