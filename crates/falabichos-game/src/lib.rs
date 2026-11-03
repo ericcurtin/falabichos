@@ -31,7 +31,7 @@ use falabichos_core::save::{PlayerState, SaveGame, Settings, load as load_save_t
 use falabichos_core::{Content, Rng};
 use falabichos_media::{ArtBank, Canvas};
 use input::PadTracker;
-use menus::{DexState, MenuState, NotebookState, SealsState, SettingsState, TitleState};
+use menus::{CalendarState, DexState, MenuState, NotebookState, SealsState, SettingsState, TitleState};
 use std::sync::Arc;
 use world::World;
 
@@ -88,6 +88,7 @@ pub(crate) enum Scene {
     Dex(DexState),
     Notebook(NotebookState),
     Seals(SealsState),
+    Calendar(CalendarState),
     Settings(SettingsState),
 }
 
@@ -353,6 +354,7 @@ impl Game {
             Scene::Dex(s) => self.tick_dex(s, &pad),
             Scene::Notebook(s) => self.tick_notebook(s, &pad),
             Scene::Seals(s) => self.tick_seals(s, &pad),
+            Scene::Calendar(s) => self.tick_calendar(s, &pad),
             Scene::Settings(s) => self.tick_settings(s, &pad),
         }
     }
@@ -371,6 +373,7 @@ impl Game {
             Scene::Dex(s) => self.draw_dex(c, &ui, s),
             Scene::Notebook(s) => self.draw_notebook(c, &ui, s),
             Scene::Seals(s) => self.draw_seals(c, &ui, s),
+            Scene::Calendar(s) => self.draw_calendar(c, &ui, s),
             Scene::Settings(s) => self.draw_settings(c, &ui, s),
         }
         if let Some((text, t)) = &self.toast {
@@ -393,6 +396,7 @@ impl Game {
             Scene::Dex(_) => "dex",
             Scene::Notebook(_) => "notebook",
             Scene::Seals(_) => "seals",
+            Scene::Calendar(_) => "calendar",
             Scene::Settings(_) => "settings",
         }
     }

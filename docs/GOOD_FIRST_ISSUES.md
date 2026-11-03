@@ -41,7 +41,7 @@ You never need to understand the whole project. Tags: 🗣 Portuguese · 🎨 ar
 ## 🦀 Rust
 
 24. **Language picker in Settings.** Add a "Language" row to `crates/falabichos-game/src/menus.rs` that cycles through the folders under `assets/i18n/` (needs `Assets::list`) and saves `ui_lang`. *Done when:* a test switches language and a string changes.
-25. **Review calendar.** In the Bichodex or menu, show how many SRS cards are due now / tomorrow (`SrsStore::due_count`). Add a unit test in `falabichos-core`.
+25. ~~**Review calendar.**~~ (done: `SrsStore::calendar` in `falabichos-core` and the *Review* menu screen).
 26. **Add a `--list-content` flag** to `falabichos-lint` that prints each vocab category with item counts and the percentage with audio.
 27. **Gamepad rumble / haptics hook:** emit a `GameEvent::Haptic` on wrong answers and handle it for gamepads in the Bevy client (behind a setting). Keep Bevy usage thin.
 28. **Tap-to-select in battle** for touch: let a tap on an option row choose it directly (the shell converts tap positions to logical pixels; extend `Input` or add a `pointer` field). Add a headless test.

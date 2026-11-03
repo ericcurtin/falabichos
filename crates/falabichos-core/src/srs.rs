@@ -165,6 +165,41 @@ impl Card {
     }
 }
 
+/// How many days ahead the review calendar looks.
+pub const CALENDAR_DAYS: usize = 7;
+
+/// A summary of the review workload: what is due now, within the next 24 hours ("today") and the
+/// 24 hours after that ("tomorrow"), and a per-day histogram for the next week.
+///
+/// The windows are rolling 24-hour windows measured from `now`, not calendar days: the engine has
+/// no time-zone information (only unix seconds are injected), and a rolling window is honest about
+/// what it measures.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct ReviewCalendar {
+    /// Cards already due (overdue included).
+    pub due_now: usize,
+    /// ...of which are in learning steps (short intervals; they come back within the session).
+    pub due_now_learning: usize,
+    /// Cards that become due within the next 24 hours (after `now`).
+    pub later_today: usize,
+    /// Cards that become due 24 to 48 hours from now.
+    pub tomorrow: usize,
+    /// Histogram of the next [`CALENDAR_DAYS`] windows of 24 h. Index 0 is "now to +24 h" and also
+    /// counts everything already due.
+    pub week: [usize; CALENDAR_DAYS],
+    /// Cards due after the end of the week.
+    pub later: usize,
+    /// Cards started (not `Phase::New`).
+    pub started: usize,
+}
+
+impl ReviewCalendar {
+    /// Cards due now or within 24 hours.
+    pub fn today(&self) -> usize {
+        self.due_now + self.later_today
+    }
+}
+
 /// All cards of a player, keyed by skill id (a vocab id or a grammar exercise id).
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct SrsStore {
@@ -190,6 +225,34 @@ impl SrsStore {
     /// Number of cards due now.
     pub fn due_count(&self, now: i64) -> usize {
         self.cards.values().filter(|c| c.is_due(now)).count()
+    }
+
+    /// The review calendar at time `now` (see [`ReviewCalendar`]).
+    pub fn calendar(&self, now: i64) -> ReviewCalendar {
+        let mut cal = ReviewCalendar::default();
+        for c in self.cards.values().filter(|c| c.phase != Phase::New) {
+            cal.started += 1;
+            if c.due <= now {
+                cal.due_now += 1;
+                if matches!(c.phase, Phase::Learning(_)) {
+                    cal.due_now_learning += 1;
+                }
+                cal.week[0] += 1;
+                continue;
+            }
+            // whole 24 h windows from now: 0 = (now, now+24h], 1 = (now+24h, now+48h], ...
+            let window = ((c.due - now - 1) / DAY) as usize;
+            match window {
+                0 => cal.later_today += 1,
+                1 => cal.tomorrow += 1,
+                _ => {}
+            }
+            match cal.week.get_mut(window) {
+                Some(slot) => *slot += 1,
+                None => cal.later += 1,
+            }
+        }
+        cal
     }
 
     /// Pick the next skill to show from `candidates`.
@@ -311,6 +374,51 @@ mod tests {
         assert_eq!(c.mastery(), 1.0);
     }
 
+    fn card_due_at(phase: Phase, due: i64) -> Card {
+        Card {
+            phase,
+            due,
+            ..Card::default()
+        }
+    }
+
+    #[test]
+    fn calendar_buckets_by_rolling_24h_windows() {
+        let now = 1_000_000;
+        let mut store = SrsStore::default();
+        let mut add = |id: &str, c: Card| {
+            store.cards.insert(id.to_string(), c);
+        };
+        add("overdue", card_due_at(Phase::Review, now - 5 * DAY));
+        add("due_exactly_now", card_due_at(Phase::Review, now));
+        add("learning_now", card_due_at(Phase::Learning(0), now - 30));
+        add("in_10_min", card_due_at(Phase::Learning(1), now + 600));
+        add("edge_24h", card_due_at(Phase::Review, now + DAY));
+        add("just_after_24h", card_due_at(Phase::Review, now + DAY + 1));
+        add("in_2_days", card_due_at(Phase::Review, now + 2 * DAY + 100));
+        add("in_6_days", card_due_at(Phase::Review, now + 6 * DAY));
+        add("in_30_days", card_due_at(Phase::Review, now + 30 * DAY));
+        add("never_seen", card_due_at(Phase::New, 0)); // New cards are not part of the calendar
+        let cal = store.calendar(now);
+        assert_eq!(cal.started, 9);
+        assert_eq!(cal.due_now, 3);
+        assert_eq!(cal.due_now_learning, 1);
+        assert_eq!(cal.later_today, 2, "10 minutes ahead and exactly 24 h ahead");
+        assert_eq!(cal.tomorrow, 1, "one second past 24 h");
+        assert_eq!(cal.today(), 5);
+        assert_eq!(cal.week[0], 5);
+        assert_eq!(cal.week[1], 1);
+        assert_eq!(cal.week[2], 1);
+        assert_eq!(cal.week[5], 1, "6 days ahead falls in the sixth window");
+        assert_eq!(cal.later, 1);
+        assert_eq!(store.due_count(now), cal.due_now, "agrees with due_count");
+    }
+
+    #[test]
+    fn empty_store_has_an_empty_calendar() {
+        assert_eq!(SrsStore::default().calendar(123), ReviewCalendar::default());
+    }
+
     #[test]
     fn pick_prefers_due_learning_then_new() {
         let mut store = SrsStore::default();
@@ -376,6 +484,26 @@ mod tests {
                     prop_assert!(c.due - now <= 600);
                 }
             }
+        }
+
+        #[test]
+        fn calendar_accounts_for_every_started_card(
+            offsets in proptest::collection::vec(-3_000_000i64..40_000_000, 0..40),
+            learning in proptest::collection::vec(proptest::bool::ANY, 0..40),
+        ) {
+            let now = 5_000_000;
+            let mut store = SrsStore::default();
+            for (i, off) in offsets.iter().enumerate() {
+                let phase = if learning.get(i).copied().unwrap_or(false) { Phase::Learning(0) } else { Phase::Review };
+                store.cards.insert(format!("c{i}"), Card { phase, due: now + off, ..Card::default() });
+            }
+            let cal = store.calendar(now);
+            prop_assert_eq!(cal.started, offsets.len());
+            prop_assert_eq!(cal.week.iter().sum::<usize>() + cal.later, cal.started);
+            prop_assert_eq!(cal.due_now, store.due_count(now));
+            prop_assert!(cal.due_now_learning <= cal.due_now);
+            prop_assert_eq!(cal.week[0], cal.due_now + cal.later_today);
+            prop_assert_eq!(cal.week[1], cal.tomorrow);
         }
 
         #[test]

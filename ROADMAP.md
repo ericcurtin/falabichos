@@ -28,7 +28,7 @@ Status key: **done**, **in progress**, **next**, **later**. Want to take somethi
 
 ## Learning features
 
-- **next** Review calendar: see what is due today and tomorrow.
+- **done** Review calendar: a *Review* screen in the pause menu shows what is due now, within 24 h and in 24 to 48 h, plus a 7-day histogram (`SrsStore::calendar` in core, rolling 24 h windows because the engine has no time-zone data).
 - **next** More exercise types: listening dictation, sentence translation with hints per word.
 - **next** Per-concept "mini-lesson" screens before a grammar Bicho's first battle.
 - **later** Verb conjugation tables as a game mode (pretérito perfeito, imperfeito, futuro).

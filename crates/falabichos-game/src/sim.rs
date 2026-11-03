@@ -743,10 +743,14 @@ pub fn playthrough(assets: Arc<Assets>, shots: Option<PathBuf>) -> R<Vec<String>
     d.open_menu_item(4);
     d.capture("seals");
     d.settle()?;
-    d.open_menu_item(6);
+    d.open_menu_item(5);
+    check(d.game.scene_name() == "calendar", "the review calendar opens")?;
+    d.capture("calendar");
+    d.settle()?;
+    d.open_menu_item(7);
     d.capture("settings");
     d.settle()?;
-    log.push("Bichodex / Notebook / Seals / Settings screens open and close OK".into());
+    log.push("Bichodex / Notebook / Seals / Review calendar / Settings screens open and close OK".into());
 
     // ---- practice session
     d.open_menu_item(2);
@@ -758,7 +762,7 @@ pub fn playthrough(assets: Arc<Assets>, shots: Option<PathBuf>) -> R<Vec<String>
     log.push("practice session (SRS review) completed".into());
 
     // ---- save, quit, resume
-    d.open_menu_item(5);
+    d.open_menu_item(6);
     d.idle(5);
     check(storage.read("save.ron").is_some(), "Save writes save.ron")?;
     let (map, x, y) = d.pos();

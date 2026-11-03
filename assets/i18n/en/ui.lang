@@ -99,3 +99,16 @@ battle.q.grammar = Choose the correct option.
 
 battle.keys_intro = A: confirm  B: back  Select: hint (uses a star)
 battle.type_here = type, or pick letters with A
+menu.calendar = Review
+menu.due = Due
+calendar.title = Review calendar
+calendar.now = Due now
+calendar.today = Within 24 hours
+calendar.tomorrow = In 24 to 48 hours
+calendar.week = Next 7 days (24 h each)
+calendar.started = Words and rules started: {n}
+calendar.learning = {n} of the due ones are in short steps
+calendar.nothing = Nothing started yet. Catch a Bicho and practise its words!
+calendar.clear = All caught up. Nothing is due right now.
+calendar.later = Later: {n}
+calendar.hint = A or B: back

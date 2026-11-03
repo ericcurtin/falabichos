@@ -168,6 +168,7 @@ pub(crate) enum MenuItem {
     Practice,
     Notebook,
     Seals,
+    Calendar,
     Save,
     Settings,
     Title,
@@ -188,6 +189,7 @@ impl MenuState {
                 MenuItem::Practice,
                 MenuItem::Notebook,
                 MenuItem::Seals,
+                MenuItem::Calendar,
                 MenuItem::Save,
                 MenuItem::Settings,
                 MenuItem::Title,
@@ -206,6 +208,7 @@ impl Game {
             MenuItem::Practice => "menu.practice",
             MenuItem::Notebook => "menu.notebook",
             MenuItem::Seals => "menu.seals",
+            MenuItem::Calendar => "menu.calendar",
             MenuItem::Save => "menu.save",
             MenuItem::Settings => "menu.settings",
             MenuItem::Title => "menu.title_screen",
@@ -244,6 +247,7 @@ impl Game {
                     })
                 }
                 MenuItem::Seals => self.scene = Scene::Seals(SealsState { cursor: 0 }),
+                MenuItem::Calendar => self.scene = Scene::Calendar(CalendarState),
                 MenuItem::Save => {
                     let ok = self.save_game();
                     let m = self.t(if ok { "toast.saved" } else { "toast.save_failed" });
@@ -280,7 +284,7 @@ impl Game {
         }
         // status
         let (seen, caught) = self.save.progress.dex_counts();
-        ui.panel(c, 4, 4, 100, 42);
+        ui.panel(c, 4, 4, 100, 54);
         ui.text(
             c,
             10,
@@ -301,6 +305,13 @@ impl Game {
             10,
             32,
             &format!("{} {}:{:02}", self.t("menu.time"), mins / 60, mins % 60),
+            ui.col.dim,
+        );
+        ui.text(
+            c,
+            10,
+            44,
+            &format!("{} {}", self.t("menu.due"), self.save.srs.due_count(self.now())),
             ui.col.dim,
         );
         let _ = seen;
@@ -818,6 +829,76 @@ impl Game {
     }
 }
 
+// ---------------------------------------------------------------------------------- review calendar
+
+pub(crate) struct CalendarState;
+
+impl Game {
+    pub(crate) fn tick_calendar(&mut self, s: CalendarState, pad: &Pad) {
+        if pad.a || pad.b || pad.start {
+            self.sfx("sfx_cancel");
+            self.scene = Scene::Menu(MenuState::new(""));
+            return;
+        }
+        self.scene = Scene::Calendar(s);
+    }
+
+    pub(crate) fn draw_calendar(&self, c: &mut Canvas, ui: &Ui, _s: &CalendarState) {
+        c.clear(self.bank.pal(if self.settings.high_contrast { 'K' } else { 'n' }));
+        ui.text(c, 8, 6, &self.t("calendar.title"), self.bank.pal('W'));
+        ui.panel(c, 4, 20, 232, 122);
+        let cal = self.save.srs.calendar(self.now());
+        if cal.started == 0 {
+            ui.text_wrap(c, 12, 30, 36, &self.t("calendar.nothing"), ui.col.text, 3);
+            ui.text(c, 8, 146, &self.t("calendar.hint"), self.bank.pal('W'));
+            return;
+        }
+        let rows = [
+            ("calendar.now", cal.due_now, ui.col.accent),
+            ("calendar.today", cal.later_today, ui.col.text),
+            ("calendar.tomorrow", cal.tomorrow, ui.col.text),
+        ];
+        for (i, (key, n, col)) in rows.iter().enumerate() {
+            let y = 27 + i as i32 * 12;
+            ui.text(c, 12, y, &self.t(key), *col);
+            let num = n.to_string();
+            let w = self.bank.font.width(&num, 1);
+            ui.text(c, 224 - w, y, &num, *col);
+        }
+        let note = if cal.due_now == 0 {
+            self.t("calendar.clear")
+        } else if cal.due_now_learning > 0 {
+            self.tf("calendar.learning", &[("n", &cal.due_now_learning.to_string())])
+        } else {
+            self.tf("calendar.started", &[("n", &cal.started.to_string())])
+        };
+        ui.text(c, 12, 63, &clip(&note, 36), ui.col.dim);
+        // histogram of the next seven 24 h windows
+        ui.text(c, 12, 74, &self.t("calendar.week"), ui.col.accent);
+        let max = cal.week.iter().copied().max().unwrap_or(0).max(1);
+        let (base, top) = (122, 96);
+        for (i, n) in cal.week.iter().enumerate() {
+            let x = 18 + i as i32 * 30;
+            let h = ((base - top) as f32 * (*n as f32 / max as f32)).round() as i32;
+            let h = if *n > 0 { h.max(2) } else { 0 };
+            c.rect_fill(
+                x,
+                base - h,
+                22,
+                h,
+                if i == 0 { ui.col.accent } else { ui.col.good },
+            );
+            c.rect_fill(x, base, 22, 1, ui.col.dim);
+            ui.text_center(c, x + 11, base - h - 9, &n.to_string(), ui.col.text, 1);
+            ui.text_center(c, x + 11, base + 3, &format!("+{i}"), ui.col.dim, 1);
+        }
+        let foot = self.tf("calendar.later", &[("n", &cal.later.to_string())]);
+        ui.text(c, 8, 146, &self.t("calendar.hint"), self.bank.pal('W'));
+        let w = self.bank.font.width(&foot, 1);
+        ui.text(c, 232 - w, 146, &foot, self.bank.pal('W'));
+    }
+}
+
 // ---------------------------------------------------------------------------------- settings
 
 pub(crate) struct SettingsState {
@@ -955,6 +1036,91 @@ impl Game {
             }
             ui.text(c, 22, y, &label, ui.col.text);
             ui.text(c, 224 - ui.bank.font.width(&value, 1), y, &value, ui.col.accent);
+        }
+    }
+}
+
+#[cfg(test)]
+mod calendar_tests {
+    use super::*;
+    use crate::{GameConfig, Input, MemoryStorage};
+    use falabichos_assets::Assets;
+    use falabichos_core::srs::{Card, DAY, Phase};
+    use std::sync::Arc;
+
+    fn game() -> Game {
+        let mut g = Game::new(
+            Arc::new(Assets::embedded()),
+            Box::new(MemoryStorage::default()),
+            GameConfig::default(),
+        )
+        .unwrap();
+        g.set_clock(|| 1_000_000);
+        g.debug_teleport("vila_azul");
+        g
+    }
+
+    fn frame(g: &Game) -> Vec<[u8; 4]> {
+        let mut c = Canvas::new(crate::LOGICAL_W, crate::LOGICAL_H);
+        g.draw(&mut c);
+        (0..c.h)
+            .flat_map(|y| (0..c.w).map(move |x| (x, y)))
+            .map(|(x, y)| c.get(x, y))
+            .collect()
+    }
+
+    fn tap(g: &mut Game, f: impl Fn(&mut Input)) {
+        let mut i = Input::default();
+        f(&mut i);
+        g.tick(&i);
+        g.tick(&Input::default());
+    }
+
+    #[test]
+    fn calendar_is_reachable_from_the_menu_and_closes_again() {
+        let mut g = game();
+        tap(&mut g, |i| i.start = true);
+        assert_eq!(g.scene_name(), "menu");
+        let index = MenuState::new("")
+            .items
+            .iter()
+            .position(|m| *m == MenuItem::Calendar)
+            .unwrap();
+        for _ in 0..index {
+            tap(&mut g, |i| i.down = true);
+        }
+        tap(&mut g, |i| i.a = true);
+        assert_eq!(g.scene_name(), "calendar");
+        tap(&mut g, |i| i.b = true);
+        assert_eq!(g.scene_name(), "menu");
+    }
+
+    #[test]
+    fn calendar_screen_reflects_the_srs_state() {
+        let mut g = game();
+        g.scene = Scene::Calendar(CalendarState);
+        let empty = frame(&g);
+        let now = g.now();
+        for (i, due) in [-100, -50, 600, DAY + 5, 3 * DAY].into_iter().enumerate() {
+            g.save.srs.cards.insert(
+                format!("skill_{i}"),
+                Card {
+                    phase: if i == 0 { Phase::Learning(0) } else { Phase::Review },
+                    due: now + due,
+                    ..Card::default()
+                },
+            );
+        }
+        let busy = frame(&g);
+        assert_ne!(empty, busy, "the screen must change when cards exist");
+        let cal = g.save.srs.calendar(now);
+        assert_eq!((cal.due_now, cal.later_today, cal.tomorrow), (2, 1, 1));
+        // the menu status panel shows the same number of due cards
+        assert_eq!(g.save.srs.due_count(now), 2);
+        if let Ok(dir) = std::env::var("FALABICHOS_TEST_PNG_DIR") {
+            let mut c = Canvas::new(crate::LOGICAL_W, crate::LOGICAL_H);
+            g.draw(&mut c);
+            std::fs::write(format!("{dir}/calendar.png"), c.upscaled(3).to_png()).unwrap();
         }
     }
 }
